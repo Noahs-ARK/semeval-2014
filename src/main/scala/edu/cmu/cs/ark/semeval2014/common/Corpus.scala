@@ -1,9 +1,4 @@
-package edu.cmu.lti.nlp.amr
-
-import scala.util.matching.Regex
-import scala.collection.mutable.Map
-import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
+package edu.cmu.cs.ark.semeval2014.common
 
 object Corpus {
     def splitOnNewline(iterator: Iterator[String]) : Iterator[String] = {   // This treats more than one newline in a row as a single newline
