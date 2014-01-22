@@ -1,4 +1,4 @@
-package edu.cmu.cs.ark.semeval2014
+package edu.cmu.cs.ark.semeval2014.common
 
 import scala.util.matching.Regex
 import scala.collection.mutable.Map
