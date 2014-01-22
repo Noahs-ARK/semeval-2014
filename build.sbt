@@ -6,6 +6,10 @@ organization := "edu.cmu.cs.ark"
 
 scalaVersion := "2.10.2"
 
+libraryDependencies ++= Seq(
+  "org.scalatest" %% "scalatest" % "1.9.2"
+)
+
 //mainClass := Some("edu.cmu.lti.nlp.amr.AMRParser")
 
 mainClass := None
