@@ -3,19 +3,19 @@ package edu.cmu.cs.ark.semeval2014.common
 import scala.collection.mutable.Map
 
 // In Java, the important members of this class are:
-// public class AnnotatedSentence {
-//     public AnnotatedSentence(String[], Dependency[], String[]);  // Constructor
-//     public static AnnotatedSentence fromString(String);          // Static constructor
+// public class InputAnnotatedSentence {
+//     public InputAnnotatedSentence(String[], Dependency[], String[]);  // Constructor
+//     public static InputAnnotatedSentence fromString(String);          // Static constructor
 //     public String[] sentence();
 //     public Dependency[] dependencies();
 //     public String[] pos();
 // }
 
-case class AnnotatedSentence(sentence: Array[String],
-                             dependencies: Array[Dependency],
-                             pos: Array[String])
+case class InputAnnotatedSentence(sentence: Array[String],
+                                  syntaticDependencies: Array[Dependency],
+                                  pos: Array[String])
 
-object AnnotatedSentence {
+object InputAnnotatedSentence {
 
 // fromString loads an annotated sentence from a sentence in this format:
 // Annotations are split with \t###\t, fields are split with \t, and the first field is a marker for the type of annotation
@@ -31,9 +31,9 @@ object AnnotatedSentence {
 // DEPS    6   JJ  2   amod    ### SDP 6   old old JJ  -   +   _   _   measure _   _   _   _   _   _   _   _
 
 
-    def fromString(string: String) : AnnotatedSentence = {
+    def fromString(string: String) : InputAnnotatedSentence = {
         val lines = string.split("\n").filterNot(x => x.matches("^#.*"))
-        val annotations = AnnotatedSentence(new Array(lines.size),
+        val annotations = InputAnnotatedSentence(new Array(lines.size),
                                             if (lines.size > 0 && lines(0).matches("""^DEPS\t.*|.*\t###\tDEPS\t.*""")) { new Array(lines.size) } else { new Array(0) },
                                             new Array(lines.size))
         for ((line, i) <- lines.zipWithIndex) {
@@ -42,7 +42,7 @@ object AnnotatedSentence {
             annotations.sentence(i) = field("SDP")(1)
             annotations.pos(i) = field("SDP")(3)
             if (field.contains("DEPS")) {
-                annotations.dependencies(i) = Dependency.fromSemEval8(field("DEPS").mkString("\t"))
+                annotations.syntaticDependencies(i) = Dependency.fromSemEval8(field("DEPS").mkString("\t"))
             }
             } catch {
                 case _ : Throwable => throw new RuntimeException("Error processing line:\n"+line)

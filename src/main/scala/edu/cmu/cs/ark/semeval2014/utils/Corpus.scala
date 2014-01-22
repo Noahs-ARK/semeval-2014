@@ -1,6 +1,6 @@
 package edu.cmu.cs.ark.semeval2014.utils
 
-import edu.cmu.cs.ark.semeval2014.common.AnnotatedSentence
+import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence
 import scala.io.Source
 
 object Corpus {
@@ -11,8 +11,8 @@ object Corpus {
         } yield p
     }
 
-    def getAnnotatedSentences(filename: String) : Array[AnnotatedSentence] = {
-        return splitOnNewline(Source.fromFile(filename).getLines).map(x => AnnotatedSentence.fromString(x)).toArray
+    def getInputAnnotatedSentences(filename: String) : Array[InputAnnotatedSentence] = {
+        return splitOnNewline(Source.fromFile(filename).getLines).map(x => InputAnnotatedSentence.fromString(x)).toArray
     }
 }
 
