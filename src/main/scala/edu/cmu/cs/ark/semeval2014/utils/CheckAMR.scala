@@ -1,29 +1,16 @@
-package edu.cmu.lti.nlp.amr
+package edu.cmu.cs.ark.semeval2014.utils
 
-import java.io.File
-import java.io.FileOutputStream
-import java.io.PrintStream
-import java.io.BufferedOutputStream
-import java.io.OutputStreamWriter
-import java.lang.Math.abs
-import java.lang.Math.log
-import java.lang.Math.exp
-import java.lang.Math.random
-import java.lang.Math.floor
-import java.lang.Math.min
-import java.lang.Math.max
 import scala.io.Source
-import scala.util.matching.Regex
 import scala.collection.mutable.Map
-import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
+import edu.cmu.cs.ark.semeval2014.amr.graph.Graph
+import edu.cmu.cs.ark.verbosity
 
 object CheckAMR {
     val usage = """Usage: scala -classpath . edu.cmu.lti.nlp.amr.CheckAMR < amr_corpus > output"""
     type OptionMap = Map[Symbol, Any]
 
     def parseOptions(map : OptionMap, list: List[String]) : OptionMap = {
-        def isSwitch(s : String) = (s(0) == '-')
+        def isSwitch(s : String) = s(0) == '-'
         list match {
             case Nil => map
             case "--tokenized" :: value :: tail =>

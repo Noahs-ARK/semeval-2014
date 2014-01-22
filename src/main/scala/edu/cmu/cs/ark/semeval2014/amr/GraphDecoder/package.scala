@@ -1,6 +1,6 @@
-package edu.cmu.lti.nlp.amr
+package edu.cmu.cs.ark.semeval2014
 
-package object GraphDecoder {
+package object amr {
     type Label = String
 }
 

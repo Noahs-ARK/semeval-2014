@@ -1,10 +1,6 @@
 package edu.cmu.cs.ark.semeval2014.common
 
-import scala.util.matching.Regex
 import scala.collection.mutable.Map
-import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
-import scala.util.parsing.combinator._
 
 /**************************** Feature Vectors *******************************/
 

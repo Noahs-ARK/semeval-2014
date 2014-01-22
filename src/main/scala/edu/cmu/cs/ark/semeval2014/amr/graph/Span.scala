@@ -1,10 +1,5 @@
-package edu.cmu.lti.nlp.amr
+package edu.cmu.cs.ark.semeval2014.amr.graph
 
-import scala.util.matching.Regex
-import scala.collection.mutable.Map
-import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
-import scala.util.parsing.combinator._
 
 case class Span(var start: Int, var end: Int, var nodeIds: List[String], var words: String, var amr: Node, var coRef: Boolean) {
     def format() : String = {

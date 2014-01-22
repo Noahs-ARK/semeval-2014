@@ -1,18 +1,16 @@
-package edu.cmu.lti.nlp.amr.GraphDecoder
-import edu.cmu.lti.nlp.amr._
+package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
-import scala.collection.mutable.Map
-import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
+import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, AnnotatedSentence}
+import edu.cmu.cs.ark.semeval2014.amr.DecoderResult
 
 class Oracle(featureNames: List[String])
     extends Decoder(featureNames) {
     // Base class has defined:
     // val features: Features
 
-    private var inputSave: Input = _
-    def input : Input = inputSave
-    def input_= (i: Input) {
+    private var inputSave: AnnotatedSentence = _
+    def input : AnnotatedSentence = inputSave
+    def input_= (i: AnnotatedSentence) {
         inputSave = i
         features.input = i
     }

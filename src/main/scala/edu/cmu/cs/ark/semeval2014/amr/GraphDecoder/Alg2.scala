@@ -1,29 +1,21 @@
-package edu.cmu.lti.nlp.amr.GraphDecoder
-import edu.cmu.lti.nlp.amr._
+package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
-import java.lang.Math.abs
-import java.lang.Math.log
-import java.lang.Math.exp
-import java.lang.Math.random
-import java.lang.Math.floor
-import java.lang.Math.min
-import java.lang.Math.max
-import scala.io.Source
-import scala.util.matching.Regex
-import scala.collection.mutable.Map
+
 import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.PriorityQueue
-import Double.{NegativeInfinity => minusInfty}
+import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, AnnotatedSentence}
+import edu.cmu.cs.ark.semeval2014.amr.graph.{Graph, Node}
+import edu.cmu.cs.ark.logger
+import edu.cmu.cs.ark.semeval2014.amr.DecoderResult
 
 class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected: Boolean = true)
     extends Decoder(featureNames) {
     // Base class has defined:
     // val features: Features
 
-    private var inputSave: Input = _
-    def input : Input = inputSave
-    def input_= (i: Input) {
+    private var inputSave: AnnotatedSentence = _
+    def input : AnnotatedSentence = inputSave
+    def input_= (i: AnnotatedSentence) {
         inputSave = i
         features.input = i
         precomputeEdgeWeights

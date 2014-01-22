@@ -1,10 +1,5 @@
-package edu.cmu.lti.nlp.amr.ConceptInvoke
-import edu.cmu.lti.nlp.amr._
+package edu.cmu.cs.ark.semeval2014.amr.ConceptInvoke
 
-import scala.util.matching.Regex
-import scala.collection.mutable.Map
-import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
 
 case class PhraseConceptFeatures(count: Double,
                                  conceptGivenPhrase: Double) {

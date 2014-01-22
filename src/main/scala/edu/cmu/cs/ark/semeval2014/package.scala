@@ -1,8 +1,10 @@
-package edu.cmu.lti.nlp
+package edu.cmu.cs
+
 import scala.language.implicitConversions
 import java.lang.Math.min
+import edu.cmu.cs.ark.semeval2014.common.{Annotation, MulAssoc}
 
-package object amr {
+package object ark {
     implicit def doubleToMulAssoc(x: Double) = new MulAssoc(x)
     implicit def AnnotationToBaseAnnotation[T](a: Annotation[T]) = a.annotations
     var verbosity = 1

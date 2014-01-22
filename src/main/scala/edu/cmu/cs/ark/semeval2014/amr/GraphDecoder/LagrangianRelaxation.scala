@@ -1,24 +1,12 @@
-package edu.cmu.lti.nlp.amr.GraphDecoder
-import edu.cmu.lti.nlp.amr._
+package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
-import java.io.File
-import java.io.FileOutputStream
-import java.io.PrintStream
-import java.io.BufferedOutputStream
-import java.io.OutputStreamWriter
+
 import java.lang.Math.abs
-import java.lang.Math.log
-import java.lang.Math.exp
-import java.lang.Math.random
-import java.lang.Math.floor
-import java.lang.Math.min
 import java.lang.Math.max
-import scala.io.Source
-import scala.util.matching.Regex
-import scala.collection.mutable.Map
-import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
-import Double.{NegativeInfinity => minusInfty}
+import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, AnnotatedSentence}
+import edu.cmu.cs.ark.semeval2014.amr.DecoderResult
+import edu.cmu.cs.ark.semeval2014.amr.graph.Graph
+import edu.cmu.cs.ark.logger
 
 class LagrangianRelaxation(featureNames: List[String], labelSet: Array[(String, Int)], stepsize: Double, maxIterations: Int)
     extends Decoder(featureNames) {
@@ -30,9 +18,9 @@ class LagrangianRelaxation(featureNames: List[String], labelSet: Array[(String, 
     val labelConstraint = labelSet.toMap
     val IdLabel = """Id1.*[+]L=(.*)""".r
 
-    private var inputSave: Input = _
-    def input : Input = inputSave
-    def input_= (i: Input) {
+    private var inputSave: AnnotatedSentence = _
+    def input : AnnotatedSentence = inputSave
+    def input_= (i: AnnotatedSentence) {
         inputSave = i
         features.input = i
         alg2.features.weights = features.weights    // Set alg2's weights same our weights (shared weights) (This must be done before we set alg2.input, because it precomputes edge weights using its feature weights)

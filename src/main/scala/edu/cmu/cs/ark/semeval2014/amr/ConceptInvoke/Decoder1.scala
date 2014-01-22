@@ -1,20 +1,10 @@
-package edu.cmu.lti.nlp.amr.ConceptInvoke
-import edu.cmu.lti.nlp.amr._
+package edu.cmu.cs.ark.semeval2014.amr.ConceptInvoke
 
-import java.lang.Math.abs
-import java.lang.Math.log
-import java.lang.Math.exp
-import java.lang.Math.random
-import java.lang.Math.floor
-import java.lang.Math.min
-import java.lang.Math.max
-import scala.io.Source
-import scala.util.matching.Regex
-import scala.collection.mutable.Map
-import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
-import scala.collection.mutable.PriorityQueue
-import Double.{NegativeInfinity => minusInfty}
+
+import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, AnnotatedSentence}
+import edu.cmu.cs.ark.semeval2014.amr.DecoderResult
+import edu.cmu.cs.ark.semeval2014.amr.graph.Graph
+import edu.cmu.cs.ark.logger
 
 /*** Defined in package.scala ***
 type PhraseConceptPair = (List[String], String, PhraseConceptFeatures)
@@ -29,7 +19,7 @@ class Decoder1(featureNames: List[String],
 
     val conceptInvoker = new Concepts(phraseConceptPairs)
 
-    def decode(input: Input) : DecoderResult = {
+    def decode(input: AnnotatedSentence): DecoderResult = {
         logger(1, "\n--- Decoder1 ---\n")
         val sentence = input.sentence
         val bestState : Array[Option[(Double, PhraseConceptPair, Int)]] = sentence.map(x => None)    // (score, concept, backpointer)

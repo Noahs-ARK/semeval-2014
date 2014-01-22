@@ -2,6 +2,7 @@ package edu.cmu.cs.ark.semeval2014.common.Train
 
 import edu.cmu.cs.ark.semeval2014.common.FeatureVector
 import scala.util.Random
+import edu.cmu.cs.ark._
 
 class SSGD extends Optimizer {
     def learnParameters(gradient: Int => FeatureVector,

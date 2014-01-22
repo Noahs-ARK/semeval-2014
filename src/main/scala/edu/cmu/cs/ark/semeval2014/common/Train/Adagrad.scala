@@ -4,6 +4,7 @@ import edu.cmu.cs.ark.semeval2014.common.FeatureVector
 
 import scala.util.Random
 import scala.math.sqrt
+import edu.cmu.cs.ark.logger
 
 class Adagrad extends Optimizer {
     def learnParameters(gradient: Int => FeatureVector,

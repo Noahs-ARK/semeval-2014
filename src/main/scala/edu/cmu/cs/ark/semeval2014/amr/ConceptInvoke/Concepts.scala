@@ -1,18 +1,8 @@
-package edu.cmu.lti.nlp.amr.ConceptInvoke
-import edu.cmu.lti.nlp.amr._
+package edu.cmu.cs.ark.semeval2014.amr.ConceptInvoke
 
-import java.lang.Math.abs
-import java.lang.Math.log
-import java.lang.Math.exp
-import java.lang.Math.random
-import java.lang.Math.floor
-import java.lang.Math.min
-import java.lang.Math.max
-import scala.io.Source
-import scala.util.matching.Regex
+
 import scala.collection.mutable.Map
-import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
+import edu.cmu.cs.ark.semeval2014.common.AnnotatedSentence
 
 class Concepts(phraseConceptPairs: Array[PhraseConceptPair],
                useNER: Boolean = true,
@@ -31,13 +21,13 @@ class Concepts(phraseConceptPairs: Array[PhraseConceptPair],
 
     private var tokens : Array[String] = Array()  // stores sentence.drop(i) (used in the dateEntity code to make it more concise)
 
-    def invoke(input: Input, i: Int) : List[PhraseConceptPair] = {
+    def invoke(input: AnnotatedSentence, i: Int) : List[PhraseConceptPair] = {
         // returns a list of all concepts that can be invoke starting at 
         // position i in input.sentence (i.e. position i in the tokenized input)
         // Note: none of the concepts returned have spans that go past the end of the sentence
         val sentence = input.sentence
 
-        var conceptList = conceptTable.getOrElse(sentence(i), List()).filter(x => x.words == sentence.slice(i, i+x.words.size).toList) // TODO: this this case insensitive??
+        val conceptList = conceptTable.getOrElse(sentence(i), List()).filter(x => x.words == sentence.slice(i, i + x.words.size).toList) // TODO: this this case insensitive??
         return conceptList
     }
 }

@@ -1,20 +1,10 @@
-package edu.cmu.lti.nlp.amr.GraphDecoder
-import edu.cmu.lti.nlp.amr._
+package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
-import java.lang.Math.abs
-import java.lang.Math.log
-import java.lang.Math.exp
-import java.lang.Math.random
-import java.lang.Math.floor
-import java.lang.Math.min
-import java.lang.Math.max
-import scala.io.Source
-import scala.util.matching.Regex
-import scala.collection.mutable.Map
+
 import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
-import scala.collection.mutable.PriorityQueue
-import Double.{NegativeInfinity => minusInfty}
+import edu.cmu.cs.ark.semeval2014.amr.graph.{Node, Graph}
+import edu.cmu.cs.ark.semeval2014.common.FeatureVector
+import edu.cmu.cs.ark.logger
 
 case class GraphObj(graph: Graph,
                     nodes: Array[Node], // usually 'nodes' is graph.nodes.filter(_.name != None).toArray

@@ -1,40 +1,27 @@
-package edu.cmu.lti.nlp.amr.GraphDecoder
-import edu.cmu.lti.nlp.amr._
+package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
-import java.io.File
-import java.io.FileOutputStream
-import java.io.PrintStream
-import java.io.BufferedOutputStream
-import java.io.OutputStreamWriter
 import java.lang.Math
-import java.lang.Math.abs
 import java.lang.Math.log
-import java.lang.Math.exp
-import java.lang.Math.random
-import java.lang.Math.floor
 import java.lang.Math.min
-import java.lang.Math.max
-import scala.io.Source
-import scala.util.matching.Regex
 import scala.collection.mutable.Map
-import scala.collection.mutable.Set
-import scala.collection.mutable.ArrayBuffer
-import scala.util.parsing.combinator._
+import edu.cmu.cs.ark.semeval2014.amr.graph.{Graph, Node}
+import edu.cmu.cs.ark.semeval2014.common.{Dependency, Annotation, AnnotatedSentence, FeatureVector}
+import edu.cmu.cs.ark._
 
 
 /**************************** Feature Functions *****************************/
 
 class Features(featureNames: List[String]) {
     var weights = FeatureVector()
-    private var inputSave: Input = _
+    private var inputSave: AnnotatedSentence = _
     private var graph: Graph = _
     private var sentence: Array[String] = _
     private var dependencies: Annotation[Array[Dependency]] = _
     private var fullPos: Annotation[Array[String]] = _
     //private var pos: Annotation[Array[String]] = _
 
-    def input: Input = inputSave
-    def input_= (i: Input) {
+    def input: AnnotatedSentence = inputSave
+    def input_= (i: AnnotatedSentence) {
         inputSave = i
         graph = i.graph.get
         sentence = i.sentence
@@ -48,28 +35,28 @@ class Features(featureNames: List[String]) {
     type RootFeatureFunction = (Node) => FeatureVector
 
     val ffTable = Map[String, FeatureFunction](
-        "edgeId" -> ffEdgeId,
-        "labelWithId" -> ffLabelWithId,
-        "bias" -> ffBias,
-        "biasCSuf" -> ffBiasCSuf,
-        "typeBias" -> ffTypeBias,
-        "self" -> ffSelf,
-        "fragHead" -> ffFragHead,
-        "edgeCount" -> ffEdgeCount,
-        "distance" -> ffDistance,
-        "logDistance" -> fflogDistance,
-        "conceptBigram" -> ffConceptBigram,
-        "conceptUnigramWithLabel" -> ffConceptUnigramWithLabel,
-        "posPathv1" -> ffPosPathUnigramBigramv1,
-        "posPathv2" -> ffPosPathUnigramBigramv2,
-        "posPathv3" -> ffPosPathUnigramBigramv3,
+        "edgeId" -> ffEdgeId _,
+        "labelWithId" -> ffLabelWithId _,
+        "bias" -> ffBias _,
+        "biasCSuf" -> ffBiasCSuf _,
+        "typeBias" -> ffTypeBias _,
+        "self" -> ffSelf _,
+        "fragHead" -> ffFragHead _,
+        "edgeCount" -> ffEdgeCount _,
+        "distance" -> ffDistance _,
+        "logDistance" -> fflogDistance _,
+        "conceptBigram" -> ffConceptBigram _,
+        "conceptUnigramWithLabel" -> ffConceptUnigramWithLabel _,
+        "posPathv1" -> ffPosPathUnigramBigramv1 _,
+        "posPathv2" -> ffPosPathUnigramBigramv2 _,
+        "posPathv3" -> ffPosPathUnigramBigramv3 _,
         //"dependencyPathv1" -> ffDependencyPathv1,
-        "dependencyPathv2" -> ffDependencyPathv2,
-        "dependencyPathv3" -> ffDependencyPathv3
+        "dependencyPathv2" -> ffDependencyPathv2 _,
+        "dependencyPathv3" -> ffDependencyPathv3 _
     )
 
     val rootFFTable = Map[String, RootFeatureFunction](
-        "rootConcept" -> ffRootConcept
+        "rootConcept" -> ffRootConcept _
     )
 
     def precompute() {

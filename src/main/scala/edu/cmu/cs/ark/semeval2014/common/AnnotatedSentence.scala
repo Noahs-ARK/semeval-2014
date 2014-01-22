@@ -1,6 +1,8 @@
 package edu.cmu.cs.ark.semeval2014.common
 
-case class AnnotatedSentence(tokenized: Array[String],
-                             dependencies: Array[Dependency],
-                             pos: Array[String])
+import edu.cmu.cs.ark.semeval2014.amr.graph.Graph
 
+case class AnnotatedSentence(sentence: Array[String],
+                             dependencies: Annotation[Array[Dependency]],
+                             pos: Annotation[Array[String]],
+                             graph: Option[Graph]) // TODO: not needed
