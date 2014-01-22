@@ -1,7 +1,6 @@
 package edu.cmu.cs.ark.semeval2014.amr
 
 import edu.cmu.cs.ark.semeval2014.common.Dependency
-import edu.cmu.cs.ark.semeval2014.amr.Annotation
 import edu.cmu.cs.ark.semeval2014.amr.graph.Graph
 
 case class Input(sentence: Array[String],

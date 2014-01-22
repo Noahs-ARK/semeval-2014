@@ -1,6 +1,7 @@
 package edu.cmu.cs.ark.semeval2014.common.Train
 
 import edu.cmu.cs.ark.semeval2014.common.FeatureVector
+import edu.cmu.cs.ark.semeval2014.common.doubleToMulAssoc
 
 import scala.util.Random
 import scala.math.sqrt
