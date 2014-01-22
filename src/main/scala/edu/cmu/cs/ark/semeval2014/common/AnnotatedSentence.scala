@@ -17,10 +17,10 @@ case class AnnotatedSentence(sentence: Array[String],
 
 object AnnotatedSentence {
 
-// fromString loads an annotated from a sentence in this format:
+// fromString loads an annotated sentence from a sentence in this format:
 // Annotations are split with \t###\t, fields are split with \t, and the first field is a marker for the type of annotation
 // Lines beginning with # are ignored.
-// Annotations that can be represented over tokens can be added as comments.
+// Annotations that cannot be represented over tokens can be added as comments.
 // Ex:
 // #20001001
 // DEPS    1   NNP 2   nn  ### SDP 1   Pierre  Pierre  NNP -   +   _   _   _   _   _   _   _   _   _   _   _
