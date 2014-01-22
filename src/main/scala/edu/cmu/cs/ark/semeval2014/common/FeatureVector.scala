@@ -2,7 +2,16 @@ package edu.cmu.cs.ark.semeval2014.common
 
 import scala.collection.mutable.Map
 
-/**************************** Feature Vectors *******************************/
+// In Java, the important methods for this class are:
+// public class edu.cmu.cs.ark.semeval2014.common.FeatureVector {
+//     public FeatureVector(scala.collection.mutable.Map); // constructor
+//     public scala.collection.mutable.Map fmap(); // returns the feature map
+//     public double apply(java.lang.String);      // looks up the value of a feature
+//     public double dot(FeatureVector);           // dots two feature vectors
+//     public void $plus$eq(FeatureVector);        // += feature vector
+//     public void fromFile(java.lang.String);     // for reading from file
+//     public java.lang.String toString();         // converts to String (can be written to file)
+// }
 
 case class mul(scale: Double, v: FeatureVector);
 // Trickyness below: see p.452 Programming Scala 2nd Edition (21.5 Implicit conversions)
@@ -54,11 +63,14 @@ case class FeatureVector(fmap : Map[String, Double] = Map[String, Double]()) {
         }
         return f
     }
-    def read(iterator: Iterator[String]) = {    // TODO: make this another constructor
+    def read(iterator: Iterator[String]) {
         val regex = """(.*)[ \t]([^ \t]*)""".r
-        //val iterator = Source.fromFile(filename).getLines()
         fmap.clear()
         fmap ++= iterator.map((s : String) => { val regex(f,v) = s; (f,v.toDouble) })
+    }
+    def fromFile(filename: String) {
+        val iterator = Source.fromFile(filename).getLines()
+        read(iterator)
     }
     override def toString() : String = {
         val string = new StringBuilder

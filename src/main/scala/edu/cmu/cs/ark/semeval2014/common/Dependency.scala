@@ -1,5 +1,16 @@
 package edu.cmu.cs.ark.semeval2014.common
 
+// In Java this class is:
+// public class edu.cmu.cs.ark.semeval2014.common.Dependency {
+//    public Dependency(int, int, java.lang.String);
+//    public static Dependency fromStanford(java.lang.String);
+//    public static Dependency fromConll(java.lang.String);
+//    public static Dependency fromSemEval8(java.lang.String);
+//    public int head();
+//    public int dependent();
+//    public java.lang.String relation();
+// }
+
 case class Dependency(head: Int, dependent: Int, relation: String)
 
 object Dependency {
