@@ -11,7 +11,7 @@ import edu.cmu.cs.ark.semeval2014.amr._
 /**************************** Feature Functions *****************************/
 
 class Features(featureNames: List[String]) {
-    var weights = FeatureVector()
+    var weights = new FeatureVector()
     private var inputSave: Input = _
     private var graph: Graph = _
     private var sentence: Array[String] = _
@@ -146,7 +146,7 @@ class Features(featureNames: List[String]) {
         val posSet1 = posSpanSet(node1).mkString("_")
         val posSet2 = posSpanSet(node2).mkString("_")
         val (unigrams, bigrams) = posPathUnigramAndBigramCounts(node1, node2)
-        val feats = FeatureVector()
+        val feats = new FeatureVector()
         val pp = "PPv1"
         val direction = if (graph.spans(node1.spans(0)).start < graph.spans(node2.spans(0)).start) { "+1" } else { "-1" }
         val dpStr = depPathStrv3(node1, node2)
@@ -179,7 +179,7 @@ class Features(featureNames: List[String]) {
         val posSet1 = posSpanSet(node1).mkString("_")
         val posSet2 = posSpanSet(node2).mkString("_")
         val (unigrams, bigrams) = posPathUnigramAndBigramCounts(node1, node2)
-        val feats = FeatureVector()
+        val feats = new FeatureVector()
         val pp = "PPv2"
         val direction = if (graph.spans(node1.spans(0)).start < graph.spans(node2.spans(0)).start) { "+1" } else { "-1" }
         val dpStr = depPathStrv3(node1, node2)
@@ -199,7 +199,7 @@ class Features(featureNames: List[String]) {
     def ffPosPathUnigramBigramv3(node1: Node, node2: Node, label: String) : FeatureVector = {
         val posSet1 = posSpanSet(node1).mkString("_")
         val posSet2 = posSpanSet(node2).mkString("_")
-        val feats = FeatureVector()
+        val feats = new FeatureVector()
         val pp = "PPv3"
         val direction = if (graph.spans(node1.spans(0)).start < graph.spans(node2.spans(0)).start) { "+1" } else { "-1" }
         val dpStr = depPathStrv3(node1, node2)
@@ -271,7 +271,7 @@ class Features(featureNames: List[String]) {
                               ("W2="+word2+"+"+dp+pathStr+"+L="+label) -> 1.0,
                               (dp+pathStr+"+L="+label) -> 1.0
                               ))
-        } else { FeatureVector() }
+        } else { new FeatureVector() }
         return feats
     }
 
@@ -395,7 +395,7 @@ class Features(featureNames: List[String]) {
 
     def localFeatures(node1: Node, node2: Node, label: String) : FeatureVector = {
         // Calculate the local features
-        val feats = FeatureVector()
+        val feats = new FeatureVector()
         for (ff <- featureFunctions) {
             feats += ff(node1, node2, label)
         }
@@ -414,7 +414,7 @@ class Features(featureNames: List[String]) {
 
     def rootFeatures(node: Node) : FeatureVector = {
         // Calculate the local features
-        val feats = FeatureVector()
+        val feats = new FeatureVector()
         for (ff <- rootFeatureFunctions) {
             feats += ff(node)
         }

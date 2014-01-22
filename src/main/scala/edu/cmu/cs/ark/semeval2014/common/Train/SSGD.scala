@@ -10,7 +10,7 @@ class SSGD extends Optimizer {
                         passes: Int,
                         stepsize: Double,
                         avg: Boolean) : FeatureVector = {
-        var avg_weights = FeatureVector()
+        var avg_weights = new FeatureVector()
         for (i <- Range(1,passes+1)) {
             logger(0,"Pass "+i.toString)
             for (t <- Random.shuffle(Range(0, trainingSize).toList)) {

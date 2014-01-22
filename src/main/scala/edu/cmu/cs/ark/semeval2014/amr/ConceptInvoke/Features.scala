@@ -13,7 +13,7 @@ import edu.cmu.cs.ark.semeval2014.amr.Input
 // TODO: the input to the feature function is just Input and Span.  Change to use Span?
 
 class Features(featureNames: List[String]) {
-    var weights = FeatureVector()
+    var weights = new FeatureVector()
 
     type FeatureFunction = (Input, PhraseConceptPair, Int, Int) => FeatureVector
 
@@ -62,7 +62,7 @@ class Features(featureNames: List[String]) {
 
     def localFeatures(input: Input, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
         // Calculate the local features
-        val feats = FeatureVector()
+        val feats = new FeatureVector()
         for (ff <- featureFunctions) {
             feats += ff(input, concept, start, end)
         }

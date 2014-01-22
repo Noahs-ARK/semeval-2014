@@ -12,8 +12,8 @@ class Adagrad extends Optimizer {
                         passes: Int,
                         stepsize: Double,
                         avg: Boolean) : FeatureVector = {
-        var avg_weights = FeatureVector()
-        var sumSq = FeatureVector()         // G_{i,i}
+        var avg_weights = new FeatureVector()
+        var sumSq = new FeatureVector()         // G_{i,i}
         for (i <- Range(1,passes+1)) {
             logger(0,"Pass "+i.toString)
             for (t <- Random.shuffle(Range(0, trainingSize).toList)) {

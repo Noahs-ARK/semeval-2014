@@ -28,9 +28,9 @@ class LagrangianRelaxation(featureNames: List[String], labelSet: Array[(String, 
 
 
     def decode() : DecoderResult = {
-        var result = DecoderResult(Graph.empty(), FeatureVector(), 0.0)
+        var result = DecoderResult(Graph.empty(), new FeatureVector(), 0.0)
 
-        val multipliers = FeatureVector()
+        val multipliers = new FeatureVector()
         var delta = 0.0     // so we know when we have converged
         var counter = 0
         do {
