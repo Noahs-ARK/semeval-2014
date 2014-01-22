@@ -5,7 +5,7 @@ import java.lang.Math.log
 import java.lang.Math.min
 import scala.collection.mutable.Map
 import edu.cmu.cs.ark.semeval2014.amr.graph.{Graph, Node}
-import edu.cmu.cs.ark.semeval2014.common.{Dependency, FeatureVector, logger}
+import edu.cmu.cs.ark.semeval2014.common.{SyntacticDependency, FeatureVector, logger}
 import edu.cmu.cs.ark.semeval2014.amr._
 
 /**************************** Feature Functions *****************************/
@@ -15,7 +15,7 @@ class Features(featureNames: List[String]) {
     private var inputSave: Input = _
     private var graph: Graph = _
     private var sentence: Array[String] = _
-    private var dependencies: Annotation[Array[Dependency]] = _
+    private var dependencies: Annotation[Array[SyntacticDependency]] = _
     private var fullPos: Annotation[Array[String]] = _
     //private var pos: Annotation[Array[String]] = _
 

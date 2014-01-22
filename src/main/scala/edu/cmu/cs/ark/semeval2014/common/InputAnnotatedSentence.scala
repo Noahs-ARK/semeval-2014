@@ -4,15 +4,16 @@ import scala.collection.mutable.Map
 
 // In Java, the important members of this class are:
 // public class InputAnnotatedSentence {
-//     public InputAnnotatedSentence(String[], Dependency[], String[]);  // Constructor
-//     public static InputAnnotatedSentence fromString(String);          // Static constructor
+//     public InputAnnotatedSentence(String[], SyntacticDependency[], String[]);  // Constructor
+//     public static InputAnnotatedSentence fromString(String);                   // Static constructor
 //     public String[] sentence();
-//     public Dependency[] dependencies();
+//     public SyntacticDependency[] syntaticDependencies();
 //     public String[] pos();
 // }
 
-case class InputAnnotatedSentence(sentence: Array[String],
-                                  syntaticDependencies: Array[Dependency],
+case class InputAnnotatedSentence(sentenceId: String,
+                                  sentence: Array[String],
+                                  syntaticDependencies: Array[SyntacticDependency],
                                   pos: Array[String])
 
 object InputAnnotatedSentence {
@@ -32,17 +33,20 @@ object InputAnnotatedSentence {
 
 
     def fromString(string: String) : InputAnnotatedSentence = {
-        val lines = string.split("\n").filterNot(x => x.matches("^#.*"))
-        val annotations = InputAnnotatedSentence(new Array(lines.size),
-                                            if (lines.size > 0 && lines(0).matches("""^DEPS\t.*|.*\t###\tDEPS\t.*""")) { new Array(lines.size) } else { new Array(0) },
-                                            new Array(lines.size))
+        val allLines = string.split("\n")
+        val lines = allLines.filterNot(x => x.matches("^#.*"))
+        val annotations = InputAnnotatedSentence(
+                            if (allLines.size > 0 && allLines(0).matches("#.*")) { allLines(0).split("\t")(0).tail } else { "" },
+                            new Array(lines.size),
+                            if (lines.size > 0 && lines(0).matches("""^DEPS\t.*|.*\t###\tDEPS\t.*""")) { new Array(lines.size) } else { new Array(0) },
+                            new Array(lines.size))
         for ((line, i) <- lines.zipWithIndex) {
             try {
             val field = splitLine(line)
             annotations.sentence(i) = field("SDP")(1)
             annotations.pos(i) = field("SDP")(3)
             if (field.contains("DEPS")) {
-                annotations.syntaticDependencies(i) = Dependency.fromSemEval8(field("DEPS").mkString("\t"))
+                annotations.syntaticDependencies(i) = SyntacticDependency.fromSemEval8(field("DEPS").mkString("\t"))
             }
             } catch {
                 case _ : Throwable => throw new RuntimeException("Error processing line:\n"+line)
