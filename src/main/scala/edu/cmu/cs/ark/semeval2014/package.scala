@@ -2,7 +2,8 @@ package edu.cmu.cs
 
 import scala.language.implicitConversions
 import java.lang.Math.min
-import edu.cmu.cs.ark.semeval2014.common.{Annotation, MulAssoc}
+import edu.cmu.cs.ark.semeval2014.common.MulAssoc
+import edu.cmu.cs.ark.semeval2014.amr.Annotation
 
 package object ark {
     implicit def doubleToMulAssoc(x: Double) = new MulAssoc(x)

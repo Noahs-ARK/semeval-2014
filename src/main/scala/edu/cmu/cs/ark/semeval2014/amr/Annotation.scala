@@ -1,4 +1,4 @@
-package edu.cmu.cs.ark.semeval2014.common
+package edu.cmu.cs.ark.semeval2014.amr
 
 import java.util.regex.Pattern
 import edu.cmu.cs.ark.logger
