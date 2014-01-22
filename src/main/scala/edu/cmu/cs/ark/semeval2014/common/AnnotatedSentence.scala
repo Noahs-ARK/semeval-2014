@@ -37,11 +37,15 @@ object AnnotatedSentence {
                                             if (lines.size > 0 && lines(0).matches("""^DEPS\t.*|.*\t###\tDEPS\t.*""")) { new Array(lines.size) } else { new Array(0) },
                                             new Array(lines.size))
         for ((line, i) <- lines.zipWithIndex) {
+            try {
             val field = splitLine(line)
             annotations.sentence(i) = field("SDP")(1)
             annotations.pos(i) = field("SDP")(3)
             if (field.contains("DEPS")) {
                 annotations.dependencies(i) = Dependency.fromSemEval8(field("DEPS").mkString("\t"))
+            }
+            } catch {
+                case _ : Throwable => throw new RuntimeException("Error processing line:\n"+line)
             }
         }
         return annotations
@@ -49,7 +53,7 @@ object AnnotatedSentence {
 
     def splitLine(line: String) : Map[String, Array[String]] = {
         val map : Map[String, Array[String]] = Map()
-        for (split <- line.split("\t###\t")) {
+        for (split <- line.split("""\t###\t""")) {
             map(split.split("\t")(0)) = split.split("\t").tail
         }
         return map
