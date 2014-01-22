@@ -1,4 +1,4 @@
-package edu.cmu.cs.ark.semeval2014.common
+package edu.cmu.cs.ark.semeval2014.utils
 
 object Corpus {
     def splitOnNewline(iterator: Iterator[String]) : Iterator[String] = {   // This treats more than one newline in a row as a single newline
