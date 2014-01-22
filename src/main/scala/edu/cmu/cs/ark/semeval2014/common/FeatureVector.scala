@@ -4,10 +4,10 @@ import scala.collection.mutable.Map
 import scala.io.Source
 
 // In Java, the important methods for this class are:
-// public class edu.cmu.cs.ark.semeval2014.common.FeatureVector {
+// public class FeatureVector {
 //     public FeatureVector();                      // constructor (use this one for Java)
 //     public double get(java.lang.String);         // look up the value of a feature
-//     public double set(java.lang.String, double)  // set the value of a feature
+//     public double set(java.lang.String, double); // set the value of a feature
 //     public double dot(FeatureVector);            // dot two feature vectors
 //     public void $plus$eq(FeatureVector);         // += feature vector
 //     public void fromFile(java.lang.String);      // for reading from file
