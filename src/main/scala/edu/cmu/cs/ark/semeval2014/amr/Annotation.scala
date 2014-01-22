@@ -1,7 +1,7 @@
 package edu.cmu.cs.ark.semeval2014.amr
 
 import java.util.regex.Pattern
-//import edu.cmu.cs.ark.logger
+import edu.cmu.cs.ark.semeval2014.common.logger
 
 case class Annotation[T](snt: Array[String], tok: Array[String], var annotation: T) {
   // This class can be used for annotations on the tokens of a sentence.

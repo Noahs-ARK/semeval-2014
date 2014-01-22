@@ -3,10 +3,9 @@ package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
 import java.lang.Math.abs
 import java.lang.Math.max
-import edu.cmu.cs.ark.semeval2014.common.FeatureVector
+import edu.cmu.cs.ark.semeval2014.common.{logger, FeatureVector}
 import edu.cmu.cs.ark.semeval2014.amr.{Input, DecoderResult}
 import edu.cmu.cs.ark.semeval2014.amr.graph.Graph
-import edu.cmu.cs.ark.logger
 
 class LagrangianRelaxation(featureNames: List[String], labelSet: Array[(String, Int)], stepsize: Double, maxIterations: Int)
     extends Decoder(featureNames) {

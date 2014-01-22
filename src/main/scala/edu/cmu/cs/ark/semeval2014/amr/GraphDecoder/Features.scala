@@ -5,9 +5,8 @@ import java.lang.Math.log
 import java.lang.Math.min
 import scala.collection.mutable.Map
 import edu.cmu.cs.ark.semeval2014.amr.graph.{Graph, Node}
-import edu.cmu.cs.ark.semeval2014.common.{Dependency, FeatureVector}
+import edu.cmu.cs.ark.semeval2014.common.{Dependency, FeatureVector, logger}
 import edu.cmu.cs.ark.semeval2014.amr._
-import edu.cmu.cs.ark.logger
 
 /**************************** Feature Functions *****************************/
 

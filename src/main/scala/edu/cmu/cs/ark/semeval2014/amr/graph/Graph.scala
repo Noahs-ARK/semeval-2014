@@ -5,7 +5,7 @@ import scala.collection.mutable.Set
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.immutable.Queue
 import scala.util.parsing.combinator._
-import edu.cmu.cs.ark.logger
+import edu.cmu.cs.ark.semeval2014.common.logger
 
 case class Graph(var root: Node, spans: ArrayBuffer[Span], getNodeById: Map[String, Node], getNodeByName: Map[String, Node]) {
 

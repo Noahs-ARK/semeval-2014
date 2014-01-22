@@ -1,7 +1,7 @@
 package edu.cmu.cs.ark.semeval2014.amr.graph
 
 import scala.collection.mutable.ArrayBuffer
-import edu.cmu.cs.ark.logger
+import edu.cmu.cs.ark.semeval2014.common.logger
 
 /************************************* Span Loader *******************************
 

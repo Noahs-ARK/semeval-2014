@@ -3,7 +3,7 @@ package edu.cmu.cs.ark.semeval2014.utils
 import scala.io.Source
 import scala.collection.mutable.Map
 import edu.cmu.cs.ark.semeval2014.amr.graph.Graph
-import edu.cmu.cs.ark.verbosity
+import edu.cmu.cs.ark.semeval2014.common.verbosity
 
 object CheckAMR {
     val usage = """Usage: scala -classpath . edu.cmu.lti.nlp.amr.CheckAMR < amr_corpus > output"""

@@ -1,9 +1,7 @@
 package edu.cmu.cs.ark.semeval2014.amr.ConceptInvoke
 
-
-import edu.cmu.cs.ark.semeval2014.common.FeatureVector
+import edu.cmu.cs.ark.semeval2014.common.{logger, FeatureVector}
 import edu.cmu.cs.ark.semeval2014.amr.{Input, DecoderResult}
-import edu.cmu.cs.ark.logger
 
 /*** Defined in package.scala ***
 type PhraseConceptPair = (List[String], String, PhraseConceptFeatures)

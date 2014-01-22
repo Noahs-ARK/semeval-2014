@@ -1,11 +1,9 @@
 package edu.cmu.cs.ark.semeval2014.common.Train
 
-import edu.cmu.cs.ark.semeval2014.common.FeatureVector
-import edu.cmu.cs.ark.semeval2014.common.doubleToMulAssoc
+import edu.cmu.cs.ark.semeval2014.common._
 
 import scala.util.Random
 import scala.math.sqrt
-import edu.cmu.cs.ark.logger
 
 class Adagrad extends Optimizer {
     def learnParameters(gradient: Int => FeatureVector,

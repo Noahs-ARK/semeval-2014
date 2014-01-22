@@ -1,11 +1,9 @@
 package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
-
 import scala.collection.mutable.Set
 import scala.collection.mutable.PriorityQueue
-import edu.cmu.cs.ark.semeval2014.common.FeatureVector
+import edu.cmu.cs.ark.semeval2014.common.{logger, FeatureVector}
 import edu.cmu.cs.ark.semeval2014.amr.graph.{Graph, Node}
-import edu.cmu.cs.ark.logger
 import edu.cmu.cs.ark.semeval2014.amr.{Input, DecoderResult}
 
 class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected: Boolean = true)

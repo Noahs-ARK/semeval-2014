@@ -1,7 +1,7 @@
 package edu.cmu.cs.ark.semeval2014.amr.graph
 
 import scala.collection.mutable.ArrayBuffer
-import edu.cmu.cs.ark.logger
+import edu.cmu.cs.ark.semeval2014.common.logger
 
 case class Var(node: Node, name: String)    // TODO: Remove this? Var is redundant, because the name can be found using node.name (but node.name sometimes can be None, which it should not be)
 

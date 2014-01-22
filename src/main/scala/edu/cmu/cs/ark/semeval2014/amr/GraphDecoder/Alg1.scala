@@ -5,7 +5,7 @@ import scala.collection.mutable.ArrayBuffer
 import edu.cmu.cs.ark.semeval2014.amr.Input
 import edu.cmu.cs.ark.semeval2014.amr.DecoderResult
 import edu.cmu.cs.ark.semeval2014.amr.graph.{Graph, Node}
-import edu.cmu.cs.ark.logger
+import edu.cmu.cs.ark.semeval2014.common.logger
 
 class Alg1(featureNames: List[String], labelSet: Array[(String, Int)], connectedConstraint: String = "none")
     extends Decoder(featureNames) {

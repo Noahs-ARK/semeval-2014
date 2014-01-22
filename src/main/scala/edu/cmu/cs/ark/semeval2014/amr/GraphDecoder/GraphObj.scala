@@ -3,8 +3,7 @@ package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
 import scala.collection.mutable.Set
 import edu.cmu.cs.ark.semeval2014.amr.graph.{Node, Graph}
-import edu.cmu.cs.ark.semeval2014.common.FeatureVector
-import edu.cmu.cs.ark.logger
+import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, logger}
 
 case class GraphObj(graph: Graph,
                     nodes: Array[Node], // usually 'nodes' is graph.nodes.filter(_.name != None).toArray
