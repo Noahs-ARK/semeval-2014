@@ -1,8 +1,8 @@
 package edu.cmu.cs.ark.semeval2014.amr.ConceptInvoke
 
 
-import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, AnnotatedSentence}
-import edu.cmu.cs.ark.semeval2014.amr.DecoderResult
+import edu.cmu.cs.ark.semeval2014.common.FeatureVector
+import edu.cmu.cs.ark.semeval2014.amr.{Input, DecoderResult}
 import edu.cmu.cs.ark.semeval2014.amr.graph.Graph
 import edu.cmu.cs.ark.logger
 
@@ -19,7 +19,7 @@ class Decoder1(featureNames: List[String],
 
     val conceptInvoker = new Concepts(phraseConceptPairs)
 
-    def decode(input: AnnotatedSentence): DecoderResult = {
+    def decode(input: Input): DecoderResult = {
         logger(1, "\n--- Decoder1 ---\n")
         val sentence = input.sentence
         val bestState : Array[Option[(Double, PhraseConceptPair, Int)]] = sentence.map(x => None)    // (score, concept, backpointer)

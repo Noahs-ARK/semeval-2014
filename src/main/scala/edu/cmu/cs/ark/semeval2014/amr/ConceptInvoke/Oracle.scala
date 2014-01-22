@@ -1,8 +1,8 @@
 package edu.cmu.cs.ark.semeval2014.amr.ConceptInvoke
 
 
-import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, AnnotatedSentence}
-import edu.cmu.cs.ark.semeval2014.amr.DecoderResult
+import edu.cmu.cs.ark.semeval2014.common.FeatureVector
+import edu.cmu.cs.ark.semeval2014.amr.{Input, DecoderResult}
 import edu.cmu.cs.ark.logger
 
 /*** Defined in package.scala ***
@@ -18,7 +18,7 @@ class Oracle(featureNames: List[String],
 
     val conceptInvoker = new Concepts(phraseConceptPairs)
 
-    def decode(input: AnnotatedSentence) : DecoderResult = {
+    def decode(input: Input) : DecoderResult = {
         assert(input.graph != None, "Error: stage1 oracle decoder was not given a graph")
         val graph = input.graph.get
         val sentence = input.sentence

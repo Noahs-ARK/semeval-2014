@@ -3,19 +3,19 @@ package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
 import scala.collection.mutable.Set
 import scala.collection.mutable.PriorityQueue
-import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, AnnotatedSentence}
+import edu.cmu.cs.ark.semeval2014.common.FeatureVector
 import edu.cmu.cs.ark.semeval2014.amr.graph.{Graph, Node}
 import edu.cmu.cs.ark.logger
-import edu.cmu.cs.ark.semeval2014.amr.DecoderResult
+import edu.cmu.cs.ark.semeval2014.amr.{Input, DecoderResult}
 
 class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected: Boolean = true)
     extends Decoder(featureNames) {
     // Base class has defined:
     // val features: Features
 
-    private var inputSave: AnnotatedSentence = _
-    def input : AnnotatedSentence = inputSave
-    def input_= (i: AnnotatedSentence) {
+    private var inputSave: Input = _
+    def input : Input = inputSave
+    def input_= (i: Input) {
         inputSave = i
         features.input = i
         precomputeEdgeWeights

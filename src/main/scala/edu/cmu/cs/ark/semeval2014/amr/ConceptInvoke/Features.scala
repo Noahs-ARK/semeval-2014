@@ -2,7 +2,8 @@ package edu.cmu.cs.ark.semeval2014.amr.ConceptInvoke
 
 
 import scala.collection.mutable.Map
-import edu.cmu.cs.ark.semeval2014.common.{AnnotatedSentence, FeatureVector}
+import edu.cmu.cs.ark.semeval2014.common.FeatureVector
+import edu.cmu.cs.ark.semeval2014.amr.Input
 
 
 /**************************** Feature Functions *****************************/
@@ -14,7 +15,7 @@ import edu.cmu.cs.ark.semeval2014.common.{AnnotatedSentence, FeatureVector}
 class Features(featureNames: List[String]) {
     var weights = FeatureVector()
 
-    type FeatureFunction = (AnnotatedSentence, PhraseConceptPair, Int, Int) => FeatureVector
+    type FeatureFunction = (Input, PhraseConceptPair, Int, Int) => FeatureVector
 
     val ffTable = Map[String, FeatureFunction](
         "bias" -> ffBias,
@@ -25,27 +26,27 @@ class Features(featureNames: List[String]) {
         "pairWith2WordContext" -> ffPairWith2WordContext
     )
 
-    def ffBias(input: AnnotatedSentence, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
+    def ffBias(input: Input, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
         return FeatureVector(Map("bias" -> 1.0))
     }
 
-    def ffLength(input: AnnotatedSentence, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
+    def ffLength(input: Input, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
         return FeatureVector(Map("len" -> concept.words.size))
     }
 
-    def ffCount(input: AnnotatedSentence, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
+    def ffCount(input: Input, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
         return FeatureVector(Map("N" -> concept.features.count))
     }
 
-    def ffConceptGivenPhrase(input: AnnotatedSentence, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
+    def ffConceptGivenPhrase(input: Input, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
         return FeatureVector(Map("c|p" -> concept.features.conceptGivenPhrase))
     }
 
-    def ffPhraseConceptPair(input: AnnotatedSentence, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
+    def ffPhraseConceptPair(input: Input, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
         return FeatureVector(Map("CP="+concept.words.mkString("_")+"=>"+concept.graphFrag.replaceAllLiterally(" ","_") -> 1.0))
     }
 
-    def ffPairWith2WordContext(input: AnnotatedSentence, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
+    def ffPairWith2WordContext(input: Input, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
         val cp = "CP="+concept.words.mkString("_")+"=>"+concept.graphFrag.replaceAllLiterally(" ","_")
         val feats = new FeatureVector()
         if (start > 0) {
@@ -59,7 +60,7 @@ class Features(featureNames: List[String]) {
 
     var featureFunctions : List[FeatureFunction] = featureNames.map(x => ffTable(x)) // TODO: error checking on lookup
 
-    def localFeatures(input: AnnotatedSentence, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
+    def localFeatures(input: Input, concept: PhraseConceptPair, start: Int, end: Int) : FeatureVector = {
         // Calculate the local features
         val feats = FeatureVector()
         for (ff <- featureFunctions) {
@@ -68,7 +69,7 @@ class Features(featureNames: List[String]) {
         return feats
     }
 
-    def localScore(input: AnnotatedSentence, concept: PhraseConceptPair, start: Int, end: Int) : Double = {
+    def localScore(input: Input, concept: PhraseConceptPair, start: Int, end: Int) : Double = {
         var score = 0.0
         for (ff <- featureFunctions) {
             score += weights.dot(ff(input, concept, start, end))

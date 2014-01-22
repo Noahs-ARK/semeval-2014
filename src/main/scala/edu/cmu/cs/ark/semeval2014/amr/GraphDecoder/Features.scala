@@ -5,23 +5,24 @@ import java.lang.Math.log
 import java.lang.Math.min
 import scala.collection.mutable.Map
 import edu.cmu.cs.ark.semeval2014.amr.graph.{Graph, Node}
-import edu.cmu.cs.ark.semeval2014.common.{Dependency, Annotation, AnnotatedSentence, FeatureVector}
+import edu.cmu.cs.ark.semeval2014.common.{Dependency, Annotation, FeatureVector}
 import edu.cmu.cs.ark._
+import edu.cmu.cs.ark.semeval2014.amr.Input
 
 
 /**************************** Feature Functions *****************************/
 
 class Features(featureNames: List[String]) {
     var weights = FeatureVector()
-    private var inputSave: AnnotatedSentence = _
+    private var inputSave: Input = _
     private var graph: Graph = _
     private var sentence: Array[String] = _
     private var dependencies: Annotation[Array[Dependency]] = _
     private var fullPos: Annotation[Array[String]] = _
     //private var pos: Annotation[Array[String]] = _
 
-    def input: AnnotatedSentence = inputSave
-    def input_= (i: AnnotatedSentence) {
+    def input: Input = inputSave
+    def input_= (i: Input) {
         inputSave = i
         graph = i.graph.get
         sentence = i.sentence

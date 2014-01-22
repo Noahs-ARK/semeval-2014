@@ -3,8 +3,8 @@ package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
 import java.lang.Math.abs
 import java.lang.Math.max
-import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, AnnotatedSentence}
-import edu.cmu.cs.ark.semeval2014.amr.DecoderResult
+import edu.cmu.cs.ark.semeval2014.common.FeatureVector
+import edu.cmu.cs.ark.semeval2014.amr.{Input, DecoderResult}
 import edu.cmu.cs.ark.semeval2014.amr.graph.Graph
 import edu.cmu.cs.ark.logger
 
@@ -18,9 +18,9 @@ class LagrangianRelaxation(featureNames: List[String], labelSet: Array[(String, 
     val labelConstraint = labelSet.toMap
     val IdLabel = """Id1.*[+]L=(.*)""".r
 
-    private var inputSave: AnnotatedSentence = _
-    def input : AnnotatedSentence = inputSave
-    def input_= (i: AnnotatedSentence) {
+    private var inputSave: Input = _
+    def input : Input = inputSave
+    def input_= (i: Input) {
         inputSave = i
         features.input = i
         alg2.features.weights = features.weights    // Set alg2's weights same our weights (shared weights) (This must be done before we set alg2.input, because it precomputes edge weights using its feature weights)

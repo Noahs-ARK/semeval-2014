@@ -1,16 +1,16 @@
 package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
-import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, AnnotatedSentence}
-import edu.cmu.cs.ark.semeval2014.amr.DecoderResult
+import edu.cmu.cs.ark.semeval2014.common.FeatureVector
+import edu.cmu.cs.ark.semeval2014.amr.{Input, DecoderResult}
 
 class Oracle(featureNames: List[String])
     extends Decoder(featureNames) {
     // Base class has defined:
     // val features: Features
 
-    private var inputSave: AnnotatedSentence = _
-    def input : AnnotatedSentence = inputSave
-    def input_= (i: AnnotatedSentence) {
+    private var inputSave: Input = _
+    def input : Input = inputSave
+    def input_= (i: Input) {
         inputSave = i
         features.input = i
     }

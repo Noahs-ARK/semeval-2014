@@ -2,7 +2,7 @@ package edu.cmu.cs.ark.semeval2014.amr.ConceptInvoke
 
 
 import scala.collection.mutable.Map
-import edu.cmu.cs.ark.semeval2014.common.AnnotatedSentence
+import edu.cmu.cs.ark.semeval2014.amr.Input
 
 class Concepts(phraseConceptPairs: Array[PhraseConceptPair],
                useNER: Boolean = true,
@@ -21,7 +21,7 @@ class Concepts(phraseConceptPairs: Array[PhraseConceptPair],
 
     private var tokens : Array[String] = Array()  // stores sentence.drop(i) (used in the dateEntity code to make it more concise)
 
-    def invoke(input: AnnotatedSentence, i: Int) : List[PhraseConceptPair] = {
+    def invoke(input: Input, i: Int) : List[PhraseConceptPair] = {
         // returns a list of all concepts that can be invoke starting at 
         // position i in input.sentence (i.e. position i in the tokenized input)
         // Note: none of the concepts returned have spans that go past the end of the sentence

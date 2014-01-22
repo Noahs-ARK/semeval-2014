@@ -2,7 +2,7 @@ package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
 
 import scala.collection.mutable.ArrayBuffer
-import edu.cmu.cs.ark.semeval2014.common.AnnotatedSentence
+import edu.cmu.cs.ark.semeval2014.amr.Input
 import edu.cmu.cs.ark.semeval2014.amr.DecoderResult
 import edu.cmu.cs.ark.semeval2014.amr.graph.{Graph, Node}
 import edu.cmu.cs.ark.logger
@@ -12,9 +12,9 @@ class Alg1(featureNames: List[String], labelSet: Array[(String, Int)], connected
     // Base class has defined:
     // val features: Features
 
-    private var inputSave: AnnotatedSentence = _
-    def input : AnnotatedSentence = inputSave
-    def input_= (i: AnnotatedSentence) {
+    private var inputSave: Input = _
+    def input : Input = inputSave
+    def input_= (i: Input) {
         inputSave = i
         features.input = i
     }
