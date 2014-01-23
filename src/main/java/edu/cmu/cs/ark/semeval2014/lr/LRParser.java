@@ -47,7 +47,7 @@ public class LRParser {
 	
 	// 4. Runtime options
 	static boolean verboseFeatures = false;
-	static int numTrainIters = 30;
+	static int numTrainIters = 20;
 	
 	
 //	static List<Class<FeatureExtractor1>> allFE1 = new ArrayList<>();
@@ -175,6 +175,38 @@ public class LRParser {
 					);
 		}
 	}
+	
+	static class FullAdder extends FE.FeatureAdder {
+		int i=-1, j=-1, labelID=-1;
+		NumberizedSentence ns;
+		
+		@Override
+		public void add(String featname, double value) {
+//			if (verboseFeatures) {
+//				U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", 
+//						is.sentence()[i[0]], i[0], is.sentence()[j[0]], j[0],
+//						goldEdgeMatrix!=null ? labelVocab.name(goldEdgeMatrix[i[0]][j[0]]) : null,
+//						featname, value);
+//			}
+			int featnum = featVocab.num(featname);
+			if (featnum==-1) return;
+			ns.argFeatures[i][j].add(new FVItem(featnum, labelID, value));
+		}
+	}
+	
+//	static class LabelConjAdder extends FE.FeatureAdder {
+//		int i=-1, j=-1;
+//		NumberizedSentence ns;
+//		@Override
+//		public void add(String featname, double value) {
+//			int featnum = featVocab.num(featname);
+//			if (featnum==-1) return;
+//			for (int label=0; label<labelVocab.size(); label++) {
+//				assert false : "wrong";
+//				ns.argFeatures[i][j].add(new FVLItem(featnum, label, value));	
+//			}
+//		}
+//	}
 
 	/** 
 	 * if overcomplete, extracts for ALL possible edge labels. Give null for the goldEdgeMatrix then.
@@ -183,53 +215,29 @@ public class LRParser {
 	static NumberizedSentence extractFeatures(final InputAnnotatedSentence is, 
 			boolean overcomplete, final int[][] goldEdgeMatrix
 	) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+
 		final NumberizedSentence ns = new NumberizedSentence( size(is) );
+		FullAdder adder = new FullAdder();
+		adder.ns=ns;
 		
-		// workaround stupid java closure rules that need 'final'
-		final int[] i = new int[]{0};
-		final int[] j = new int[]{0};
-		final int[] labelID = new int[]{-1};
+//		LabelConjAdder la = new LabelConjAdder();
+//		la.ns=ns;
+//		for (la.i=0; la.i<ns.T; la.i++) {
+//			for (la.j=0; la.j<ns.T; la.j++) {
+//				if (badDistance(la.i,la.j)) continue;
+//			}
+//		}
 		
-		for (i[0]=0; i[0]<ns.T; i[0]++) {
-			for (j[0]=0; j[0]<ns.T; j[0]++) {
+		for (adder.i=0; adder.i<ns.T; adder.i++) {
+			for (adder.j=0; adder.j<ns.T; adder.j++) {
 				
-				if (badDistance(i[0],j[0])) continue;
+				if (badDistance(adder.i,adder.j)) continue;
 				
-				FeatureAdder callbackEdge = new FE.FeatureAdder() {
-					@Override
-					public void add(String featname, double value) {
-//						featname = "EDGE::" + featname;
-						if (verboseFeatures) {
-							U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", 
-									is.sentence()[i[0]], i[0],
-									is.sentence()[j[0]], j[0],
-									goldEdgeMatrix!=null ? labelVocab.name(goldEdgeMatrix[i[0]][j[0]]) : null,
-									featname, value);
-						}
-						int featnum = featVocab.num(featname);
-						if (featnum==-1) return;
-						ns.argFeatures[i[0]][j[0]].add(new FVItem(featnum, labelID[0], value));
-					}
-				};
-				
-				if (overcomplete) {
-					for (labelID[0]=0; labelID[0]<labelVocab.size(); labelID[0]++) {
-						ns.argFeatures[i[0]][j[0]].add(new FVItem(labelBiasFeatnum(labelID[0]), labelID[0], 1.0));
-
-						String label = labelVocab.name(labelID[0]);
-						for (FE.FeatureExtractor2 fe : allFE2) {
-							fe.features(is, i[0], j[0], label, callbackEdge);
-						}
-					}
-				}
-				else {
-					assert false : "disable this";
-					// look at gold data
-					labelID[0] = goldEdgeMatrix[i[0]][j[0]];
-					ns.argFeatures[i[0]][j[0]].add(new FVItem(labelBiasFeatnum(labelID[0]), labelID[0], 1.0));
-
+				for (adder.labelID=0; adder.labelID<labelVocab.size(); adder.labelID++) {
+					ns.argFeatures[adder.i][adder.j].add(new FVItem(labelBiasFeatnum(adder.labelID), adder.labelID, 1.0));
+					String label = labelVocab.name(adder.labelID);
 					for (FE.FeatureExtractor2 fe : allFE2) {
-						fe.features(is, i[0], j[0], labelVocab.name(goldEdgeMatrix[i[0]][j[0]]), callbackEdge);
+						fe.features(is, adder.i, adder.j, label, adder);
 					}
 				}
 			}

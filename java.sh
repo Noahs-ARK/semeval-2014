@@ -15,4 +15,8 @@ CP=lib/myutil.jar:$CP
 # file.encoding necessary for mac (ugh!!) http://stackoverflow.com/questions/361975/setting-the-default-java-character-encoding
 # XX:ParallelGCThreads prevents horrible crashes on large multicore machines (basically, another stupid java bug)
 
-exec java -ea -Dfile.encoding=UTF-8 -XX:ParallelGCThreads=2 -Xmx2g -cp "$CP" "$@"
+klass=$1
+shift
+klass=edu.cmu.cs.ark.semeval2014.$klass
+# set -x
+exec java -ea -Dfile.encoding=UTF-8 -XX:ParallelGCThreads=2 -Xmx2g -cp "$CP" $klass "$@"
