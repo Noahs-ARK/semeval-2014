@@ -6,7 +6,6 @@ import util.U;
 import util.misc.Pair;
 import util.misc.Triple;
 
-/** holds base feature vectors. current design does NOT have conjunctions against labels or nothing like that. is this ok? */
 public class NumberizedSentence {
 	int T;  // sentence length
 	
