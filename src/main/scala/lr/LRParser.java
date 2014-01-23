@@ -93,7 +93,6 @@ public class LRParser {
 	        assert graphs.length == inputSentences.length;
 	        
 	        for (int snum=0; snum<graphs.length; snum++) {
-		        // TODO check IDs that arrays really are parallel
 	        	InputAnnotatedSentence sent = inputSentences[snum];
 	        	graph = graphs[snum];
 	        	assert sent.sentenceId().equals(graph.id.replace("#",""));
@@ -129,12 +128,8 @@ public class LRParser {
 		}
 		else if (mode.equals("test")) {
 			loadModel(modelFile);
-			
 			U.pf("Writing predictions to %s\n", sdpFile);
-//			if (new File(sdpFile).exists()) { throw new RuntimeException("file already exists! not overwriting."); }
-			
 			makePredictions(sdpFile);
-
 		}
 	}
 	
