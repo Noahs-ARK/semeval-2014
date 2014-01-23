@@ -4,10 +4,10 @@ import util.U;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
 
-public class WordFormFE implements FE.FeatureExtractor2 {
+public class WordFormFE extends FE.FeatureExtractor2 {
 
 	@Override
-	public void features(InputAnnotatedSentence sent, int word1, int word2, String label, FeatureAdder fa) {
+	public void features(int word1, int word2, String label, FeatureAdder fa) {
 //		String w1 = sent.sentence()[word1];
 //		String w2 = sent.sentence()[word2];
 //		fa.add(U.sf("lc:head:%s_%s", w1.toLowerCase(), label));

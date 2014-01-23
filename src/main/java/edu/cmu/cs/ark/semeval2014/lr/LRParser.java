@@ -16,6 +16,7 @@ import sdp.io.GraphReader;
 import util.Arr;
 import util.BasicFileIO;
 import util.LBFGS;
+import util.Timer;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
@@ -34,7 +35,7 @@ public class LRParser {
 	static ArrayList<int[][]> graphMatrixes = null;
 	
 	// 2. Feature system and model parameters
-	static List<FE.FeatureExtractor1> allFE1 = new ArrayList<>();
+//	static List<FE.FeatureExtractor1> allFE1 = new ArrayList<>();
 	static List<FE.FeatureExtractor2> allFE2 = new ArrayList<>();
 	static Vocabulary labelVocab = new Vocabulary();
 	static Vocabulary featVocab;
@@ -113,25 +114,34 @@ public class LRParser {
 
 		initializeFeatureExtractors();
 
+		double t0,dur;
 		if (mode.equals("train")) {
 			U.pf("Feature extraction "); System.out.flush();
 			featVocab = new Vocabulary();
 			for (int k=0; k<labelVocab.size(); k++) {
 				featVocab.num(labelBiasName(k));
 			}
+					t0 = System.currentTimeMillis();
 			extractFeatures(true);
+					dur = System.currentTimeMillis() - t0;
+					U.pf("\nFE TIME %.1f sec,  %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
 			lockdownVocabAndAllocateCoefs();
+					t0 = System.currentTimeMillis();
 			trainLoop();
+					dur = System.currentTimeMillis() - t0;
+					U.pf("\nTRAINLOOP TIME %.1f sec\n", dur/1e3);
 			saveModel(modelFile);
 		}
 		else if (mode.equals("test")) {
 			loadModel(modelFile);
 			U.pf("Writing predictions to %s\n", sdpFile);
+					t0 = System.currentTimeMillis();
 			makePredictions(sdpFile);
+					dur = System.currentTimeMillis() - t0;
+					U.pf("\nPRED TIME %.1f sec, %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
 		}
+		
 	}
-	
-
 	
 	static int size(InputAnnotatedSentence s) { 
 		return s.sentence().length;
@@ -220,13 +230,9 @@ public class LRParser {
 		FullAdder adder = new FullAdder();
 		adder.ns=ns;
 		
-//		LabelConjAdder la = new LabelConjAdder();
-//		la.ns=ns;
-//		for (la.i=0; la.i<ns.T; la.i++) {
-//			for (la.j=0; la.j<ns.T; la.j++) {
-//				if (badDistance(la.i,la.j)) continue;
-//			}
-//		}
+		for (FE.FeatureExtractor2 fe : allFE2) {
+			fe.setupSentence(is);
+		}
 		
 		for (adder.i=0; adder.i<ns.T; adder.i++) {
 			for (adder.j=0; adder.j<ns.T; adder.j++) {
@@ -237,7 +243,7 @@ public class LRParser {
 					ns.argFeatures[adder.i][adder.j].add(new FVItem(labelBiasFeatnum(adder.labelID), adder.labelID, 1.0));
 					String label = labelVocab.name(adder.labelID);
 					for (FE.FeatureExtractor2 fe : allFE2) {
-						fe.features(is, adder.i, adder.j, label, adder);
+						fe.features(adder.i, adder.j, label, adder);
 					}
 				}
 			}
