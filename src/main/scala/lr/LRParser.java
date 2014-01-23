@@ -1,6 +1,7 @@
 package lr;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -13,12 +14,14 @@ import lr.fe.WordFormFE;
 import sdp.graph.Edge;
 import sdp.graph.Graph;
 import sdp.io.GraphReader;
+import sdp.io.GraphWriter;
 import util.Arr;
 import util.BasicFileIO;
 import util.LBFGS;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
+import util.misc.Triple;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 //import edu.cmu.cs.ark.semeval2014.common.FeatureExtractor1;
@@ -42,6 +45,7 @@ public class LRParser {
 	// 3. Model parameter-ish options
 	static int maxEdgeDistance = 10;
 	static double l2reg = 1.0;
+	static double noedgeWeight = 0.3;
 	
 	// 4. Runtime options
 	static boolean verboseFeatures = false;
@@ -66,7 +70,7 @@ public class LRParser {
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 
 		if (mode.equals("train")) {
-			labelVocab.num("NO_EDGE");
+			labelVocab.num("NOEDGE");
 			
 			U.pf("Reading graphs from %s\n", sdpFile);
 			
@@ -87,6 +91,7 @@ public class LRParser {
 	        graphs = graphsAL.toArray(new Graph[0]);
 	        
 	        assert graphs.length == inputSentences.length;
+	        
 	        for (int snum=0; snum<graphs.length; snum++) {
 		        // TODO check IDs that arrays really are parallel
 	        	InputAnnotatedSentence sent = inputSentences[snum];
@@ -96,11 +101,11 @@ public class LRParser {
 	        	int[][] edgeMatrix = new int[size(sent)][size(sent)];
 	        	for (int i=0; i<size(sent); i++) {
 	        		for (int j=0; j<size(sent); j++) {
-	        			edgeMatrix[i][j] = labelVocab.num("NO_EDGE");
+	        			edgeMatrix[i][j] = labelVocab.num("NOEDGE");
 	        		}
 	        	}
 	        	for (Edge e : graphs[snum].getEdges()) {
-	        		edgeMatrix[e.source][e.target] = labelVocab.num(e.label);
+	        		edgeMatrix[e.source-1][e.target-1] = labelVocab.num(e.label);
 	        	}
 	        	graphMatrixes.add(edgeMatrix);
 	        }
@@ -109,8 +114,6 @@ public class LRParser {
 		
 		U.pf("%d input sentences\n", inputSentences.length);
 
-		// Feature extraction
-		
 		initializeFeatureExtractors();
 
 		if (mode.equals("train")) {
@@ -119,27 +122,24 @@ public class LRParser {
 			for (int k=0; k<labelVocab.size(); k++) {
 				featVocab.num(labelBiasName(k));
 			}
-			extractFeatures(false);
+			extractFeatures(true);
 			lockdownVocabAndAllocateCoefs();
 			trainLoop();
 			saveModel(modelFile);
 		}
 		else if (mode.equals("test")) {
 			loadModel(modelFile);
-			extractFeatures(true);
+			
 			U.pf("Writing predictions to %s\n", sdpFile);
+//			if (new File(sdpFile).exists()) { throw new RuntimeException("file already exists! not overwriting."); }
+			
 			makePredictions(sdpFile);
+
 		}
 	}
 	
-	static void extractFeatures(boolean overcomplete) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		nbdSentences = new NumberizedSentence[inputSentences.length];
-		for (int i=0; i<inputSentences.length; i++) {
-			U.pf(".");
-			nbdSentences[i] = extractFeatures(inputSentences[i], overcomplete, 
-					overcomplete ? null : graphMatrixes.get(i));
-		}
-	}
+
+	
 	static int size(InputAnnotatedSentence s) { 
 		return s.sentence().length;
 	}
@@ -153,10 +153,10 @@ public class LRParser {
 				
 				if (badDistance(i,j)) continue;
 
-				// store log-linear scores
-				for (int k=0; k<labelVocab.size(); k++) {
-					scores[i][j][k] += coefs[featVocab.num(labelBiasName(k))]; 
-				}
+//				// store log-linear scores
+//				for (int k=0; k<labelVocab.size(); k++) {
+//					scores[i][j][k] += coefs[labelBiasFeatnum(k)];
+//				}
 				
 				for (FVItem fvItem : ns.argFeatures[i][j]) {
 					scores[i][j][fvItem.label] += coefs[fvItem.featnum] * fvItem.value;
@@ -171,12 +171,24 @@ public class LRParser {
 	static boolean badDistance(int i, int j) {
 		return i==j || Math.abs(i-j) > maxEdgeDistance;
 	}
+	
+	static void extractFeatures(boolean overcomplete) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		nbdSentences = new NumberizedSentence[inputSentences.length];
+		for (int i=0; i<inputSentences.length; i++) {
+			U.pf(".");
+			nbdSentences[i] = extractFeatures(inputSentences[i], overcomplete, 
+					graphMatrixes!=null ? graphMatrixes.get(i) : null
+//					overcomplete ? null : graphMatrixes.get(i)
+					);
+		}
+	}
+
 	/** 
 	 * if overcomplete, extracts for ALL possible edge labels. Give null for the goldEdgeMatrix then.
 	 * if not overcomplete, only extracts 
 	 */
 	static NumberizedSentence extractFeatures(final InputAnnotatedSentence is, 
-			boolean overcomplete, int[][] goldEdgeMatrix
+			boolean overcomplete, final int[][] goldEdgeMatrix
 	) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		final NumberizedSentence ns = new NumberizedSentence( size(is) );
 		
@@ -188,7 +200,6 @@ public class LRParser {
 		for (i[0]=0; i[0]<ns.T; i[0]++) {
 			for (j[0]=0; j[0]<ns.T; j[0]++) {
 				
-				if (i[0]==j[0]) continue;
 				if (badDistance(i[0],j[0])) continue;
 				
 				FeatureAdder callbackEdge = new FE.FeatureAdder() {
@@ -196,12 +207,14 @@ public class LRParser {
 					public void add(String featname, double value) {
 //						featname = "EDGE::" + featname;
 						if (verboseFeatures) {
-							U.pf("WORDS %s:%d -> %s:%d\tEDGEFEAT %s %s\n", 
+							U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", 
 									is.sentence()[i[0]], i[0],
 									is.sentence()[j[0]], j[0],
+									goldEdgeMatrix!=null ? labelVocab.name(goldEdgeMatrix[i[0]][j[0]]) : null,
 									featname, value);
 						}
 						int featnum = featVocab.num(featname);
+						if (featnum==-1) return;
 						ns.argFeatures[i[0]][j[0]].add(new FVItem(featnum, labelID[0], value));
 					}
 				};
@@ -217,6 +230,7 @@ public class LRParser {
 					}
 				}
 				else {
+					assert false : "disable this";
 					// look at gold data
 					labelID[0] = goldEdgeMatrix[i[0]][j[0]];
 					ns.argFeatures[i[0]][j[0]].add(new FVItem(labelBiasFeatnum(labelID[0]), labelID[0], 1.0));
@@ -236,7 +250,9 @@ public class LRParser {
 		coefs = new double[featVocab.size()];
 	}
 	static int labelBiasFeatnum(int label) {
-		return featVocab.num(labelBiasName( label ));
+		int n = featVocab.num(labelBiasName( label ));
+		assert n != -1 : "wtf";
+		return n;
 	}
 	static String labelBiasName(String label) {
 		return "LABELBIAS::" + label;
@@ -273,7 +289,7 @@ public class LRParser {
 		while ( (line = reader.readLine()) != null ) {
 			String[] parts = line.split("\t");
 			if (parts[0].equals("LABELVOCAB")) {
-				String[] labels = parts[2].trim().split(" ");
+				String[] labels = parts[1].trim().split(" ");
 				for (String x : labels) labelVocab.num(x);
 			}
 			else if (parts[0].equals("C")) {
@@ -302,14 +318,13 @@ public class LRParser {
 		U.pf("Label vocab (size %d): %s\n", labelVocab.size(), labelVocab.names());
 		U.pf("Num features: %d\n", coefs.length);
 
-		LBFGS.lbfgs(new double[featVocab.size()], numTrainIters, new LBFGS.Function() {
+		double initcoefs[] = new double[featVocab.size()];
+		LBFGS.Result r = LBFGS.lbfgs(initcoefs, numTrainIters, new LBFGS.Function() {
 
 			@Override
 			public double evaluate(double[] newCoefs, double[] grad, int n, double step) {
-				Arr.fill(grad,0);
+				Arr.fill(grad,0);  // gonna go in ascent direction, flip only at end
 				coefs = Arr.copy(newCoefs);
-				// first do it in positive loglik, flip only at end
-				
 				double ll = 0;
 				for (int snum=0; snum<inputSentences.length; snum++) {
 					NumberizedSentence ns = nbdSentences[snum];
@@ -320,33 +335,101 @@ public class LRParser {
 					for (int i=0;i<ns.T;i++) {
 						for (int j=0; j<ns.T;j++) {
 							if (badDistance(i,j)) continue;
-							ll += Math.log(probs[i][j][edgeMatrix[i][j]]);
+							assert Math.abs( Arr.sum(probs[i][j])  - 1 ) < 1e-5;
+							double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
+							ll += w * Math.log(probs[i][j][edgeMatrix[i][j]]);
 							
 //							if (Arr.max(probs[i][j]) < 0.9999) U.p(probs[i][j]);
 							for (FVItem fvItem : ns.argFeatures[i][j]) {
 								int observed = edgeMatrix[i][j] == fvItem.label ? 1 : 0;
 								double resid = observed - probs[i][j][fvItem.label];
-								grad[fvItem.featnum] += resid * fvItem.value;
+								grad[fvItem.featnum] += w * resid * fvItem.value;
 							}
 						}
 					}
 				}
-				Arr.multiplyInPlace(grad, -1);
+				//  logprior  =  - (1/2) lambda || beta ||^2
+				//  gradient =  - lambda beta
 				for (int f=0; f<coefs.length; f++) {
-					double ss = l2reg * coefs[f]*coefs[f];
-					ll -= 0.5*ss;
+					ll -= 0.5 * l2reg * coefs[f]*coefs[f];
 					grad[f] -= l2reg * coefs[f];
 				}
+				Arr.multiplyInPlace(grad, -1);
 				return -ll;
 			}
 		});
-//		assert false : "todo";
+		
+		U.pf("LBFGS status %s\n", r.status);
+		coefs = initcoefs;
 	}
 	
-	static void makePredictions(String outputFile) {
-//		assert false : "todo";
+	static void makePredictions(String outputFile) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, IOException {
+		BufferedWriter bw = BasicFileIO.openFileToWriteUTF8(outputFile);
+		PrintWriter out = new PrintWriter(bw);
+//		GraphWriter gw = new GraphWriter(out);
+
+		for (int snum=0; snum<inputSentences.length; snum++) {
+			InputAnnotatedSentence sent = inputSentences[snum];
+			NumberizedSentence ns = extractFeatures(sent, true, null);
+			double[][][] probs = inferEdgeProbs(ns);
+			MyGraph g = decodeEdgeprobsToGraph(sent, probs);
+
+			U.pf(".");
+//			U.pf("\nSENT %d\n", snum);
+//			for (Triple<Integer,Integer,String> tt : g.edgelist) {
+//				U.pf("%s[%s:%d -> %s:%d]\n", tt.third, sent.sentence()[tt.first], tt.first, sent.sentence()[tt.second], tt.second);
+//			}
+			
+			out.println("#" + sent.sentenceId());
+			for (int i=0; i<size(sent); i++) {
+				boolean istop = !g.isChildOfSomething[i] && g.isPred[i];
+				out.printf("%d\t%s\tlemmaz\t%s\t%s\t%s", i+1, sent.sentence()[i], sent.pos()[i], 
+						 istop ? "+" : "-", g.isPred[i] ? "+" : "-");
+				for (int head=0; head<size(sent); head++) {
+					if (!g.isPred[head]) continue;
+					// ok now we're in a predicate column that may be dominating this node
+					String label = g.edgeMatrix[head][i];
+					label = label==null ? "_" : label;
+					out.print("\t" + label);
+				}
+				out.print("\n");
+			}
+			out.print("\n");
+			out.flush();
+		}
+		out.close();
 	}
 	
+	static class MyGraph {
+		boolean[] isChildOfSomething;
+		boolean[] isPred;
+		ArrayList< Triple<Integer,Integer,String> > edgelist;
+		String[][] edgeMatrix;
+	}
+	static MyGraph decodeEdgeprobsToGraph(InputAnnotatedSentence sent, double[][][] probs) {
+//		Graph g = new Graph("#"+sent.sentenceId());
+		MyGraph g = new MyGraph();
+		g.isChildOfSomething = new boolean[size(sent)];
+		g.isPred = new boolean[size(sent)];
+		
+		g.edgelist = new ArrayList<>();
+		g.edgeMatrix = new String[size(sent)][size(sent)];
+		for (int i=0; i<size(sent); i++) {
+			for (int j=0; j<size(sent); j++) {
+				if (badDistance(i,j)) continue;
+				int predlabel = Arr.argmax(probs[i][j]);
+				Triple<Integer,Integer,String> tt = new Triple(i,j,labelVocab.name(predlabel));
+				if (tt.third.equals("NOEDGE")) continue;
+				
+				g.edgelist.add(tt);
+				g.edgeMatrix[i][j] = tt.third;
+				g.isPred[i] = true;
+				g.isChildOfSomething[j] = true;
+			}
+		}
+		
+		return g;
+	}
 	
 	///////////////////////////////////////////////////////////
 	
