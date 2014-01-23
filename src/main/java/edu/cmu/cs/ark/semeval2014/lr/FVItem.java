@@ -1,4 +1,4 @@
-package lr;
+package edu.cmu.cs.ark.semeval2014.lr;
 
 public class FVItem {
 	int featnum;

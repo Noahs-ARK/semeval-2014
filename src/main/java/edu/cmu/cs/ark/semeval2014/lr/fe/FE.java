@@ -1,4 +1,4 @@
-package lr.fe;
+package edu.cmu.cs.ark.semeval2014.lr.fe;
 
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 

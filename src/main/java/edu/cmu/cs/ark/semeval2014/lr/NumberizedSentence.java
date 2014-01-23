@@ -1,10 +1,6 @@
-package lr;
+package edu.cmu.cs.ark.semeval2014.lr;
 
 import java.util.ArrayList;
-
-import util.U;
-import util.misc.Pair;
-import util.misc.Triple;
 
 public class NumberizedSentence {
 	int T;  // sentence length

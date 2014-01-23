@@ -1,8 +1,8 @@
-package lr.fe;
+package edu.cmu.cs.ark.semeval2014.lr.fe;
 
 import util.U;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
-import lr.fe.FE.FeatureAdder;
+import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
 
 public class WordFormFE implements FE.FeatureExtractor2 {
 

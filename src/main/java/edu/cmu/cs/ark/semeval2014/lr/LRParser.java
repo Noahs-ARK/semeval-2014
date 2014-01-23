@@ -1,20 +1,18 @@
-package lr;
+package edu.cmu.cs.ark.semeval2014.lr;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import lr.fe.FE;
-import lr.fe.FE.FeatureAdder;
-import lr.fe.WordFormFE;
+import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
+import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
+import edu.cmu.cs.ark.semeval2014.lr.fe.WordFormFE;
 import sdp.graph.Edge;
 import sdp.graph.Graph;
 import sdp.io.GraphReader;
-import sdp.io.GraphWriter;
 import util.Arr;
 import util.BasicFileIO;
 import util.LBFGS;
