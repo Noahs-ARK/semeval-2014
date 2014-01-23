@@ -151,20 +151,15 @@ public class LRParser {
 	 */
 	static double[][][] inferEdgeProbs(NumberizedSentence ns) {
 		double[][][] scores = new double[ns.T][ns.T][labelVocab.size()];  // intermediate scores, but finally becomes probs for return
+		
+		for (int kk=0; kk<ns.nnz; kk++) {
+			scores[ns.i(kk)][ns.j(kk)][ns.label(kk)] += coefs[ns.featnum(kk)] * ns.value(kk);
+		}
 		for (int i=0; i<ns.T; i++) {
 			for (int j=0; j<ns.T; j++) {
 				
 				if (badDistance(i,j)) continue;
 
-//				// store log-linear scores
-//				for (int k=0; k<labelVocab.size(); k++) {
-//					scores[i][j][k] += coefs[labelBiasFeatnum(k)];
-//				}
-				
-				for (FVItem fvItem : ns.argFeatures[i][j]) {
-					scores[i][j][fvItem.label] += coefs[fvItem.featnum] * fvItem.value;
-				}
-				
 				// transform in-place into probs
 				Arr.softmaxInPlace(scores[i][j]);
 			}
@@ -349,19 +344,20 @@ public class LRParser {
 					
 					double[][][] probs = inferEdgeProbs(ns);
 					
+					for (int kk=0; kk<ns.nnz; kk++) {
+						int i=ns.i(kk), j=ns.j(kk);
+						double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
+						int observed = edgeMatrix[i][j] == ns.label(kk) ? 1 : 0;
+						double resid = observed - probs[i][j][ns.label(kk)];
+						grad[ns.featnum(kk)] += w * resid * ns.value(kk);
+					}
+					
 					for (int i=0;i<ns.T;i++) {
 						for (int j=0; j<ns.T;j++) {
 							if (badDistance(i,j)) continue;
-							assert Math.abs( Arr.sum(probs[i][j])  - 1 ) < 1e-5;
+//							assert Math.abs( Arr.sum(probs[i][j])  - 1 ) < 1e-5;
 							double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
 							ll += w * Math.log(probs[i][j][edgeMatrix[i][j]]);
-							
-//							if (Arr.max(probs[i][j]) < 0.9999) U.p(probs[i][j]);
-							for (FVItem fvItem : ns.argFeatures[i][j]) {
-								int observed = edgeMatrix[i][j] == fvItem.label ? 1 : 0;
-								double resid = observed - probs[i][j][fvItem.label];
-								grad[fvItem.featnum] += w * resid * fvItem.value;
-							}
 						}
 					}
 				}
