@@ -175,6 +175,8 @@ public class LRParser {
 		return i==j || Math.abs(i-j) > maxEdgeDistance;
 	}
 	
+	static int totalPairs = 0;
+	
 	static void extractFeatures(boolean overcomplete) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		nbdSentences = new NumberizedSentence[inputSentences.length];
 		for (int i=0; i<inputSentences.length; i++) {
@@ -183,6 +185,13 @@ public class LRParser {
 					graphMatrixes!=null ? graphMatrixes.get(i) : null
 //					overcomplete ? null : graphMatrixes.get(i)
 					);
+		}
+		U.pf("\n");
+		if (NumberizedSentence.totalNNZ > 0) {
+			U.pf("Total NNZ %d\n", NumberizedSentence.totalNNZ);
+		}
+		if (totalPairs > 0) {
+			U.pf("Total pairs %d\n", totalPairs);
 		}
 	}
 	
@@ -200,7 +209,7 @@ public class LRParser {
 //			}
 			int featnum = featVocab.num(featname);
 			if (featnum==-1) return;
-			ns.argFeatures[i][j].add(new FVItem(featnum, labelID, value));
+			ns.add(i,j, featnum, labelID, value);
 		}
 	}
 	
@@ -238,9 +247,10 @@ public class LRParser {
 			for (adder.j=0; adder.j<ns.T; adder.j++) {
 				
 				if (badDistance(adder.i,adder.j)) continue;
+				totalPairs++;
 				
 				for (adder.labelID=0; adder.labelID<labelVocab.size(); adder.labelID++) {
-					ns.argFeatures[adder.i][adder.j].add(new FVItem(labelBiasFeatnum(adder.labelID), adder.labelID, 1.0));
+					ns.add(adder.i, adder.j, labelBiasFeatnum(adder.labelID), adder.labelID, 1.0);
 					String label = labelVocab.name(adder.labelID);
 					for (FE.FeatureExtractor2 fe : allFE2) {
 						fe.features(adder.i, adder.j, label, adder);

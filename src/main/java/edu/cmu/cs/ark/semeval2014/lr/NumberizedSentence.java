@@ -13,6 +13,13 @@ public class NumberizedSentence {
 	 *  */
 	ArrayList<FVItem>[][] argFeatures;
 	
+	void add(int i, int j, int featnum, int label, double value) {
+		argFeatures[i][j].add(new FVItem(featnum, label, (float) value));
+		totalNNZ++;
+	}
+	
+	static int totalNNZ = 0;
+	
 	@SuppressWarnings("unchecked")
 	NumberizedSentence(int sentenceLength) {
 		T = sentenceLength;
