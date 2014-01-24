@@ -10,8 +10,6 @@ public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE
 	public void features(int word1, int word2, String label, FeatureAdder fa) {
 //		String w1 = sent.sentence()[word1];
 //		String w2 = sent.sentence()[word2];
-//		fa.add(U.sf("lc:head:%s_%s", w1.toLowerCase(), label));
-//		fa.add(U.sf("lc:child:%s_%s", w2.toLowerCase(), label));
 //		fa.add(U.sf("lc:bg:%s_%s_%s", w1.toLowerCase(), w2.toLowerCase(), label));
 
 		String p1 = sent.pos()[word1];
@@ -23,6 +21,8 @@ public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE
 	public void features(int word1, FeatureAdder fa) {
 		String p1 = sent.pos()[word1];
 		fa.add(U.sf("pos:%s", p1));
+//		String w1 = sent.pos()[word1].toLowerCase();
+//		fa.add("lc:" + w1);
 	}
 
 }

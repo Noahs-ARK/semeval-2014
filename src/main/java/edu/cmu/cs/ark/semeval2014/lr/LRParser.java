@@ -168,7 +168,7 @@ public class LRParser {
 		}
 		return scores;
 	}
-	static boolean badDistance(int i, int j) {
+	public static boolean badDistance(int i, int j) {
 		return i==j || Math.abs(i-j) > maxEdgeDistance;
 	}
 	

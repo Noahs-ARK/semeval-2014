@@ -1,14 +1,15 @@
 set -eu
 
-modelfile=$1
-predfile=$2
+modelfile=mymodel
+predfile=mypred
 
-trainfile=../data/tiny_split/pcedt.sdp.first100
-traindeps=../data/tiny_split/pcedt.sdp.dependencies.first100
+trainfile=../data/splits/first100.dm.sdp
+traindeps=../data/splits/first100.dm.sdp.dependencies
 
-testfile=../data/tiny_split/pcedt.sdp.last1000
-testdeps=../data/tiny_split/pcedt.sdp.dependencies.last1000
+testfile=../data/splits/dev.dm.sdp
+testdeps=../data/splits/dev.dm.sdp.dependencies
 
+set -x
 ./java.sh lr.LRParser train $modelfile $trainfile $traindeps
 ./java.sh lr.LRParser test $modelfile $predfile $testdeps
 echo "evalling"

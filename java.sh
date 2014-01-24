@@ -2,7 +2,7 @@
 
 set -eu
 
-# Invokes 'java' using .class files as compiled by Eclipse, plus the scala library installed by sbt,
+# Invokes 'java' using .class files as compiled by SBT and/or Eclipse,
 # plus flags to stop crashes due to idiotic default JVM behaviors
 
 CP=target/scala-2.10/classes
@@ -19,5 +19,6 @@ CP=lib/kryo-2.22-all.jar:$CP
 klass=$1
 shift
 klass=edu.cmu.cs.ark.semeval2014.$klass
+
 # set -x
-exec java -ea -Dfile.encoding=UTF-8 -XX:ParallelGCThreads=2 -Xmx2g -cp "$CP" $klass "$@"
+exec java -ea -Dfile.encoding=UTF-8 -XX:ParallelGCThreads=2 -Xmx4g -cp "$CP" $klass "$@"
