@@ -35,7 +35,8 @@ public class NumberizedSentence {
 	static final int INIT_SIZE = 100;
 	static final double GROWTH_MULTIPLIER = 1.5;
 	
-	@SuppressWarnings("unchecked")
+	public NumberizedSentence() {
+	}
 	NumberizedSentence(int sentenceLength) {
 		T = sentenceLength;
 		

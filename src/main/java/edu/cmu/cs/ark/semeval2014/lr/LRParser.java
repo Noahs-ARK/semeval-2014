@@ -1,11 +1,18 @@
 package edu.cmu.cs.ark.semeval2014.lr;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import sdp.graph.Edge;
 import sdp.graph.Graph;
@@ -18,7 +25,7 @@ import util.misc.Pair;
 import util.misc.Triple;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
-import edu.cmu.cs.ark.semeval2014.lr.fe.WordFormFE;
+import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 
 public class LRParser {
@@ -27,10 +34,6 @@ public class LRParser {
 	static Graph[] graphs;
 	static InputAnnotatedSentence[] inputSentences = null; // full dataset
 	static ArrayList<int[][]> graphMatrixes = null;  // full dataset
-	
-//	static ArrayList<NumberizedSentence> numberizedSentences = null;
-
-	
 	
 	// 2. Feature system and model parameters
 //	static List<FE.FeatureExtractor1> allFE1 = new ArrayList<>();
@@ -47,9 +50,8 @@ public class LRParser {
 	
 	// 4. Runtime options
 	static boolean verboseFeatures = false;
-	static int numOnlineIters = 20;
-	
-	
+    static boolean useFeatureCache = true;
+	static int numOnlineIters = 30;
 	
 //	static List<Class<FeatureExtractor1>> allFE1 = new ArrayList<>();
 //	static List<Class<FeatureExtractor2>> allFE2 = new ArrayList<>();
@@ -120,16 +122,8 @@ public class LRParser {
 			for (int k=0; k<labelVocab.size(); k++) {
 				featVocab.num(labelBiasName(k));
 			}
-			
-//					t0 = System.currentTimeMillis();
-//			extractFeaturesForAll();
-//					dur = System.currentTimeMillis() - t0;
-//					U.pf("\nFE TIME %.1f sec,  %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
-//			lockdownVocabAndAllocateCoefs();
-			
 					t0 = System.currentTimeMillis();
 			trainingOuterloopOnline(modelFile);
-//			trainingOuterloopMB();
 					dur = System.currentTimeMillis() - t0;
 					U.pf("TRAINLOOP TIME %.1f sec\n", dur/1e3);
 
@@ -333,10 +327,74 @@ public class LRParser {
     static void trainingOuterloopOnline(String modelFilePrefix) throws IOException {
     	for (int outer=0; outer<numOnlineIters; outer++) {
     		U.pf("iter %3d ", outer);  System.out.flush();
+    		double t0 = System.currentTimeMillis();
+    		
+    		if (outer==0) {
+    			cacheReadMode = false;
+    			openCacheForWriting();
+    		} else {
+    			cacheReadMode = true;
+    			resetCacheReader();
+    		}
+    		
     		trainOnlineIter(outer==0);
-    		saveModel(U.sf("%s.iter%s",modelFilePrefix, outer+1));
+    		
+        	double dur = System.currentTimeMillis() - t0;
+        	U.pf("%.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
+    		
+        	if (outer % 5 == 0) saveModel(U.sf("%s.iter%s",modelFilePrefix, outer));
+    		
+    		if (outer==0) {
+    			closeCacheAfterWriting();
+    		}
+    		
+    		if (outer==0) U.pf("%d features, %d nnz\n", featVocab.size(), NumberizedSentence.totalNNZ);
     	}
     }
+
+    // START feature cache stuff
+    // uses https://github.com/EsotericSoftware/kryo found from http://stackoverflow.com/questions/239280/which-is-the-best-alternative-for-java-serialization
+    
+    static Kryo kryo;
+    static { kryo = new Kryo(); }
+    static boolean cacheReadMode = false;
+    static Input kryoInput;
+    static Output kryoOutput;
+    static String featureCacheFile = "featcache.bin";
+    
+    /** this should work with or without caching enabled.
+     * for caching, assume accesses are in order!!
+     */
+    static NumberizedSentence getNextExample(int snum) {
+    	if (useFeatureCache && cacheReadMode) {
+    		return kryo.readObject(kryoInput, NumberizedSentence.class);
+    	} else {
+    		NumberizedSentence ns = extractFeatures(snum);
+    		if (useFeatureCache) { 
+    			kryo.writeObject(kryoOutput, ns);
+    		}
+    		return ns;
+    	}
+    }
+    static void openCacheForWriting() throws FileNotFoundException {
+    	if (!useFeatureCache) return;
+        kryoOutput = new Output(new FileOutputStream(featureCacheFile));
+    }
+    static void closeCacheAfterWriting() {
+    	if (!useFeatureCache) return;
+    	kryoOutput.close();
+    }
+    static void resetCacheReader() throws FileNotFoundException {
+    	if (!useFeatureCache) return;
+    	if (kryoInput != null) {
+        	kryoInput.close();
+    	}
+    	kryoInput = new Input(new FileInputStream(featureCacheFile));
+    }
+    
+    // END feature cache stuff
+    
+    
 	static double[] ssGrad;
 	static double learningRate = .1;
 	
@@ -362,13 +420,15 @@ public class LRParser {
     static void adagradStore(int featnum, double g) {
         ssGrad[featnum] += g*g;
     }
-    static void trainOnlineIter(boolean firstIter) {
-    	double t0=System.currentTimeMillis();
+    
+    /** adagrad: http://www.ark.cs.cmu.edu/cdyer/adagrad.pdf */ 
+    static void trainOnlineIter(boolean firstIter) throws FileNotFoundException {
+
         double ll = 0;
         for (int snum=0; snum<inputSentences.length; snum++) {
         	U.pf(".");
             
-            NumberizedSentence ns = extractFeatures(snum);
+            NumberizedSentence ns = getNextExample(snum);
             if (firstIter) {
                 growCoefsIfNecessary();
             }
@@ -377,7 +437,6 @@ public class LRParser {
             double[][][] probs = inferEdgeProbs(ns);
             
             for (int kk=0; kk<ns.nnz; kk++) {
-                
                 int i=ns.i(kk), j=ns.j(kk);
                 double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
                 int observed = edgeMatrix[i][j] == ns.label(kk) ? 1 : 0;
@@ -388,9 +447,10 @@ public class LRParser {
                 double rate = adagradRate(ns.featnum(kk));
 
                 coefs[ns.featnum(kk)] += learningRate * rate * g;
-                
             }
             
+            // loglik is completely unnecessary for optimization, just nice for diagnosis.
+            // comment this out for 5% speed gain
             for (int i=0;i<ns.T;i++) {
                 for (int j=0; j<ns.T;j++) {
                     if (badDistance(i,j)) continue;
@@ -407,12 +467,7 @@ public class LRParser {
             adagradStore(f,g);
             coefs[f] -= adagradRate(f) * learningRate * g;
         }
-        U.pf("ll %.1f\n", ll);
-        if (firstIter) {
-        	U.pf("%d features\n", featVocab.size());
-        	double dur = System.currentTimeMillis() - t0;
-        	U.pf("%.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
-        }
+        U.pf("ll %.1f  ", ll);
     }
 
 	static void makePredictions(String outputFile) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, IOException {
@@ -488,7 +543,7 @@ public class LRParser {
 	///////////////////////////////////////////////////////////
 	
 	static void initializeFeatureExtractors() {
-		allFE2.add(new WordFormFE());
+		allFE2.add(new BasicFeatures());
 	}
 
 }
