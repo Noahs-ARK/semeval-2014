@@ -30,9 +30,14 @@ public class LRParser {
 	
 	// 1. Data structures
 	static Graph[] graphs;
-	static InputAnnotatedSentence[] inputSentences = null;
-	static NumberizedSentence[] nbdSentences = null;
-	static ArrayList<int[][]> graphMatrixes = null;
+	static InputAnnotatedSentence[] inputSentences = null; // full dataset
+	static ArrayList<int[][]> graphMatrixes = null;  // full dataset
+	
+	// 'mb' prefix means it only contains items for the current minibatch.
+	static ArrayList<NumberizedSentence> mbNumberizedSentences = null;
+	static ArrayList<int[][]> mbGraphMatrixes = null;
+
+	
 	
 	// 2. Feature system and model parameters
 //	static List<FE.FeatureExtractor1> allFE1 = new ArrayList<>();
@@ -44,14 +49,14 @@ public class LRParser {
 	
 	// 3. Model parameter-ish options
 	static int maxEdgeDistance = 10;
-	static double l2reg = 1.0;
+	static double l2reg = .01;  // this is per-sentence scaled
 	static double noedgeWeight = 0.3;
 	
 	// 4. Runtime options
 	static boolean verboseFeatures = false;
-	static String featureExtractionStrategy = "ram_cache";
-	static double learningRate = 1e-2;
-	static int numTrainIters = 20;
+	static int numItersInMinibatch = 30;  // iterations within a minibatch
+	static int numOuterIters = 2;  // iterations over entire dataset
+	static int minibatchSize = 100;  // number of sentences within a minibatch (to be loaded into memory at once)
 	
 	
 	
@@ -125,16 +130,16 @@ public class LRParser {
 			for (int k=0; k<labelVocab.size(); k++) {
 				featVocab.num(labelBiasName(k));
 			}
-			if (featureExtractionStrategy.equals("ram_cache")) {
-						t0 = System.currentTimeMillis();
-				extractFeaturesForAll();
-						dur = System.currentTimeMillis() - t0;
-						U.pf("\nFE TIME %.1f sec,  %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
-				lockdownVocabAndAllocateCoefs();
-			}
+			
+//					t0 = System.currentTimeMillis();
+//			extractFeaturesForAll();
+//					dur = System.currentTimeMillis() - t0;
+//					U.pf("\nFE TIME %.1f sec,  %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
+//			lockdownVocabAndAllocateCoefs();
 			
 					t0 = System.currentTimeMillis();
-			trainLBFGS();
+			trainingOuterloop();
+//			trainLBFGS();
 					dur = System.currentTimeMillis() - t0;
 					U.pf("TRAINLOOP TIME %.1f sec\n", dur/1e3);
 
@@ -180,10 +185,10 @@ public class LRParser {
 	static int totalPairs = 0;
 	
 	static void extractFeaturesForAll() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		nbdSentences = new NumberizedSentence[inputSentences.length];
+		mbNumberizedSentences = new ArrayList<>();
 		for (int i=0; i<inputSentences.length; i++) {
 			U.pf(".");
-			nbdSentences[i] = extractFeatures(i);
+			mbNumberizedSentences.add( extractFeatures(i) );
 		}
 		U.pf("\n");
 		if (NumberizedSentence.totalNNZ > 0) {
@@ -343,35 +348,57 @@ public class LRParser {
 		U.pf("Num features: %d\n", featVocab.size());
 	}
 	
-	/** the abstraction that decides whether to do new feature extraction, use RAM cache, or use disk cache */
-	static NumberizedSentence getNumberizedSentence(int snum) {
-		if (featureExtractionStrategy.equals("ram_cache")) {
-			return nbdSentences[snum];
+	static void trainingOuterloop() {
+		int numMinibatches = (int) Math.ceil(1.0*inputSentences.length / minibatchSize);
+		U.pf("%d minibatches over %d total sentences\n", numMinibatches, inputSentences.length);
+		
+		for (int outer=0; outer<numOuterIters; outer++) {
+			U.pf("outer loop %d\n", outer);
+			for (int mb=0; mb<numMinibatches; mb++) {
+				assert ! labelVocab.isLocked();
+				assert ! featVocab.isLocked();
+				
+				U.pf("Minibatch %d/%d, extract features ", mb, numMinibatches);  System.out.flush();
+				mbNumberizedSentences = new ArrayList<>();
+				mbGraphMatrixes = new ArrayList<>();
+				for (int i=mb*minibatchSize; i<(mb+1)*minibatchSize; i++) {
+					if (i >= inputSentences.length) break;
+					U.pf(".");
+					mbNumberizedSentences.add( extractFeatures(i) );
+					mbGraphMatrixes.add( graphMatrixes.get(i) );
+				}
+				if (coefs==null) {
+					coefs = new double[featVocab.size()];
+				} 
+				else if (coefs.length < featVocab.size()){
+					// pad in 0's for the new features
+					double[] old = coefs;
+					coefs = new double[featVocab.size()];
+					System.arraycopy(old,0, coefs,0, old.length);
+				}
+				trainOnCurrentMinibatch();
+			}
 		}
-		else if (featureExtractionStrategy.equals("always_redo")) {
-			return extractFeatures(snum);
-		}
-		assert false : "bad option";
-		return null;
 	}
-	
-	/** lbfgs only works for vocab-lockdown form */
-	static void trainLBFGS() {
-		U.pf("Starting training with\n");
-		U.pf("Label vocab (size %d): %s\n", labelVocab.size(), labelVocab.names());
-		U.pf("Num features: %d\n", featVocab.size());
 
-		double initcoefs[] = new double[featVocab.size()];
-		LBFGS.Result r = LBFGS.lbfgs(initcoefs, numTrainIters, new LBFGS.Function() {
+	static void trainOnCurrentMinibatch() {
+		U.pf("Minibatch starting with label vocab size %d, num features %d\n",
+				labelVocab.size(), featVocab.size());
+
+		double initcoefs[] = Arr.copy(coefs);
+		LBFGS.Result r = LBFGS.lbfgs(initcoefs, numItersInMinibatch, new LBFGS.Function() {
 
 			@Override
 			public double evaluate(double[] newCoefs, double[] grad, int n, double step) {
 				Arr.fill(grad,0);  // gonna go in ascent direction, flip only at end
 				coefs = Arr.copy(newCoefs);
 				double ll = 0;
-				for (int snum=0; snum<inputSentences.length; snum++) {
-					NumberizedSentence ns = getNumberizedSentence(snum);
-					int[][] edgeMatrix = graphMatrixes.get(snum);
+				
+				// indexing is relative to within the MINIBATCH
+				
+				for (int snum=0; snum<mbNumberizedSentences.size(); snum++) {
+					NumberizedSentence ns = mbNumberizedSentences.get(snum);
+					int[][] edgeMatrix = mbGraphMatrixes.get(snum);
 					
 					double[][][] probs = inferEdgeProbs(ns);
 					
@@ -395,8 +422,8 @@ public class LRParser {
 				//  logprior  =  - (1/2) lambda || beta ||^2
 				//  gradient =  - lambda beta
 				for (int f=0; f<coefs.length; f++) {
-					ll -= 0.5 * l2reg * coefs[f]*coefs[f];
-					grad[f] -= l2reg * coefs[f];
+					ll -= 0.5 * l2reg * mbNumberizedSentences.size() * coefs[f]*coefs[f];
+					grad[f] -= l2reg * mbNumberizedSentences.size() * coefs[f];
 				}
 				Arr.multiplyInPlace(grad, -1);
 				return -ll;
