@@ -374,13 +374,14 @@ public class LRParser {
     }
 	
     static double adagradRate(int featnum) {
-        if (Math.abs(ssGrad[featnum]) < 1e-2) return 1.0;
+        if (ssGrad[featnum] < 1e-2) return 1.0/Math.sqrt(1e-2);
         return 1.0 / Math.sqrt(ssGrad[featnum]);
     }
     static void adagradStore(int featnum, double g) {
         ssGrad[featnum] += g*g;
     }
     static void trainOnlineIter(boolean firstIter) {
+    	double t0=System.currentTimeMillis();
         double ll = 0;
         for (int snum=0; snum<inputSentences.length; snum++) {
         	U.pf(".");
@@ -427,96 +428,11 @@ public class LRParser {
         U.pf("ll %.1f\n", ll);
         if (firstIter) {
         	U.pf("%d features\n", featVocab.size());
+        	double dur = System.currentTimeMillis() - t0;
+        	U.pf("%.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
         }
     }
 
-
-	static void trainingOuterloopMB() {
-		int numMinibatches = (int) Math.ceil(1.0*inputSentences.length / minibatchSize);
-		U.pf("%d minibatches over %d total sentences\n", numMinibatches, inputSentences.length);
-		
-		for (int outer=0; outer<numMBOuterIters; outer++) {
-			U.pf("outer loop %d\n", outer);
-			for (int mb=0; mb<numMinibatches; mb++) {
-				assert ! labelVocab.isLocked();
-				assert ! featVocab.isLocked();
-				
-				U.pf("Minibatch %d/%d, extract features ", mb, numMinibatches);  System.out.flush();
-				mbNumberizedSentences = new ArrayList<>();
-				mbGraphMatrixes = new ArrayList<>();
-				for (int i=mb*minibatchSize; i<(mb+1)*minibatchSize; i++) {
-					if (i >= inputSentences.length) break;
-					U.pf(".");
-					mbNumberizedSentences.add( extractFeatures(i) );
-					mbGraphMatrixes.add( graphMatrixes.get(i) );
-				}
-				if (coefs==null) {
-					coefs = new double[featVocab.size()];
-				} 
-				else if (coefs.length < featVocab.size()){
-					// pad in 0's for the new features
-					double[] old = coefs;
-					coefs = new double[featVocab.size()];
-					System.arraycopy(old,0, coefs,0, old.length);
-				}
-				trainOnCurrentMinibatch();
-			}
-		}
-	}
-
-	static void trainOnCurrentMinibatch() {
-		U.pf("Minibatch starting with label vocab size %d, num features %d\n",
-				labelVocab.size(), featVocab.size());
-
-		double initcoefs[] = Arr.copy(coefs);
-		LBFGS.Result r = LBFGS.lbfgs(initcoefs, numMBInnerIters, new LBFGS.Function() {
-
-			@Override
-			public double evaluate(double[] newCoefs, double[] grad, int n, double step) {
-				Arr.fill(grad,0);  // gonna go in ascent direction, flip only at end
-				coefs = Arr.copy(newCoefs);
-				double ll = 0;
-				
-				// indexing is relative to within the MINIBATCH
-				
-				for (int snum=0; snum<mbNumberizedSentences.size(); snum++) {
-					NumberizedSentence ns = mbNumberizedSentences.get(snum);
-					int[][] edgeMatrix = mbGraphMatrixes.get(snum);
-					
-					double[][][] probs = inferEdgeProbs(ns);
-					
-					for (int kk=0; kk<ns.nnz; kk++) {
-						int i=ns.i(kk), j=ns.j(kk);
-						double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
-						int observed = edgeMatrix[i][j] == ns.label(kk) ? 1 : 0;
-						double resid = observed - probs[i][j][ns.label(kk)];
-						grad[ns.featnum(kk)] += w * resid * ns.value(kk);
-					}
-					
-					for (int i=0;i<ns.T;i++) {
-						for (int j=0; j<ns.T;j++) {
-							if (badDistance(i,j)) continue;
-//							assert Math.abs( Arr.sum(probs[i][j])  - 1 ) < 1e-5;
-							double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
-							ll += w * Math.log(probs[i][j][edgeMatrix[i][j]]);
-						}
-					}
-				}
-				//  logprior  =  - (1/2) lambda || beta ||^2
-				//  gradient =  - lambda beta
-				for (int f=0; f<coefs.length; f++) {
-					ll -= 0.5 * l2reg * mbNumberizedSentences.size() * coefs[f]*coefs[f];
-					grad[f] -= l2reg * mbNumberizedSentences.size() * coefs[f];
-				}
-				Arr.multiplyInPlace(grad, -1);
-				return -ll;
-			}
-		});
-		
-		U.pf("LBFGS status %s\n", r.status);
-		coefs = initcoefs;
-	}
-	
 	static void makePredictions(String outputFile) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, IOException {
 		BufferedWriter bw = BasicFileIO.openFileToWriteUTF8(outputFile);
 		PrintWriter out = new PrintWriter(bw);
