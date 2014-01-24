@@ -7,24 +7,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
-import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
-import edu.cmu.cs.ark.semeval2014.lr.fe.WordFormFE;
 import sdp.graph.Edge;
 import sdp.graph.Graph;
 import sdp.io.GraphReader;
 import util.Arr;
 import util.BasicFileIO;
-import util.LBFGS;
-import util.Timer;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
 import util.misc.Triple;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
+import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
+import edu.cmu.cs.ark.semeval2014.lr.fe.WordFormFE;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
-//import edu.cmu.cs.ark.semeval2014.common.FeatureExtractor1;
-//import edu.cmu.cs.ark.semeval2014.common.FeatureExtractor2;
 
 public class LRParser {
 	
@@ -33,9 +28,7 @@ public class LRParser {
 	static InputAnnotatedSentence[] inputSentences = null; // full dataset
 	static ArrayList<int[][]> graphMatrixes = null;  // full dataset
 	
-	// 'mb' prefix means it only contains items for the current minibatch.
-	static ArrayList<NumberizedSentence> mbNumberizedSentences = null;
-	static ArrayList<int[][]> mbGraphMatrixes = null;
+//	static ArrayList<NumberizedSentence> numberizedSentences = null;
 
 	
 	
@@ -49,15 +42,12 @@ public class LRParser {
 	
 	// 3. Model parameter-ish options
 	static int maxEdgeDistance = 10;
-	static double l2reg = .01;  // this is per-sentence scaled
+	static double l2reg = .01;
 	static double noedgeWeight = 0.3;
 	
 	// 4. Runtime options
 	static boolean verboseFeatures = false;
-	static int numMBInnerIters = 30;  // iterations within a minibatch
-	static int numMBOuterIters = 2;  // iterations over entire dataset
 	static int numOnlineIters = 20;
-	static int minibatchSize = 100;  // number of sentences within a minibatch (to be loaded into memory at once)
 	
 	
 	
@@ -184,33 +174,21 @@ public class LRParser {
 	
 	static int totalPairs = 0;
 	
-	static void extractFeaturesForAll() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		mbNumberizedSentences = new ArrayList<>();
-		for (int i=0; i<inputSentences.length; i++) {
-			U.pf(".");
-			mbNumberizedSentences.add( extractFeatures(i) );
-		}
-		U.pf("\n");
-		if (NumberizedSentence.totalNNZ > 0) {
-			U.pf("Total NNZ %d\n", NumberizedSentence.totalNNZ);
-		}
-		if (totalPairs > 0) {
-			U.pf("Total pairs %d\n", totalPairs);
-		}
-	}
-	
 	static class FullAdder extends FE.FeatureAdder {
 		int i=-1, j=-1, labelID=-1;
 		NumberizedSentence ns;
+		// these are only for debugging
+		InputAnnotatedSentence is;
+		int[][] goldEdgeMatrix;
 		
 		@Override
 		public void add(String featname, double value) {
-//			if (verboseFeatures) {
-//				U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", 
-//						is.sentence()[i[0]], i[0], is.sentence()[j[0]], j[0],
-//						goldEdgeMatrix!=null ? labelVocab.name(goldEdgeMatrix[i[0]][j[0]]) : null,
-//						featname, value);
-//			}
+			if (verboseFeatures && goldEdgeMatrix != null) {
+				U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", 
+						is.sentence()[i], i, is.sentence()[j], j,
+						goldEdgeMatrix!=null ? labelVocab.name(goldEdgeMatrix[i][j]) : null,
+						featname, value);
+			}
 			int featnum = featVocab.num(featname);
 			if (featnum==-1) return;
 			ns.add(i,j, featnum, labelID, value);
@@ -254,6 +232,10 @@ public class LRParser {
 		NumberizedSentence ns = new NumberizedSentence( size(is) );
 		FullAdder adder = new FullAdder();
 		adder.ns=ns;
+		
+		// only for debugging
+		adder.is=is;
+		adder.goldEdgeMatrix = goldEdgeMatrix;
 		
 		for (FE.FeatureExtractor2 fe : allFE2) {
 			fe.setupSentence(is);
@@ -473,32 +455,34 @@ public class LRParser {
 	static class MyGraph {
 		boolean[] isChildOfSomething;
 		boolean[] isPred;
-		ArrayList< Triple<Integer,Integer,String> > edgelist;
+		List< Triple<Integer,Integer,String> > edgelist;
 		String[][] edgeMatrix;
+		MyGraph(int sentenceLength, List<Triple<Integer,Integer,String>>_edgelist) {
+			edgelist = _edgelist;
+			isChildOfSomething = new boolean[sentenceLength];
+			isPred = new boolean[sentenceLength];
+			edgeMatrix = new String[sentenceLength][sentenceLength];
+			for (Triple<Integer,Integer,String> tt : _edgelist) {
+				int i=tt.first, j=tt.second;
+				edgeMatrix[i][j] = tt.third;
+				isPred[i] = true;
+				isChildOfSomething[j] = true;
+			}
+		}
 	}
 	static MyGraph decodeEdgeprobsToGraph(InputAnnotatedSentence sent, double[][][] probs) {
 //		Graph g = new Graph("#"+sent.sentenceId());
-		MyGraph g = new MyGraph();
-		g.isChildOfSomething = new boolean[size(sent)];
-		g.isPred = new boolean[size(sent)];
-		
-		g.edgelist = new ArrayList<>();
-		g.edgeMatrix = new String[size(sent)][size(sent)];
+		List<Triple<Integer,Integer,String>> edgelist = new ArrayList<>();
 		for (int i=0; i<size(sent); i++) {
 			for (int j=0; j<size(sent); j++) {
 				if (badDistance(i,j)) continue;
 				int predlabel = Arr.argmax(probs[i][j]);
 				Triple<Integer,Integer,String> tt = new Triple(i,j,labelVocab.name(predlabel));
 				if (tt.third.equals("NOEDGE")) continue;
-				
-				g.edgelist.add(tt);
-				g.edgeMatrix[i][j] = tt.third;
-				g.isPred[i] = true;
-				g.isChildOfSomething[j] = true;
+				edgelist.add(tt);
 			}
 		}
-		
-		return g;
+		return new MyGraph(size(sent), edgelist);
 	}
 	
 	///////////////////////////////////////////////////////////
