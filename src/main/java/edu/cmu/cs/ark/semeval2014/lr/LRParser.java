@@ -6,7 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +67,6 @@ public class LRParser {
 		String depFile = args[3];
 		
 		assert mode.equals("train") || mode.equals("test");
-		
 		
 		// Data loading
 		
@@ -128,6 +130,7 @@ public class LRParser {
 					U.pf("TRAINLOOP TIME %.1f sec\n", dur/1e3);
 
 			saveModel(modelFile);
+			Files.delete(Paths.get(featureCacheFile));
 		}
 		else if (mode.equals("test")) {
 			loadModel(modelFile);
@@ -352,48 +355,6 @@ public class LRParser {
     	}
     }
 
-    // START feature cache stuff
-    // uses https://github.com/EsotericSoftware/kryo found from http://stackoverflow.com/questions/239280/which-is-the-best-alternative-for-java-serialization
-    
-    static Kryo kryo;
-    static { kryo = new Kryo(); }
-    static boolean cacheReadMode = false;
-    static Input kryoInput;
-    static Output kryoOutput;
-    static String featureCacheFile = "featcache.bin";
-    
-    /** this should work with or without caching enabled.
-     * for caching, assume accesses are in order!!
-     */
-    static NumberizedSentence getNextExample(int snum) {
-    	if (useFeatureCache && cacheReadMode) {
-    		return kryo.readObject(kryoInput, NumberizedSentence.class);
-    	} else {
-    		NumberizedSentence ns = extractFeatures(snum);
-    		if (useFeatureCache) { 
-    			kryo.writeObject(kryoOutput, ns);
-    		}
-    		return ns;
-    	}
-    }
-    static void openCacheForWriting() throws FileNotFoundException {
-    	if (!useFeatureCache) return;
-        kryoOutput = new Output(new FileOutputStream(featureCacheFile));
-    }
-    static void closeCacheAfterWriting() {
-    	if (!useFeatureCache) return;
-    	kryoOutput.close();
-    }
-    static void resetCacheReader() throws FileNotFoundException {
-    	if (!useFeatureCache) return;
-    	if (kryoInput != null) {
-        	kryoInput.close();
-    	}
-    	kryoInput = new Input(new FileInputStream(featureCacheFile));
-    }
-    
-    // END feature cache stuff
-    
     
 	static double[] ssGrad;
 	static double learningRate = .1;
@@ -539,7 +500,52 @@ public class LRParser {
 		}
 		return new MyGraph(size(sent), edgelist);
 	}
+	////////////////////////////////
 	
+    // START feature cache stuff
+    // uses https://github.com/EsotericSoftware/kryo found from http://stackoverflow.com/questions/239280/which-is-the-best-alternative-for-java-serialization
+    
+    static Kryo kryo;
+    static { kryo = new Kryo(); }
+    static boolean cacheReadMode = false;
+    static Input kryoInput;
+    static Output kryoOutput;
+    static String featureCacheFile;
+    static { featureCacheFile = "featcache." + MiscUtil.getProcessId("bla") + ".bin"; }
+    
+    /** this should work with or without caching enabled.
+     * for caching, assume accesses are in order!!
+     */
+    static NumberizedSentence getNextExample(int snum) {
+    	if (useFeatureCache && cacheReadMode) {
+    		return kryo.readObject(kryoInput, NumberizedSentence.class);
+    	} else {
+    		NumberizedSentence ns = extractFeatures(snum);
+    		if (useFeatureCache) { 
+    			kryo.writeObject(kryoOutput, ns);
+    		}
+    		return ns;
+    	}
+    }
+    static void openCacheForWriting() throws FileNotFoundException {
+    	if (!useFeatureCache) return;
+        kryoOutput = new Output(new FileOutputStream(featureCacheFile));
+    }
+    static void closeCacheAfterWriting() {
+    	if (!useFeatureCache) return;
+    	kryoOutput.close();
+    }
+    static void resetCacheReader() throws FileNotFoundException {
+    	if (!useFeatureCache) return;
+    	if (kryoInput != null) {
+        	kryoInput.close();
+    	}
+    	kryoInput = new Input(new FileInputStream(featureCacheFile));
+    }
+    
+    // END feature cache stuff
+    
+
 	///////////////////////////////////////////////////////////
 	
 	static void initializeFeatureExtractors() {
