@@ -58,6 +58,12 @@ public class NumberizedSentence {
 		System.arraycopy(x,0, y,0, x.length);
 		return y;
 	}
+	static double[] grow(double[] x, double growth_multiplier) {
+		double[] y = new double[(int) Math.floor(growth_multiplier)];
+		System.arraycopy(x,0, y,0, x.length);
+		return y;
+	}
+
 	void growIfNecessary() {
 		int curCapacity = iIndexes.length;
 		if (nnz == curCapacity) {

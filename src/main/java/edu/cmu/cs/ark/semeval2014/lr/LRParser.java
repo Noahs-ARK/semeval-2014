@@ -48,7 +48,9 @@ public class LRParser {
 	
 	// 4. Runtime options
 	static boolean verboseFeatures = false;
+	static String featureExtractionStrategy = "ram_cache";
 	static int numTrainIters = 20;
+	
 	
 	
 //	static List<Class<FeatureExtractor1>> allFE1 = new ArrayList<>();
@@ -121,15 +123,19 @@ public class LRParser {
 			for (int k=0; k<labelVocab.size(); k++) {
 				featVocab.num(labelBiasName(k));
 			}
-					t0 = System.currentTimeMillis();
-			extractFeatures(true);
-					dur = System.currentTimeMillis() - t0;
-					U.pf("\nFE TIME %.1f sec,  %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
-			lockdownVocabAndAllocateCoefs();
+			if (featureExtractionStrategy.equals("ram_cache")) {
+						t0 = System.currentTimeMillis();
+				extractFeaturesForAll();
+						dur = System.currentTimeMillis() - t0;
+						U.pf("\nFE TIME %.1f sec,  %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
+				lockdownVocabAndAllocateCoefs();
+			}
+			
 					t0 = System.currentTimeMillis();
 			trainLoop();
 					dur = System.currentTimeMillis() - t0;
-					U.pf("\nTRAINLOOP TIME %.1f sec\n", dur/1e3);
+					U.pf("TRAINLOOP TIME %.1f sec\n", dur/1e3);
+
 			saveModel(modelFile);
 		}
 		else if (mode.equals("test")) {
@@ -140,7 +146,6 @@ public class LRParser {
 					dur = System.currentTimeMillis() - t0;
 					U.pf("\nPRED TIME %.1f sec, %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
 		}
-		
 	}
 	
 	static int size(InputAnnotatedSentence s) { 
@@ -172,14 +177,11 @@ public class LRParser {
 	
 	static int totalPairs = 0;
 	
-	static void extractFeatures(boolean overcomplete) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	static void extractFeaturesForAll() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		nbdSentences = new NumberizedSentence[inputSentences.length];
 		for (int i=0; i<inputSentences.length; i++) {
 			U.pf(".");
-			nbdSentences[i] = extractFeatures(inputSentences[i], overcomplete, 
-					graphMatrixes!=null ? graphMatrixes.get(i) : null
-//					overcomplete ? null : graphMatrixes.get(i)
-					);
+			nbdSentences[i] = extractFeatures(i);
 		}
 		U.pf("\n");
 		if (NumberizedSentence.totalNNZ > 0) {
@@ -222,15 +224,27 @@ public class LRParser {
 //		}
 //	}
 
-	/** 
-	 * if overcomplete, extracts for ALL possible edge labels. Give null for the goldEdgeMatrix then.
-	 * if not overcomplete, only extracts 
+	static NumberizedSentence extractFeatures(int snum) {
+		try {
+			
+			return extractFeatures(inputSentences[snum], graphMatrixes!=null ? graphMatrixes.get(snum) : null);
+			
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * goldEdgeMatrix is only for feature extractor debugging verbose reports 
 	 */
-	static NumberizedSentence extractFeatures(final InputAnnotatedSentence is, 
-			boolean overcomplete, final int[][] goldEdgeMatrix
+	static NumberizedSentence extractFeatures(
+			InputAnnotatedSentence is, int[][] goldEdgeMatrix
 	) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 
-		final NumberizedSentence ns = new NumberizedSentence( size(is) );
+		NumberizedSentence ns = new NumberizedSentence( size(is) );
 		FullAdder adder = new FullAdder();
 		adder.ns=ns;
 		
@@ -274,6 +288,8 @@ public class LRParser {
 	}
 	
 	static void saveModel(String modelFile) throws IOException {
+		U.pf("Saving model to %s\n", modelFile);
+		
 		BufferedWriter writer = BasicFileIO.openFileToWriteUTF8(modelFile);
 		PrintWriter out = new PrintWriter(writer);
 
@@ -324,6 +340,17 @@ public class LRParser {
 		U.pf("Num features: %d\n", coefs.length);
 	}
 	
+	/** the abstraction that decides whether to do new feature extraction, use RAM cache, or use disk cache */
+	static NumberizedSentence getNumberizedSentence(int snum) {
+		if (featureExtractionStrategy.equals("ram_cache")) {
+			return nbdSentences[snum];
+		}
+		else if (featureExtractionStrategy.equals("always_redo")) {
+			return extractFeatures(snum);
+		}
+		assert false : "bad option";
+		return null;
+	}
 	
 	static void trainLoop() {
 		U.pf("Starting training with\n");
@@ -339,7 +366,7 @@ public class LRParser {
 				coefs = Arr.copy(newCoefs);
 				double ll = 0;
 				for (int snum=0; snum<inputSentences.length; snum++) {
-					NumberizedSentence ns = nbdSentences[snum];
+					NumberizedSentence ns = getNumberizedSentence(snum);
 					int[][] edgeMatrix = graphMatrixes.get(snum);
 					
 					double[][][] probs = inferEdgeProbs(ns);
@@ -383,7 +410,7 @@ public class LRParser {
 
 		for (int snum=0; snum<inputSentences.length; snum++) {
 			InputAnnotatedSentence sent = inputSentences[snum];
-			NumberizedSentence ns = extractFeatures(sent, true, null);
+			NumberizedSentence ns = extractFeatures(sent, null);
 			double[][][] probs = inferEdgeProbs(ns);
 			MyGraph g = decodeEdgeprobsToGraph(sent, probs);
 
@@ -443,6 +470,20 @@ public class LRParser {
 		
 		return g;
 	}
+	
+//	static int numUsedCoefs = -1;
+//	
+//	/** In batch mode, coef cardinality is locked down ahead of time.
+//	 * This is special for online-training, in which you don't even know your total coef size before you run.
+//	 */
+//	void growCoefsIfNecessary() {
+//		assert numUsedCoefs != -1;
+//		if (featVocab.size() > numUsedCoefs) {
+//			coefs = NumberizedSentence.grow(coefs, 1.2);
+//			numUsedCoefs = 
+//		}
+//		
+//	}
 	
 	///////////////////////////////////////////////////////////
 	
