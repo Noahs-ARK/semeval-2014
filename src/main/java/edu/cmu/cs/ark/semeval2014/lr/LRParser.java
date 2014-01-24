@@ -119,6 +119,7 @@ public class LRParser {
 		initializeFeatureExtractors();
 		for (FE.FeatureExtractor fe : allFE) {
 			assert (fe instanceof FE.TokenFE) || (fe instanceof FE.EdgeFE) : "all feature extractors need to implement one of the interfaces!";
+			fe.initializeAtStartup();
 		}
 
 		double t0,dur;
