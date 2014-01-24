@@ -59,7 +59,13 @@ public class NumberizedSentence {
 		return y;
 	}
 	static double[] grow(double[] x, double growth_multiplier) {
-		double[] y = new double[(int) Math.floor(growth_multiplier)];
+		double[] y = new double[(int) Math.floor(growth_multiplier * x.length)];
+		System.arraycopy(x,0, y,0, x.length);
+		return y;
+	}
+	static double[] growToLength(double[] x, int newlength) {
+		assert newlength >= x.length;
+		double[] y = new double[newlength];
 		System.arraycopy(x,0, y,0, x.length);
 		return y;
 	}

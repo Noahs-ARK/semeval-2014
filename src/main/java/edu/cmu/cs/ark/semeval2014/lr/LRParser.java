@@ -54,8 +54,9 @@ public class LRParser {
 	
 	// 4. Runtime options
 	static boolean verboseFeatures = false;
-	static int numItersInMinibatch = 30;  // iterations within a minibatch
-	static int numOuterIters = 2;  // iterations over entire dataset
+	static int numMBInnerIters = 30;  // iterations within a minibatch
+	static int numMBOuterIters = 2;  // iterations over entire dataset
+	static int numOnlineIters = 20;
 	static int minibatchSize = 100;  // number of sentences within a minibatch (to be loaded into memory at once)
 	
 	
@@ -125,7 +126,6 @@ public class LRParser {
 
 		double t0,dur;
 		if (mode.equals("train")) {
-			U.pf("Feature extraction "); System.out.flush();
 			featVocab = new Vocabulary();
 			for (int k=0; k<labelVocab.size(); k++) {
 				featVocab.num(labelBiasName(k));
@@ -138,8 +138,8 @@ public class LRParser {
 //			lockdownVocabAndAllocateCoefs();
 			
 					t0 = System.currentTimeMillis();
-			trainingOuterloop();
-//			trainLBFGS();
+			trainingOuterloopOnline(modelFile);
+//			trainingOuterloopMB();
 					dur = System.currentTimeMillis() - t0;
 					U.pf("TRAINLOOP TIME %.1f sec\n", dur/1e3);
 
@@ -348,11 +348,94 @@ public class LRParser {
 		U.pf("Num features: %d\n", featVocab.size());
 	}
 	
-	static void trainingOuterloop() {
+    static void trainingOuterloopOnline(String modelFilePrefix) throws IOException {
+    	for (int outer=0; outer<numOnlineIters; outer++) {
+    		U.pf("iter %3d ", outer);  System.out.flush();
+    		trainOnlineIter(outer==0);
+    		saveModel(U.sf("%s.iter%s",modelFilePrefix, outer+1));
+    	}
+    }
+	static double[] ssGrad;
+	static double learningRate = .1;
+	
+    static void growCoefsIfNecessary() {
+    	assert coefs==null&&ssGrad==null || coefs.length==ssGrad.length;
+    	if (coefs==null) {
+    		coefs = new double[Math.max(10000, featVocab.size())];
+    		ssGrad = new double[Math.max(10000, featVocab.size())];
+    	}
+    	else if (featVocab.size() > coefs.length) {
+    		int newlen = (int) Math.ceil(1.2 * featVocab.size());
+            coefs = NumberizedSentence.growToLength(coefs, newlen);
+            ssGrad = NumberizedSentence.growToLength(ssGrad, newlen);
+            assert coefs.length==ssGrad.length;
+//            U.pf("GROW COEFS TO %d\n", coefs.length);
+        }
+    }
+	
+    static double adagradRate(int featnum) {
+        if (Math.abs(ssGrad[featnum]) < 1e-2) return 1.0;
+        return 1.0 / Math.sqrt(ssGrad[featnum]);
+    }
+    static void adagradStore(int featnum, double g) {
+        ssGrad[featnum] += g*g;
+    }
+    static void trainOnlineIter(boolean firstIter) {
+        double ll = 0;
+        for (int snum=0; snum<inputSentences.length; snum++) {
+        	U.pf(".");
+            
+            NumberizedSentence ns = extractFeatures(snum);
+            if (firstIter) {
+                growCoefsIfNecessary();
+            }
+            int[][] edgeMatrix = graphMatrixes.get(snum);
+            
+            double[][][] probs = inferEdgeProbs(ns);
+            
+            for (int kk=0; kk<ns.nnz; kk++) {
+                
+                int i=ns.i(kk), j=ns.j(kk);
+                double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
+                int observed = edgeMatrix[i][j] == ns.label(kk) ? 1 : 0;
+                double resid = observed - probs[i][j][ns.label(kk)];
+                double g = w * resid * ns.value(kk);
+                
+                adagradStore(ns.featnum(kk), g);
+                double rate = adagradRate(ns.featnum(kk));
+
+                coefs[ns.featnum(kk)] += learningRate * rate * g;
+                
+            }
+            
+            for (int i=0;i<ns.T;i++) {
+                for (int j=0; j<ns.T;j++) {
+                    if (badDistance(i,j)) continue;
+                    double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
+                    ll += w * Math.log(probs[i][j][edgeMatrix[i][j]]);
+                }
+            }
+        }
+        //  logprior  =  - (1/2) lambda || beta ||^2
+        //  gradient =  - lambda beta
+        for (int f=0; f<coefs.length; f++) {
+            ll -= 0.5 * l2reg * coefs[f]*coefs[f];
+            double g = l2reg * coefs[f];
+            adagradStore(f,g);
+            coefs[f] -= adagradRate(f) * learningRate * g;
+        }
+        U.pf("ll %.1f\n", ll);
+        if (firstIter) {
+        	U.pf("%d features\n", featVocab.size());
+        }
+    }
+
+
+	static void trainingOuterloopMB() {
 		int numMinibatches = (int) Math.ceil(1.0*inputSentences.length / minibatchSize);
 		U.pf("%d minibatches over %d total sentences\n", numMinibatches, inputSentences.length);
 		
-		for (int outer=0; outer<numOuterIters; outer++) {
+		for (int outer=0; outer<numMBOuterIters; outer++) {
 			U.pf("outer loop %d\n", outer);
 			for (int mb=0; mb<numMinibatches; mb++) {
 				assert ! labelVocab.isLocked();
@@ -386,7 +469,7 @@ public class LRParser {
 				labelVocab.size(), featVocab.size());
 
 		double initcoefs[] = Arr.copy(coefs);
-		LBFGS.Result r = LBFGS.lbfgs(initcoefs, numItersInMinibatch, new LBFGS.Function() {
+		LBFGS.Result r = LBFGS.lbfgs(initcoefs, numMBInnerIters, new LBFGS.Function() {
 
 			@Override
 			public double evaluate(double[] newCoefs, double[] grad, int n, double step) {
