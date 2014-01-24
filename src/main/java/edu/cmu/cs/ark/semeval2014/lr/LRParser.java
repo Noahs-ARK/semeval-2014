@@ -1,6 +1,7 @@
 package edu.cmu.cs.ark.semeval2014.lr;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -572,6 +573,9 @@ public class LRParser {
     static void closeCacheAfterWriting() {
     	if (!useFeatureCache) return;
     	kryoOutput.close();
+    	long size = new File(featureCacheFile).length();
+    	U.pf("Feature cache (%s) is %.1f MB, %.2f MB/sent\n", 
+    			featureCacheFile, size*1.0/1e6, size*1.0/1e6/inputSentences.length);
     }
     static void resetCacheReader() throws FileNotFoundException {
     	if (!useFeatureCache) return;

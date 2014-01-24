@@ -7,6 +7,8 @@ import util.Arr;
 public class NumberizedSentence {
 	int T;  // sentence length
 
+	// The lengths of these things are capacity, not actual number of values.  Use 'nnz' for that.
+	
 	int[] iIndexes;
 	int[] jIndexes;
 	int[] featnums;
@@ -30,13 +32,14 @@ public class NumberizedSentence {
 	int label(int kk) { return labels[kk]; }
 	float value(int kk) { return values[kk]; }
 	
-	static long totalNNZ = 0;
+	static long totalNNZ = 0;  // only for diagnosis
 	
 	static final int INIT_SIZE = 100;
 	static final double GROWTH_MULTIPLIER = 1.5;
 	
 	public NumberizedSentence() {
 	}
+	
 	NumberizedSentence(int sentenceLength) {
 		T = sentenceLength;
 		
@@ -46,7 +49,6 @@ public class NumberizedSentence {
 		featnums = new int[INIT_SIZE];
 		labels = new int[INIT_SIZE];
 		values = new float[INIT_SIZE];
-		
 	}
 	
 	static int[] grow(int[] x) {
