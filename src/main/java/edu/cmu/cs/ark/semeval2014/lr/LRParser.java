@@ -39,7 +39,10 @@ public class LRParser {
 	static List<FE.FeatureExtractor2> allFE2 = new ArrayList<>();
 	static Vocabulary labelVocab = new Vocabulary();
 	static Vocabulary featVocab;
-	static double[] coefs; // ok let's do the giant flattened form.
+	static double[] coefs; // ok let's do the giant flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
+	static int numUsedCoefs = -1;
+	static double[] sumSqGradHistory; // for adagrad
+
 	
 	// 3. Model parameter-ish options
 	static int maxEdgeDistance = 10;
@@ -49,6 +52,7 @@ public class LRParser {
 	// 4. Runtime options
 	static boolean verboseFeatures = false;
 	static String featureExtractionStrategy = "ram_cache";
+	static double learningRate = 1e-2;
 	static int numTrainIters = 20;
 	
 	
@@ -132,7 +136,8 @@ public class LRParser {
 			}
 			
 					t0 = System.currentTimeMillis();
-			trainLoop();
+//			trainLBFGS();
+			trainOnline();
 					dur = System.currentTimeMillis() - t0;
 					U.pf("TRAINLOOP TIME %.1f sec\n", dur/1e3);
 
@@ -274,6 +279,8 @@ public class LRParser {
 		featVocab.lock();
 		labelVocab.lock();
 		coefs = new double[featVocab.size()];
+		numUsedCoefs = featVocab.size();
+		sumSqGradHistory = new double[featVocab.size()];
 	}
 	static int labelBiasFeatnum(int label) {
 		int n = featVocab.num(labelBiasName( label ));
@@ -298,7 +305,8 @@ public class LRParser {
 			out.append(x + " ");
 		}
 		out.append("\n");
-		assert featVocab.size() == coefs.length;
+//		assert featVocab.size() == coefs.length; // No more!
+		assert featVocab.size() <= coefs.length;
 		for (int f=0; f<featVocab.size(); f++) {
 			out.printf("C\t%s\t%g\n", featVocab.name(f), coefs[f]);
 		}
@@ -337,7 +345,7 @@ public class LRParser {
 		reader.close();
 		
 		U.pf("Label vocab (size %d): %s\n", labelVocab.size(), labelVocab.names());
-		U.pf("Num features: %d\n", coefs.length);
+		U.pf("Num features: %d\n", featVocab.size());
 	}
 	
 	/** the abstraction that decides whether to do new feature extraction, use RAM cache, or use disk cache */
@@ -352,10 +360,65 @@ public class LRParser {
 		return null;
 	}
 	
-	static void trainLoop() {
+	static void trainOnline() {
+		for (int iter=0; iter<numTrainIters; iter++) {
+			U.pf("iter %3d ", iter);  System.out.flush();
+			trainOnlineIter(iter==0);
+		}
+	}
+	static double adagradRate(int featnum) {
+		if (sumSqGradHistory[featnum] == 0) return 1.0;
+		return 1.0 / Math.sqrt(sumSqGradHistory[featnum]);
+	}
+	static void adagradStore(int featnum, double g) {
+		sumSqGradHistory[featnum] += g*g;
+	}
+	static void trainOnlineIter(boolean firstIter) {
+		double ll = 0;
+		for (int snum=0; snum<inputSentences.length; snum++) {
+			
+			NumberizedSentence ns = getNumberizedSentence(snum);
+			if (firstIter) {
+				growCoefsIfNecessary();
+			}
+			int[][] edgeMatrix = graphMatrixes.get(snum);
+			
+			double[][][] probs = inferEdgeProbs(ns);
+			
+			for (int kk=0; kk<ns.nnz; kk++) {
+				double rate = adagradRate(ns.featnum(kk));
+				
+				int i=ns.i(kk), j=ns.j(kk);
+				double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
+				int observed = edgeMatrix[i][j] == ns.label(kk) ? 1 : 0;
+				double resid = observed - probs[i][j][ns.label(kk)];
+				double g = w * resid * ns.value(kk);
+				coefs[ns.featnum(kk)] += learningRate * rate * g;
+				
+				adagradStore(ns.featnum(kk), g);
+			}
+			
+			for (int i=0;i<ns.T;i++) {
+				for (int j=0; j<ns.T;j++) {
+					if (badDistance(i,j)) continue;
+					double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
+					ll += w * Math.log(probs[i][j][edgeMatrix[i][j]]);
+				}
+			}
+		}
+		//  logprior  =  - (1/2) lambda || beta ||^2
+		//  gradient =  - lambda beta
+		for (int f=0; f<coefs.length; f++) {
+			ll -= learningRate * 0.5 * l2reg * coefs[f]*coefs[f];
+			coefs[f] -= learningRate * l2reg * coefs[f];
+		}
+		U.pf("ll %.1f\n", ll);
+	}
+	/** lbfgs only works for vocab-lockdown form */
+	static void trainLBFGS() {
 		U.pf("Starting training with\n");
 		U.pf("Label vocab (size %d): %s\n", labelVocab.size(), labelVocab.names());
-		U.pf("Num features: %d\n", coefs.length);
+		U.pf("Num features: %d\n", featVocab.size());
 
 		double initcoefs[] = new double[featVocab.size()];
 		LBFGS.Result r = LBFGS.lbfgs(initcoefs, numTrainIters, new LBFGS.Function() {
@@ -471,19 +534,18 @@ public class LRParser {
 		return g;
 	}
 	
-//	static int numUsedCoefs = -1;
-//	
-//	/** In batch mode, coef cardinality is locked down ahead of time.
-//	 * This is special for online-training, in which you don't even know your total coef size before you run.
-//	 */
-//	void growCoefsIfNecessary() {
-//		assert numUsedCoefs != -1;
-//		if (featVocab.size() > numUsedCoefs) {
-//			coefs = NumberizedSentence.grow(coefs, 1.2);
-//			numUsedCoefs = 
-//		}
-//		
-//	}
+	
+	/** In batch mode, coef cardinality is locked down ahead of time.
+	 * This is special for online-training, in which you don't even know your total coef size before you run.
+	 */
+	static void growCoefsIfNecessary() {
+		assert numUsedCoefs != -1;
+		if (featVocab.size() > numUsedCoefs) {
+			coefs = NumberizedSentence.grow(coefs, 1.2);
+			U.pf("GROW COEFS TO %d\n", coefs.length);
+			numUsedCoefs = featVocab.size();
+		}
+	}
 	
 	///////////////////////////////////////////////////////////
 	
