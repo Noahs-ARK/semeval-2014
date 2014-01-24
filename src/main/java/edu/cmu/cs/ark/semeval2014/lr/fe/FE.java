@@ -2,27 +2,44 @@ package edu.cmu.cs.ark.semeval2014.lr.fe;
 
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 
-// If you want to do fancier setup when starting a new sentence, override the setupSentence() method
-
+/**
+ * Every feature extractor class 
+ *     - must extend FeatureExtractor
+ *     - must implement one or more of the FeatureExtractor* interfaces
+ *  
+ * A feature extractor object gets created once at startup.
+ * For every sentence, setupSentence() gets called, which by default assigns the InputAnnotatedSentence object to the member 'sent'.
+ * It's expected that subclasses will access it there.
+ * 
+ * If you want to do fancier setup when starting a new sentence, override the setupSentence() method.
+ * If you want fancier setup at parser startup time, override initializeAtStartup().
+ * 
+ */
 public class FE {
 
-	/** extract single-token features. */
-	public static abstract class FeatureExtractor1 {
+	public static abstract class FeatureExtractor {
+		
 		/** the current sentence from which features are being extracted. */
 		public InputAnnotatedSentence sent;
+		
+		/** This gets called once when starting on a new sentence. If you override this, make sure to assign to 'sent'. */
 		public void setupSentence(InputAnnotatedSentence _sent) {
 			sent = _sent;
 		}
-		abstract public void features(InputAnnotatedSentence sent, int word1, FeatureAdder fa);
+		
+		/** If you want to load resources or something at parser startup time, override this. */
+		public void initializeAtStartup() {
+		}
+		
+	}
+
+	/** If you implement this, you're saying: I know how to extract single-token features. */
+	public static interface TokenFE {
+		abstract public void features(int word1, FeatureAdder fa);
 	}
 	
-	/** extract features for a token pair, and label output type. */
-	public static abstract class FeatureExtractor2 {
-		/** the current sentence from which features are being extracted. */
-		public InputAnnotatedSentence sent;
-		public void setupSentence(InputAnnotatedSentence _sent) {
-			sent = _sent;
-		}
+	/** If you implement this, your'e saying: I know how to extract directed edge (token pair) features. */
+	public static interface EdgeFE {
 		abstract public void features(int word1, int word2, String label, FeatureAdder fa);
 	}
 	

@@ -39,8 +39,7 @@ public class LRParser {
 	static ArrayList<int[][]> graphMatrixes = null;  // full dataset
 	
 	// 2. Feature system and model parameters
-//	static List<FE.FeatureExtractor1> allFE1 = new ArrayList<>();
-	static List<FE.FeatureExtractor2> allFE2 = new ArrayList<>();
+	static List<FE.FeatureExtractor> allFE = new ArrayList<>();
 	static Vocabulary labelVocab = new Vocabulary();
 	static Vocabulary featVocab;
 	static double[] coefs; // ok let's do the giant flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
@@ -117,6 +116,9 @@ public class LRParser {
 		U.pf("%d input sentences\n", inputSentences.length);
 
 		initializeFeatureExtractors();
+		for (FE.FeatureExtractor fe : allFE) {
+			assert (fe instanceof FE.TokenFE) || (fe instanceof FE.EdgeFE) : "all feature extractors need to implement one of the interfaces!";
+		}
 
 		double t0,dur;
 		if (mode.equals("train")) {
@@ -169,9 +171,49 @@ public class LRParser {
 		return i==j || Math.abs(i-j) > maxEdgeDistance;
 	}
 	
-	static int totalPairs = 0;
+	static long totalPairs = 0;  // only for diagnosis
 	
-	static class FullAdder extends FE.FeatureAdder {
+	static class TokenFeatAdder extends FE.FeatureAdder {
+		int i=-1, labelID=-1;
+		NumberizedSentence ns;
+		InputAnnotatedSentence is; // only for debugging
+		
+		@Override
+		public void add(String featname, double value) {
+			if (verboseFeatures) {
+				U.pf("NODEFEAT\t%s:%d\t%s\n", is.sentence()[i], featname);
+			}
+			
+			for (int labelID=0; labelID < labelVocab.size(); labelID++) {
+				String labelStr = labelVocab.name(labelID);
+				String ff;
+				int featnum;
+				
+				// this is kinda a hack, put it in both directions for every edge. we could use smarter data structures rather than the full matrix of edge featvecs to represent this more compactly.
+				
+				ff = U.sf("%s::ashead_%s", featname, labelStr);
+				featnum = featVocab.num(ff);
+				if (featnum!=-1) {
+					for (int j=0; j<ns.T; j++) {
+						if (badDistance(i,j)) continue;
+						ns.add(i,j, featnum, labelID, value);
+					}
+				}
+				
+				ff = U.sf("%s::aschild_%s", featname, labelStr);
+				featnum = featVocab.num(ff);
+				if (featnum!=-1) {
+					for (int j=0; j<ns.T; j++) {
+						if (badDistance(j,i)) continue;
+						ns.add(j,i, featnum, labelID, value);
+					}
+				}
+				
+			}
+		}
+	}
+	
+	static class EdgeFeatAdder extends FE.FeatureAdder {
 		int i=-1, j=-1, labelID=-1;
 		NumberizedSentence ns;
 		// these are only for debugging
@@ -180,32 +222,65 @@ public class LRParser {
 		
 		@Override
 		public void add(String featname, double value) {
-			if (verboseFeatures && goldEdgeMatrix != null) {
-				U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", 
-						is.sentence()[i], i, is.sentence()[j], j,
-						goldEdgeMatrix!=null ? labelVocab.name(goldEdgeMatrix[i][j]) : null,
-						featname, value);
-			}
 			int featnum = featVocab.num(featname);
 			if (featnum==-1) return;
 			ns.add(i,j, featnum, labelID, value);
+			
+			if (verboseFeatures) {
+				U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", is.sentence()[i], i, is.sentence()[j], j, 
+						goldEdgeMatrix!=null ? labelVocab.name(goldEdgeMatrix[i][j]) : null, featname, value);
+			}
+
 		}
 	}
 	
-//	static class LabelConjAdder extends FE.FeatureAdder {
-//		int i=-1, j=-1;
-//		NumberizedSentence ns;
-//		@Override
-//		public void add(String featname, double value) {
-//			int featnum = featVocab.num(featname);
-//			if (featnum==-1) return;
-//			for (int label=0; label<labelVocab.size(); label++) {
-//				assert false : "wrong";
-//				ns.argFeatures[i][j].add(new FVLItem(featnum, label, value));	
-//			}
-//		}
-//	}
+	/**
+	 * goldEdgeMatrix is only for feature extractor debugging verbose reports 
+	 */
+	static NumberizedSentence extractFeatures(
+			InputAnnotatedSentence is, int[][] goldEdgeMatrix
+	) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 
+		NumberizedSentence ns = new NumberizedSentence( size(is) );
+		EdgeFeatAdder adder2 = new EdgeFeatAdder();
+		TokenFeatAdder adder1 = new TokenFeatAdder();
+		adder1.ns=adder2.ns=ns;
+		
+		// only for verbose feature extraction reporting
+		adder1.is = adder2.is=is;
+		adder2.goldEdgeMatrix = goldEdgeMatrix;
+		
+		for (FE.FeatureExtractor fe : allFE) {
+			fe.setupSentence(is);
+		}
+		
+		for (adder2.i=0; adder2.i<ns.T; adder2.i++) {
+			adder1.i = adder2.i;
+			for (FE.FeatureExtractor fe : allFE) {
+				if (fe instanceof FE.TokenFE) {
+					((FE.TokenFE) fe).features(adder1.i, adder1);
+				}
+			}
+			
+			for (adder2.j=0; adder2.j<ns.T; adder2.j++) {
+				
+				if (badDistance(adder2.i,adder2.j)) continue;
+//				totalPairs++;
+				
+				for (adder2.labelID=0; adder2.labelID<labelVocab.size(); adder2.labelID++) {
+					ns.add(adder2.i, adder2.j, labelBiasFeatnum(adder2.labelID), adder2.labelID, 1.0);
+					String label = labelVocab.name(adder2.labelID);
+					for (FE.FeatureExtractor fe : allFE) {
+						if (fe instanceof FE.EdgeFE) {
+							((FE.EdgeFE) fe).features(adder2.i, adder2.j, label, adder2);
+						}
+					}
+				}
+			}
+		}
+		return ns;
+	}
+	
 	static NumberizedSentence extractFeatures(int snum) {
 		try {
 			
@@ -217,43 +292,6 @@ public class LRParser {
 			e.printStackTrace();
 		}
 		return null;
-	}
-	
-	/**
-	 * goldEdgeMatrix is only for feature extractor debugging verbose reports 
-	 */
-	static NumberizedSentence extractFeatures(
-			InputAnnotatedSentence is, int[][] goldEdgeMatrix
-	) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-
-		NumberizedSentence ns = new NumberizedSentence( size(is) );
-		FullAdder adder = new FullAdder();
-		adder.ns=ns;
-		
-		// only for debugging
-		adder.is=is;
-		adder.goldEdgeMatrix = goldEdgeMatrix;
-		
-		for (FE.FeatureExtractor2 fe : allFE2) {
-			fe.setupSentence(is);
-		}
-		
-		for (adder.i=0; adder.i<ns.T; adder.i++) {
-			for (adder.j=0; adder.j<ns.T; adder.j++) {
-				
-				if (badDistance(adder.i,adder.j)) continue;
-				totalPairs++;
-				
-				for (adder.labelID=0; adder.labelID<labelVocab.size(); adder.labelID++) {
-					ns.add(adder.i, adder.j, labelBiasFeatnum(adder.labelID), adder.labelID, 1.0);
-					String label = labelVocab.name(adder.labelID);
-					for (FE.FeatureExtractor2 fe : allFE2) {
-						fe.features(adder.i, adder.j, label, adder);
-					}
-				}
-			}
-		}
-		return ns;
 	}
 	
 	static void lockdownVocabAndAllocateCoefs() {
@@ -549,7 +587,7 @@ public class LRParser {
 	///////////////////////////////////////////////////////////
 	
 	static void initializeFeatureExtractors() {
-		allFE2.add(new BasicFeatures());
+		allFE.add(new BasicFeatures());
 	}
 
 }

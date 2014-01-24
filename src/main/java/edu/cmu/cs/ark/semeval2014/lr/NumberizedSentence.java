@@ -30,7 +30,7 @@ public class NumberizedSentence {
 	int label(int kk) { return labels[kk]; }
 	float value(int kk) { return values[kk]; }
 	
-	static int totalNNZ = 0;
+	static long totalNNZ = 0;
 	
 	static final int INIT_SIZE = 100;
 	static final double GROWTH_MULTIPLIER = 1.5;
