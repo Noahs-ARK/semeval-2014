@@ -30,6 +30,8 @@ public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE
 		String w2 = sent.sentence()[word2].toLowerCase();
 		if (whitelist.contains(w1) && whitelist.contains(w2)) {
 			fa.add(U.sf("lc:bg:%s_%s_%s", w1.toLowerCase(), w2.toLowerCase(), label));
+		} else {
+			fa.add(U.sf("lc:bg:OOV_%s", label));
 		}
 
 		String p1 = sent.pos()[word1];
@@ -47,9 +49,8 @@ public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE
 		fa.add(U.sf("pos:%s", p1));
 		
 		String w1 = sent.pos()[word1].toLowerCase();
-		if (whitelist.contains(w1)) {
-			fa.add("lc:" + w1);
-		}
+		w1 = whitelist.contains(w1) ? w1 : "OOV";
+		fa.add("lc:" + w1);
 	}
 
 }
