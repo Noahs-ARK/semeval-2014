@@ -28,6 +28,7 @@ import util.Vocabulary;
 import util.misc.Pair;
 import util.misc.Triple;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
+import edu.cmu.cs.ark.semeval2014.lr.fe.BrownClusters;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
@@ -385,7 +386,7 @@ public class LRParser {
         	double dur = System.currentTimeMillis() - t0;
         	U.pf("%.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
     		
-        	if (outer % 5 == 0) saveModel(U.sf("%s.iter%s",modelFilePrefix, outer));
+//        	if (outer % 5 == 0) saveModel(U.sf("%s.iter%s",modelFilePrefix, outer));
     		
     		if (outer==0) {
     			closeCacheAfterWriting();
@@ -593,6 +594,7 @@ public class LRParser {
 	
 	static void initializeFeatureExtractors() {
 		allFE.add(new BasicFeatures());
+		allFE.add(new BrownClusters());
 	}
 
 }

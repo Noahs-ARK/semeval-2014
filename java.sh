@@ -12,6 +12,7 @@ CP=$HOME/.sbt/boot/scala-2.10.3/lib/scala-library.jar:$CP
 CP=lib/sdp.jar:$CP
 CP=lib/myutil.jar:$CP
 CP=lib/kryo-2.22-all.jar:$CP
+CP=lib/commons-lang3-3.2.1.jar:$CP
 
 # file.encoding necessary for mac (ugh!!) http://stackoverflow.com/questions/361975/setting-the-default-java-character-encoding
 # XX:ParallelGCThreads prevents horrible crashes on large multicore machines (basically, another stupid java bug)
