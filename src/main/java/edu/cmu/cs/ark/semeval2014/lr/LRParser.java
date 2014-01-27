@@ -30,6 +30,7 @@ import util.misc.Triple;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
+import edu.cmu.cs.ark.semeval2014.lr.fe.LinearOrderFeatures;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 
 public class LRParser {
@@ -593,6 +594,7 @@ public class LRParser {
 	
 	static void initializeFeatureExtractors() {
 		allFE.add(new BasicFeatures());
+		allFE.add(new LinearOrderFeatures());
 	}
 
 }
