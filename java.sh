@@ -14,6 +14,9 @@ set -eu
 klass="edu.cmu.cs.ark.semeval2014.$1"
 shift
 
-# TODO: instead of using "sbt run-main ...", it's probably easier to package into uberjar then "java -cp uberjar.jar ..."
 # make sure your bin/sbt doesn't override these JAVA_OPTS, or just include these in bin/sbt
-JAVA_OPTS="-ea -Dfile.encoding=UTF-8 -XX:ParallelGCThreads=2 -Xmx4g" sbt "run-main $klass $*"
+JAVA_OPTS="-ea -Dfile.encoding=UTF-8 -XX:ParallelGCThreads=2 -Xmx4g"
+
+sbt "run-main $klass $*"
+## alternatively, run "sbt assembly" then you can put the uberjar on the classpath like below
+# java ${JAVA_OPTS} -cp target/scala-2.10/semeval2014-assembly-0.1-SNAPSHOT.jar $klass $@

@@ -1,3 +1,7 @@
+import AssemblyKeys._
+
+assemblySettings
+
 name := "semeval2014"
 
 version := "0.1-SNAPSHOT"
@@ -10,6 +14,4 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "1.9.2"
 )
 
-//mainClass := Some("edu.cmu.lti.nlp.amr.AMRParser")
-
-mainClass := None
+mainClass := Some("edu.cmu.cs.ark.semeval2014.lr.LRParser")
