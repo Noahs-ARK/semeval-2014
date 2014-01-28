@@ -15,7 +15,7 @@ public class LinearOrderFeatures extends FE.FeatureExtractor implements FE.Token
 
 		int dist=word1-word2;
 		fa.add(U.sf("lin:%s_%s", dist, label));
-		//fa.add(U.sf("left:%s_%s", (word1<word2), label));
+		fa.add(U.sf("left:%s_%s", (word1<word2), label));
 	}
 
 	@Override

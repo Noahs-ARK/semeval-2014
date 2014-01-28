@@ -39,7 +39,6 @@ public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE
 		fa.add(U.sf("pos:bg:%s_%s_%s", p1, p2, label));
 		
 		String dir = word1>word2 ? "dir=i>j" : "dir=i<j";
-		fa.add(dir);
 		fa.add(U.sf("pos:bg:%s_%s_%s_%s", p1, p2, dir, label));
 	}
 
