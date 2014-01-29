@@ -44,7 +44,10 @@ public class LRParser {
 	static List<FE.FeatureExtractor> allFE = new ArrayList<>();
 	static Vocabulary labelVocab = new Vocabulary();
 	static Vocabulary featVocab;
-	static double[] coefs; // ok let's do the giant flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
+	static double[] coefs; // flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
+	static double[] ssGrad;  // adagrad history info. parallel to coefs[].
+	static double learningRate = .1;
+	
 
 	
 	// 3. Model parameter-ish options
@@ -57,9 +60,6 @@ public class LRParser {
     static boolean useFeatureCache = true;
     static int saveModelAtEvery = 10;  // -1 to disable intermediate model saves
 	static int numOnlineIters = 30;
-	
-//	static List<Class<FeatureExtractor1>> allFE1 = new ArrayList<>();
-//	static List<Class<FeatureExtractor2>> allFE2 = new ArrayList<>();
 	
 	
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
@@ -151,31 +151,6 @@ public class LRParser {
 	static int size(InputAnnotatedSentence s) { 
 		return s.sentence().length;
 	}
-	/** returns:  (#tokens x #tokens x #labelvocab)
-	 * for token i and token j, prob dist over the possible edge labels.
-	 */
-	static double[][][] inferEdgeProbs(NumberizedSentence ns) {
-		double[][][] scores = inferEdgeScores(ns);
-		// transform in-place into probs
-		for (int i=0; i<ns.T; i++) {
-			for (int j=0; j<ns.T; j++) {
-				if (badDistance(i,j)) continue;
-				Arr.softmaxInPlace(scores[i][j]);
-			}
-		}
-		return scores;
-	}
-	/** returns:  (#tokens x #tokens x #labelvocab)
-	 * for token i and token j, nonneg scores (unnorm probs) per edge label
-	 */
-	static double[][][] inferEdgeScores(NumberizedSentence ns) {
-		double[][][] scores = new double[ns.T][ns.T][labelVocab.size()];
-		for (int kk=0; kk<ns.nnz; kk++) {
-			scores[ns.i(kk)][ns.j(kk)][ns.label(kk)] += coefs[ns.featnum(kk)] * ns.value(kk);
-		}
-		return scores;
-	}
-
 	public static boolean badDistance(int i, int j) {
 		return i==j || Math.abs(i-j) > maxEdgeDistance;
 	}
@@ -404,9 +379,6 @@ public class LRParser {
     }
 
     
-	static double[] ssGrad;
-	static double learningRate = .1;
-	
     static void growCoefsIfNecessary() {
     	assert coefs==null&&ssGrad==null || coefs.length==ssGrad.length;
     	if (coefs==null) {
@@ -481,6 +453,32 @@ public class LRParser {
 		}
 		return ll;
 	}
+	/** returns:  (#tokens x #tokens x #labelvocab)
+	 * for token i and token j, prob dist over the possible edge labels.
+	 */
+	static double[][][] inferEdgeProbs(NumberizedSentence ns) {
+		double[][][] scores = inferEdgeScores(ns);
+		// transform in-place into probs
+		for (int i=0; i<ns.T; i++) {
+			for (int j=0; j<ns.T; j++) {
+				if (badDistance(i,j)) continue;
+				Arr.softmaxInPlace(scores[i][j]);
+			}
+		}
+		return scores;
+	}
+	/** returns:  (#tokens x #tokens x #labelvocab)
+	 * for token i and token j, nonneg scores (unnorm probs) per edge label
+	 */
+	static double[][][] inferEdgeScores(NumberizedSentence ns) {
+		double[][][] scores = new double[ns.T][ns.T][labelVocab.size()];
+		for (int kk=0; kk<ns.nnz; kk++) {
+			scores[ns.i(kk)][ns.j(kk)][ns.label(kk)] += coefs[ns.featnum(kk)] * ns.value(kk);
+		}
+		return scores;
+	}
+
+
 
 	static void makePredictions(String outputFile) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, IOException {
 		BufferedWriter bw = BasicFileIO.openFileToWriteUTF8(outputFile);
