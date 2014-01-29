@@ -15,7 +15,8 @@ klass="edu.cmu.cs.ark.semeval2014.$1"
 shift
 
 # make sure your bin/sbt doesn't override these JAVA_OPTS, or just include these in bin/sbt
-JAVA_OPTS="-ea -Dfile.encoding=UTF-8 -XX:ParallelGCThreads=2 -Xmx4g"
+export JAVA_OPTS="-ea -Dfile.encoding=UTF-8 -XX:ParallelGCThreads=2 -Xmx4g"
+export SBT_OPTS=$JAVA_OPTS
 
 sbt "run-main $klass $*"
 ## alternatively, run "sbt assembly" then you can put the uberjar on the classpath like below
