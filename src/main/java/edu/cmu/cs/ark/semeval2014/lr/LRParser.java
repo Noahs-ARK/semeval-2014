@@ -55,6 +55,7 @@ public class LRParser {
 	// 4. Runtime options
 	static boolean verboseFeatures = false;
     static boolean useFeatureCache = true;
+    static int saveModelAtEvery = 10;  // -1 to disable intermediate model saves
 	static int numOnlineIters = 30;
 	
 //	static List<Class<FeatureExtractor1>> allFE1 = new ArrayList<>();
@@ -391,7 +392,8 @@ public class LRParser {
         	double dur = System.currentTimeMillis() - t0;
         	U.pf("%.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
     		
-        	if (outer % 5 == 0) saveModel(U.sf("%s.iter%s",modelFilePrefix, outer));
+        	if (saveModelAtEvery >= 0 && outer % saveModelAtEvery == 0)
+        		saveModel(U.sf("%s.iter%s",modelFilePrefix, outer));
     		
     		if (outer==0) {
     			closeCacheAfterWriting();
@@ -420,13 +422,13 @@ public class LRParser {
         }
     }
 	
-    static double adagradRate(int featnum) {
-        if (ssGrad[featnum] < 1e-2) return 1.0/Math.sqrt(1e-2);
+    /** From the new gradient value, update this feature's learning rate and return it. */
+    static double adagradStoreRate(int featnum, double g) {
+        ssGrad[featnum] += g*g;
+        if (ssGrad[featnum] < 1e-2) return 10.0; // 1/sqrt(.01)
         return 1.0 / Math.sqrt(ssGrad[featnum]);
     }
-    static void adagradStore(int featnum, double g) {
-        ssGrad[featnum] += g*g;
-    }
+    
     
     /** adagrad: http://www.ark.cs.cmu.edu/cdyer/adagrad.pdf */ 
     static void trainOnlineIter(boolean firstIter) throws FileNotFoundException {
@@ -439,43 +441,46 @@ public class LRParser {
             if (firstIter) {
                 growCoefsIfNecessary();
             }
-            int[][] edgeMatrix = graphMatrixes.get(snum);
-            
-            double[][][] probs = inferEdgeProbs(ns);
-            
-            for (int kk=0; kk<ns.nnz; kk++) {
-                int i=ns.i(kk), j=ns.j(kk);
-                double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
-                int observed = edgeMatrix[i][j] == ns.label(kk) ? 1 : 0;
-                double resid = observed - probs[i][j][ns.label(kk)];
-                double g = w * resid * ns.value(kk);
-                
-                adagradStore(ns.featnum(kk), g);
-                double rate = adagradRate(ns.featnum(kk));
-
-                coefs[ns.featnum(kk)] += learningRate * rate * g;
-            }
-            
-            // loglik is completely unnecessary for optimization, just nice for diagnosis.
-            // comment this out for 5% speed gain
-            for (int i=0;i<ns.T;i++) {
-                for (int j=0; j<ns.T;j++) {
-                    if (badDistance(i,j)) continue;
-                    double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
-                    ll += w * Math.log(probs[i][j][edgeMatrix[i][j]]);
-                }
-            }
+    		int[][] edgeMatrix = graphMatrixes.get(snum);
+            ll += updateExampleLogreg(ns, edgeMatrix);
         }
         //  logprior  =  - (1/2) lambda || beta ||^2
         //  gradient =  - lambda beta
         for (int f=0; f<coefs.length; f++) {
             ll -= 0.5 * l2reg * coefs[f]*coefs[f];
             double g = l2reg * coefs[f];
-            adagradStore(f,g);
-            coefs[f] -= adagradRate(f) * learningRate * g;
+            coefs[f] -= adagradStoreRate(f,g) * learningRate * g;
         }
         U.pf("ll %.1f  ", ll);
     }
+
+	static double updateExampleLogreg(NumberizedSentence ns, int[][] edgeMatrix) {
+		double ll = 0;
+		
+		double[][][] probs = inferEdgeProbs(ns);
+		
+		for (int kk=0; kk<ns.nnz; kk++) {
+		    int i=ns.i(kk), j=ns.j(kk);
+		    double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
+		    int observed = edgeMatrix[i][j] == ns.label(kk) ? 1 : 0;
+		    double resid = observed - probs[i][j][ns.label(kk)];
+		    double g = w * resid * ns.value(kk);
+		    
+		    double rate = adagradStoreRate(ns.featnum(kk), g);
+
+		    coefs[ns.featnum(kk)] += learningRate * rate * g;
+		}
+		
+		// loglik is completely unnecessary for optimization, just nice for diagnosis.
+		for (int i=0;i<ns.T;i++) {
+		    for (int j=0; j<ns.T;j++) {
+		        if (badDistance(i,j)) continue;
+		        double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
+		        ll += w * Math.log(probs[i][j][edgeMatrix[i][j]]);
+		    }
+		}
+		return ll;
+	}
 
 	static void makePredictions(String outputFile) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, IOException {
 		BufferedWriter bw = BasicFileIO.openFileToWriteUTF8(outputFile);
