@@ -154,22 +154,27 @@ public class LRParser {
 	 * for token i and token j, prob dist over the possible edge labels.
 	 */
 	static double[][][] inferEdgeProbs(NumberizedSentence ns) {
-		double[][][] scores = new double[ns.T][ns.T][labelVocab.size()];  // intermediate scores, but finally becomes probs for return
-		
-		for (int kk=0; kk<ns.nnz; kk++) {
-			scores[ns.i(kk)][ns.j(kk)][ns.label(kk)] += coefs[ns.featnum(kk)] * ns.value(kk);
-		}
+		double[][][] scores = inferEdgeScores(ns);
+		// transform in-place into probs
 		for (int i=0; i<ns.T; i++) {
 			for (int j=0; j<ns.T; j++) {
-				
 				if (badDistance(i,j)) continue;
-
-				// transform in-place into probs
 				Arr.softmaxInPlace(scores[i][j]);
 			}
 		}
 		return scores;
 	}
+	/** returns:  (#tokens x #tokens x #labelvocab)
+	 * for token i and token j, nonneg scores (unnorm probs) per edge label
+	 */
+	static double[][][] inferEdgeScores(NumberizedSentence ns) {
+		double[][][] scores = new double[ns.T][ns.T][labelVocab.size()];
+		for (int kk=0; kk<ns.nnz; kk++) {
+			scores[ns.i(kk)][ns.j(kk)][ns.label(kk)] += coefs[ns.featnum(kk)] * ns.value(kk);
+		}
+		return scores;
+	}
+
 	public static boolean badDistance(int i, int j) {
 		return i==j || Math.abs(i-j) > maxEdgeDistance;
 	}
