@@ -35,12 +35,12 @@ public class FE {
 
 	/** If you implement this, you're saying: I know how to extract single-token features. */
 	public static interface TokenFE {
-		abstract public void features(int word1, FeatureAdder fa);
+		abstract public void features(int tokenIdx, FeatureAdder fa);
 	}
 	
-	/** If you implement this, your'e saying: I know how to extract directed edge (token pair) features. */
+	/** If you implement this, you're saying: I know how to extract directed edge (token pair) features. */
 	public static interface EdgeFE {
-		abstract public void features(int word1, int word2, String label, FeatureAdder fa);
+		abstract public void features(int srcTokenIdx, int destTokenIdx, String label, FeatureAdder fa);
 	}
 	
 	/** this is the callback thingy that the framework passes in to the FeatureExtractor object. */
