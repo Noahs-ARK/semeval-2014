@@ -1,0 +1,1415 @@
+#21684016	#21684016
+DEPS	1	NNP	2	nn	###	SDP	1	Mr.	Mr.	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NNP	13	nsubj	###	SDP	2	Smith	Smith	NNP	-	+	compound	_	_	_	_	_	_	ARG1	_	_	_	_	_	_	_	_
+DEPS	3	CC	2	cc	###	SDP	3	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	DT	5	det	###	SDP	4	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	NN	2	conj	###	SDP	5	spokesman	spokesman	NN	-	-	_	_and_c	BV	ARG1	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	IN	5	prep	###	SDP	6	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	DT	12	det	###	SDP	7	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NNP	12	nn	###	SDP	8	America	America+’s+Cup	NNP	-	-	_	_	_	_	_	mwe	_	_	_	_	_	_	_	_	_	_
+DEPS	9	POS	12	dep	###	SDP	9	’s	America+’s+Cup	VBZ	-	-	_	_	_	_	_	mwe	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NNP	12	nn	###	SDP	10	Cup	America+’s+Cup	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	NNP	12	nn	###	SDP	11	Organizing	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	NNP	6	pobj	###	SDP	12	Committee	_generic_proper_ne_	NNP	-	-	_	_	_	ARG2	BV	compound	compound	_	_	_	_	_	_	_	_	_
+DEPS	13	VBP	0	root	###	SDP	13	insist	insist	VBP	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	IN	25	mark	###	SDP	14	that	that	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	DT	17	det	###	SDP	15	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	JJ	17	amod	###	SDP	16	added	add	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	NN	25	nsubj	###	SDP	17	competition	competition	NN	-	-	_	_	_	_	_	_	_	_	BV	ARG2	ARG1	_	_	_	ARG1	_
+DEPS	18	IN	17	prep	###	SDP	18	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	DT	20	det	###	SDP	19	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	NN	22	poss	###	SDP	20	defender	defender	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	BV	_	_	_	_
+DEPS	21	POS	20	possessive	###	SDP	21	’s	’s	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	NN	18	pobj	###	SDP	22	spot	spot	NN	-	-	_	_	_	_	_	_	_	_	_	_	ARG2	_	poss	_	_	_
+DEPS	23	MD	25	aux	###	SDP	23	will	will	MD	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	RB	25	advmod	###	SDP	24	only	only	RB	-	+	_	_	_	_	_	_	_	ARG2	_	_	_	_	_	_	_	_
+DEPS	25	VB	13	ccomp	###	SDP	25	improve	improve	VB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG1	_	_
+DEPS	26	DT	27	det	###	SDP	26	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	27	NN	25	dobj	###	SDP	27	race	race	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV
+DEPS	28	.	13	punct	###	SDP	28	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21687041	#21687041
+DEPS	1	NNP	3	nn	###	SDP	1	West	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NNP	3	nn	###	SDP	2	Texas	Texas	NNP	-	+	compound	_	_	_	_	_	_	_	_	_
+DEPS	3	NNP	7	nsubj	###	SDP	3	Intermediate	_generic_proper_ne_	NNP	-	-	_	compound	ARG1	_	ARG1	_	_	_	_	_
+DEPS	4	IN	3	prep	###	SDP	4	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	5	NNP	6	nn	###	SDP	5	November	november	NNP	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NN	4	pobj	###	SDP	6	delivery	delivery	NN	-	-	_	_	ARG2	compound	_	_	_	_	_	_
+DEPS	7	VBD	0	root	###	SDP	7	fell	fall	VBD	+	+	_	_	_	_	_	_	loc	_	ARG1	_
+DEPS	8	CD	9	num	###	SDP	8	14	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	9	NNS	7	dobj	###	SDP	9	cents	cent	NNS	-	+	_	_	_	_	_	ARG1	_	ARG1	_	_
+DEPS	10	DT	11	det	###	SDP	10	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	11	NN	9	npadvmod	###	SDP	11	barrel	barrel	NN	-	-	_	_	_	_	_	_	_	ARG2	_	_
+DEPS	12	TO	7	prep	###	SDP	12	to	to	TO	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	13	$	12	pobj	###	SDP	13	$	$	$	-	-	_	_	_	_	_	_	_	_	ARG2	ARG1
+DEPS	14	CD	13	num	###	SDP	14	20.42	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	15	.	7	punct	###	SDP	15	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_
+
+#21689019	#21689019
+DEPS	1	PRP	3	nsubj	###	SDP	1	He	he	PRP	-	-	_	ARG1	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	2	RB	3	advmod	###	SDP	2	also	also	RB	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	VBD	0	root	###	SDP	3	declined	decline	VBD	-	+	ARG1	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	TO	5	aux	###	SDP	4	to	to	TO	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	VB	3	xcomp	###	SDP	5	comment	comment	VB	-	+	_	ARG2	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	IN	5	prep	###	SDP	6	on	on	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	DT	8	det	###	SDP	7	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NN	6	pobj	###	SDP	8	name	name	NN	-	-	_	_	ARG2	BV	_	ARG2	_	_	_	_	_	_	_
+DEPS	9	IN	12	mark	###	SDP	9	that	that	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NNP	12	nsubj	###	SDP	10	Coopers	Cooper	NNP	-	-	_	_	_	_	_	ARG1	_	_	_	_	_	_	_
+DEPS	11	MD	12	aux	###	SDP	11	would	would	MD	-	+	_	_	_	_	_	_	_	ARG1	_	_	_	_	_
+DEPS	12	VB	5	advcl	###	SDP	12	use	use	VB	-	+	_	_	_	_	ARG1	_	ARG1	_	_	_	_	_	_
+DEPS	13	IN	12	prep	###	SDP	13	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	NNP	13	pobj	###	SDP	14	England	England	NNP	-	-	_	_	_	_	_	_	ARG2	_	_	_	_	_	_
+DEPS	15	IN	18	mark	###	SDP	15	if	if	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	NNP	17	nn	###	SDP	16	Deloitte	_generic_proper_ne_	NNP	-	-	_	_	_	_	_	_	_	_	compound	ARG1	_	_	_
+DEPS	17	NNP	18	nsubj	###	SDP	17	UK	UK	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	VBD	12	advcl	###	SDP	18	won	win	VBD	-	+	_	_	_	_	_	_	_	ARG2	_	_	_	_	_
+DEPS	19	PRP$	20	poss	###	SDP	19	its	its	PRP$	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	NN	22	nsubj	###	SDP	20	litigation	litigation	NN	-	-	_	_	_	_	_	_	_	_	_	ARG2	poss	_	_
+DEPS	21	TO	22	aux	###	SDP	21	to	to	TO	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	VB	18	xcomp	###	SDP	22	keep	keep	VB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	PRP$	24	poss	###	SDP	23	its	its	PRP$	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	NN	22	dobj	###	SDP	24	name	name	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	ARG2	poss
+DEPS	25	.	3	punct	###	SDP	25	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21691049	#21691049
+DEPS	1	``	6	punct	###	SDP	1	“	_	``	-	-	_	_	_	_
+DEPS	2	IN	6	prep	###	SDP	2	With	with	IN	-	+	_	_	_	_
+DEPS	3	DT	4	det	###	SDP	3	a	a	DT	-	+	_	_	_	_
+DEPS	4	NN	2	pobj	###	SDP	4	hurricane	hurricane	NN	-	-	ARG2	BV	_	_
+DEPS	5	PRP	6	nsubj	###	SDP	5	you	you	PRP	-	-	_	_	ARG1	_
+DEPS	6	VBP	0	root	###	SDP	6	know	know	VBP	+	+	ARG1	_	_	_
+DEPS	7	PRP	9	nsubj	###	SDP	7	it	it	PRP	-	-	_	_	_	ARG1
+DEPS	8	VBZ	9	aux	###	SDP	8	’s	’s	VBZ	-	-	_	_	_	_
+DEPS	9	VBG	6	ccomp	###	SDP	9	coming	come	VBG	-	+	_	_	ARG2	_
+DEPS	10	.	6	punct	###	SDP	10	.	_	.	-	-	_	_	_	_
+
+#21693020	#21693020
+DEPS	1	DT	2	det	###	SDP	1	The	the	DT	-	+	_	_	_	_	_
+DEPS	2	NN	4	nsubj	###	SDP	2	company	company	NN	-	-	BV	_	ARG1	_	_
+DEPS	3	RB	4	advmod	###	SDP	3	also	also	RB	+	+	_	_	_	_	_
+DEPS	4	VBZ	0	root	###	SDP	4	has	have	VBZ	-	+	_	ARG1	_	_	_
+DEPS	5	DT	7	det	###	SDP	5	a	a	DT	-	+	_	_	_	_	_
+DEPS	6	JJ	7	amod	###	SDP	6	stock-repurchase	repurchase	JJ	-	+	_	_	_	_	_
+DEPS	7	NN	4	dobj	###	SDP	7	plan	plan	NN	-	-	_	_	ARG2	BV	compound
+DEPS	8	.	4	punct	###	SDP	8	.	_	.	-	-	_	_	_	_	_
+
+#21695026	#21695026
+DEPS	1	JJ	5	dep	###	SDP	1	Fourth	fourth	JJ	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	,	5	punct	###	SDP	2	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	DT	4	det	###	SDP	3	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	NN	5	nsubj	###	SDP	4	theory	theory	NN	-	-	_	BV	ARG1	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	VBZ	0	root	###	SDP	5	indicates	indicate	VBZ	-	+	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	WRB	11	advmod	###	SDP	6	why	why	WRB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	DT	9	det	###	SDP	7	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NNP	9	nn	###	SDP	8	Republican	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	NNP	11	nsubj	###	SDP	9	Party	_generic_proper_ne_	NNP	-	-	_	_	_	_	BV	compound	_	ARG1	_	_	_	_	_	_
+DEPS	10	MD	11	aux	###	SDP	10	may	may	MD	-	+	_	_	ARG2	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	VB	5	ccomp	###	SDP	11	have	have	VB	-	+	_	_	_	ARG1	_	_	_	_	_	_	subord	_	_	_
+DEPS	12	DT	14	det	###	SDP	12	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	JJ	14	amod	###	SDP	13	difficult	difficult	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	NN	11	dobj	###	SDP	14	time	time	NN	-	-	_	_	_	_	_	_	_	ARG2	BV	ARG1	_	_	_	_
+DEPS	15	VBG	14	amod	###	SDP	15	attracting	attract	VBG	-	+	_	_	_	_	_	_	ARG1	_	_	_	_	_	_	_
+DEPS	16	JJ	17	amod	###	SDP	16	viable	viable	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	NNS	14	rcmod	###	SDP	17	candidates	candidate	NNS	-	-	_	_	_	_	_	_	_	_	_	_	ARG2	ARG1	ARG1	_
+DEPS	18	IN	17	prep	###	SDP	18	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	JJ	20	amod	###	SDP	19	congressional	congressional	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	NN	18	pobj	###	SDP	20	office	office	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	ARG1
+DEPS	21	.	5	punct	###	SDP	21	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21699004	#21699004
+DEPS	1	DT	2	det	###	SDP	1	The	the	DT	-	+	_	_	_	_	_	_	_	_	_
+DEPS	2	NNP	8	nsubj	###	SDP	2	Office	office	NNP	-	+	BV	_	_	_	ARG1	_	_	_	_
+DEPS	3	IN	2	prep	###	SDP	3	of	of	IN	-	-	_	_	_	_	_	_	_	_	_
+DEPS	4	NNP	3	pobj	###	SDP	4	Management	_generic_proper_ne_	NNP	-	+	_	ARG1	_	_	_	_	_	_	_
+DEPS	5	CC	4	cc	###	SDP	5	and	and	CC	-	-	_	_	_	_	_	_	_	_	_
+DEPS	6	NNP	4	conj	###	SDP	6	Budget	_generic_proper_ne_	NNP	-	-	_	_	_and_c	_	_	_	_	_	_
+DEPS	7	VBZ	8	aux	###	SDP	7	has	has	VBZ	-	-	_	_	_	_	_	_	_	_	_
+DEPS	8	VBN	0	root	###	SDP	8	begun	begin	VBN	+	+	_	_	_	_	_	_	_	_	_
+DEPS	9	VBG	8	dobj	###	SDP	9	looking	look	VBG	-	+	_	_	_	ARG1	_	_	_	_	_
+DEPS	10	IN	9	prep	###	SDP	10	into	into	IN	-	-	_	_	_	_	_	_	_	_	_
+DEPS	11	NN	10	pobj	###	SDP	11	legislation	legislation	NN	-	-	_	_	_	_	ARG2	_	_	_	_
+DEPS	12	TO	13	aux	###	SDP	12	to	to	TO	-	-	_	_	_	_	_	_	_	_	_
+DEPS	13	VB	8	xcomp	###	SDP	13	provide	provide	VB	-	+	_	_	_	_	_	_	_	_	_
+DEPS	14	JJR	15	amod	###	SDP	14	more	more	JJR	-	+	_	_	_	_	_	_	_	_	_
+DEPS	15	NNS	13	dobj	###	SDP	15	funds	fund	NNS	-	-	_	_	_	_	_	ARG2	ARG1	ARG1	_
+DEPS	16	IN	15	prep	###	SDP	16	for	for	IN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	17	NN	18	nn	###	SDP	17	earthquake	earthquake	NN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	18	NNS	16	pobj	###	SDP	18	repairs	repair	NNS	-	-	_	_	_	_	_	_	_	ARG2	compound
+DEPS	19	.	8	punct	###	SDP	19	.	_	.	-	-	_	_	_	_	_	_	_	_	_
+
+#21699064	#21699064
+DEPS	1	``	13	punct	###	SDP	1	“	_	``	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	IN	4	mark	###	SDP	2	If	if	IN	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	EX	4	expl	###	SDP	3	there	there	EX	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	VBZ	13	advcl	###	SDP	4	’s	’s	VBZ	-	+	ARG2	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	DT	6	det	###	SDP	5	any	any	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NN	4	nsubj	###	SDP	6	way	way	NN	-	+	_	ARG1	BV	_	_	_	_	_	_	_	_	_	_
+DEPS	7	PRP	9	dep	###	SDP	7	you	you	PRP	-	-	_	_	_	_	_	ARG1	_	_	_	_	_	_	_
+DEPS	8	MD	9	aux	###	SDP	8	can	can	MD	-	+	_	_	_	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	9	VB	6	rcmod	###	SDP	9	do	do	VB	-	+	_	_	_	_	ARG1	_	_	_	_	_	_	_	_
+DEPS	10	PRP	9	dobj	###	SDP	10	it	it	PRP	-	-	_	_	_	_	_	ARG2	_	_	_	_	_	_	_
+DEPS	11	,	13	punct	###	SDP	11	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	PRP	13	nsubj	###	SDP	12	you	you	PRP	-	-	_	_	_	_	_	_	_	ARG1	_	ARG1	ARG1	_	_
+DEPS	13	MD	0	aux	###	SDP	13	ought	ought	MD	-	+	ARG1	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	TO	15	aux	###	SDP	14	to	to	TO	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	VB	13	xcomp	###	SDP	15	go	go	VB	-	+	_	_	_	_	_	_	ARG1	_	ARG1	_	_	_	_
+DEPS	16	TO	15	prep	###	SDP	16	to	to	TO	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	NNP	16	pobj	###	SDP	17	Idaho	Idaho	NNP	-	-	_	_	_	_	_	_	_	_	ARG2	_	_	_	_
+DEPS	18	CC	15	cc	###	SDP	18	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	VB	15	conj	###	SDP	19	go	go	VB	-	+	_	_	_	_	_	_	_	_and_c	_	_	_	ARG1	_
+DEPS	20	VBG	19	amod	###	SDP	20	fishing	fish	NN	-	+	_	_	_	_	_	_	_	_	_	ARG2	_	_	_
+DEPS	21	IN	15	prep	###	SDP	21	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	DT	23	det	###	SDP	22	a	a+while	DT	-	-	_	_	_	_	_	_	_	_	_	_	_	_	mwe
+DEPS	23	NN	21	pobj	###	SDP	23	while	a+while	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	ARG2	_
+DEPS	24	.	13	punct	###	SDP	24	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	25	''	13	punct	###	SDP	25	”	_	''	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21705003	#21705003
+DEPS	1	CC	9	cc	###	SDP	1	But	but	CC	+	+	_	_	_	_	_
+DEPS	2	,	4	punct	###	SDP	2	,	_	,	-	-	_	_	_	_	_
+DEPS	3	PRP	4	nsubj	###	SDP	3	he	he	PRP	-	-	_	ARG1	_	_	_
+DEPS	4	VBZ	9	parataxis	###	SDP	4	continues	continue	VBZ	-	+	ARG2	_	_	_	_
+DEPS	5	,	4	punct	###	SDP	5	,	_	,	-	-	_	_	_	_	_
+DEPS	6	``	9	punct	###	SDP	6	“	_	``	-	-	_	_	_	_	_
+DEPS	7	PRP	9	nsubj	###	SDP	7	They	they	PRP	-	-	_	_	ARG1	_	_
+DEPS	8	VBP	9	aux	###	SDP	8	’re	’re	VBP	-	-	_	_	_	_	_
+DEPS	9	VBG	0	root	###	SDP	9	forgetting	forget	VBG	-	+	_	ARG2	_	_	_
+DEPS	10	PRP	13	nsubj	###	SDP	10	we	we	PRP	-	-	_	_	_	ARG1	_
+DEPS	11	VBP	13	cop	###	SDP	11	’re	’re	VBP	-	+	_	_	ARG2	_	ARG1
+DEPS	12	DT	13	advmod	###	SDP	12	all	all	DT	-	+	_	_	_	_	_
+DEPS	13	NNPS	9	rcmod	###	SDP	13	Texans	_generic_proper_ne_	NNPS	-	-	_	_	_	ARG2	_
+DEPS	14	.	9	punct	###	SDP	14	.	_	.	-	-	_	_	_	_	_
+
+#21706012	#21706012
+DEPS	1	DT	2	det	###	SDP	1	The	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NN	6	nsubj	###	SDP	2	result	result	NN	-	-	BV	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	3	VBZ	6	aux	###	SDP	3	has	has	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	VBN	6	cop	###	SDP	4	been	been	VBN	+	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	JJR	6	amod	###	SDP	5	thinner	thinner	JJR	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NNS	0	root	###	SDP	6	margins	margin	NNS	-	-	_	ARG2	ARG1	_	ARG2	_	_	_	_	_	_
+DEPS	7	,	6	punct	###	SDP	7	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	WDT	12	nsubjpass	###	SDP	8	which	which	WDT	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	VBP	12	aux	###	SDP	9	have	have	VBP	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	VBN	12	auxpass	###	SDP	10	been	been	VBN	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	RBR	12	advmod	###	SDP	11	further	further	RB	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	VBN	6	rcmod	###	SDP	12	eroded	erode	VBN	-	+	_	_	_	ARG1	_	_	_	_	_	_	_
+DEPS	13	IN	12	prep	###	SDP	13	by	by	IN	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	DT	16	det	###	SDP	14	an	an	DT	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	JJ	16	amod	###	SDP	15	ambitious	ambitious	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	NN	13	pobj	###	SDP	16	research	research	NN	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	CC	16	cc	###	SDP	17	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	NN	19	nn	###	SDP	18	development	development	NN	-	-	_	_	_	_	_	_	_	_and_c	_	_	_
+DEPS	19	NN	16	conj	###	SDP	19	effort	effort	NN	-	+	_	_	_	_	ARG1	BV	ARG1	compound	_	_	_
+DEPS	20	CC	13	cc	###	SDP	20	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	JJ	23	amod	###	SDP	21	rapid	rapid	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	JJ	23	amod	###	SDP	22	overseas	overseas	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	NN	13	conj	###	SDP	23	expansion	expansion	NN	-	-	_	_	_	_	_	_	_	_	_and_c	ARG1	ARG1
+DEPS	24	.	6	punct	###	SDP	24	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_
+
+#21713004	#21713004
+DEPS	1	NN	2	nsubj	###	SDP	1	Revenue	revenue	NN	-	-	ARG1	_	_	_	_	_	_	_	_
+DEPS	2	VBD	0	root	###	SDP	2	rose	rise	VBD	-	+	_	_	loc	ARG1	_	_	_	_	_
+DEPS	3	CD	4	num	###	SDP	3	3	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_
+DEPS	4	NN	2	dobj	###	SDP	4	%	%	NN	-	+	_	ARG1	_	_	_	_	_	_	_
+DEPS	5	TO	2	prep	###	SDP	5	to	to	TO	+	+	_	_	_	_	_	_	ARG1	_	_
+DEPS	6	$	5	pobj	###	SDP	6	$	$	$	-	-	_	_	_	ARG2	_	ARG1	_	_	_
+DEPS	7	CD	8	number	###	SDP	7	9	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_
+DEPS	8	CD	6	num	###	SDP	8	million	million	CD	-	+	_	_	_	_	times	_	_	_	_
+DEPS	9	IN	2	prep	###	SDP	9	from	from	IN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	10	$	9	pobj	###	SDP	10	$	$	$	-	-	_	_	_	_	_	_	ARG2	_	ARG1
+DEPS	11	CD	12	number	###	SDP	11	8.8	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_
+DEPS	12	CD	10	num	###	SDP	12	million	million	CD	-	+	_	_	_	_	_	_	_	times	_
+DEPS	13	.	2	punct	###	SDP	13	.	_	.	-	-	_	_	_	_	_	_	_	_	_
+
+#21722003	#21722003
+DEPS	1	NNP	4	nsubj	###	SDP	1	IBM	IBM	NNP	-	+	_	ARG1	_	_	ARG1	_	_
+DEPS	2	CC	1	cc	###	SDP	2	and	and	CC	-	-	_	_	_	_	_	_	_
+DEPS	3	NNP	1	conj	###	SDP	3	MCA	_generic_proper_ne_	NNP	-	-	_and_c	_	_	_	_	_	_
+DEPS	4	VBD	0	root	###	SDP	4	formed	form	VBD	-	+	_	_	ARG1	ARG1	_	_	_
+DEPS	5	NNP	4	dobj	###	SDP	5	Discovision	_generic_proper_ne_	NNP	-	-	_	ARG2	_	_	_	_	_
+DEPS	6	IN	4	prep	###	SDP	6	in	in	IN	-	+	_	_	_	_	_	_	_
+DEPS	7	CD	6	pobj	###	SDP	7	1979	_generic_year_ne_	CD	-	-	_	_	ARG2	_	_	_	_
+DEPS	8	TO	9	aux	###	SDP	8	to	to	TO	+	+	_	_	_	_	_	_	_
+DEPS	9	VB	4	xcomp	###	SDP	9	make	make	VB	-	+	_	_	_	ARG2	_	_	_
+DEPS	10	JJ	12	amod	###	SDP	10	laser-read	read	JJ	-	+	_	_	_	_	_	_	_
+DEPS	11	JJ	12	amod	###	SDP	11	optical	optical	JJ	-	+	_	_	_	_	_	_	_
+DEPS	12	NNS	9	dobj	###	SDP	12	products	product	NNS	-	-	_	_	_	_	ARG2	ARG2	ARG1
+DEPS	13	.	4	punct	###	SDP	13	.	_	.	-	-	_	_	_	_	_	_	_
+
+#21723052	#21723052
+DEPS	1	DT	3	det	###	SDP	1	The	the	DT	-	+	_	_	_
+DEPS	2	NN	3	nn	###	SDP	2	percentage	percentage	NN	-	+	_	_	_
+DEPS	3	NN	4	nsubj	###	SDP	3	change	change	NN	-	-	BV	compound	ARG1
+DEPS	4	VBZ	0	root	###	SDP	4	is	is	VBZ	-	-	_	_	_
+DEPS	5	IN	4	prep	###	SDP	5	since	since	IN	+	+	_	_	_
+DEPS	6	NN	5	pobj	###	SDP	6	year-end	end	NN	-	-	_	_	ARG2
+DEPS	7	.	4	punct	###	SDP	7	.	_	.	-	-	_	_	_
+
+#21728022	#21728022
+DEPS	1	NNP	4	nn	###	SDP	1	Big	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NNP	4	nn	###	SDP	2	Board	_generic_proper_ne_	NNP	-	+	compound	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	JJ	4	amod	###	SDP	3	short	short	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	NN	5	nsubj	###	SDP	4	interest	interest	NN	-	-	_	compound	ARG1	ARG1	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	VBD	0	root	###	SDP	5	fell	fall	VBD	+	+	_	_	_	_	_	loc	ARG1	_	_	_	_	_	_	_	_
+DEPS	6	CD	7	num	###	SDP	6	4.2	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NN	5	dobj	###	SDP	7	%	%	NN	-	+	_	_	_	_	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	8	IN	5	prep	###	SDP	8	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	DT	10	det	###	SDP	9	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NN	8	pobj	###	SDP	10	month	month	NN	-	-	_	_	_	_	_	_	ARG2	BV	ARG2	_	_	_	_	_	_
+DEPS	11	VBN	10	vmod	###	SDP	11	ended	end	VBN	-	+	_	_	_	_	_	_	_	_	_	_	loc	_	_	_	_
+DEPS	12	NNP	11	tmod	###	SDP	12	Oct.	Oct.	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	CD	12	num	###	SDP	13	13	_generic_dom_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	of	_	_	_	_	_
+DEPS	14	,	12	punct	###	SDP	14	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	DT	17	det	###	SDP	15	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	JJ	17	amod	###	SDP	16	second	second	JJ	-	-	_	_	_	_	_	_	_	_	_	_	_	BV	ARG1	_	_
+DEPS	17	NN	12	appos	###	SDP	17	decline	decline	NN	-	+	_	_	_	conj	_	_	_	_	_	_	_	_	_	ARG1	_
+DEPS	18	IN	17	prep	###	SDP	18	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	DT	20	det	###	SDP	19	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	NN	18	pobj	###	SDP	20	row	row	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV
+DEPS	21	.	5	punct	###	SDP	21	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21731008	#21731008
+DEPS	1	``	14	punct	###	SDP	1	“	_	``	-	-	_	_	_	_	_	_	_	_	_
+DEPS	2	DT	3	det	###	SDP	2	The	the	DT	-	+	_	_	_	_	_	_	_	_	_
+DEPS	3	NN	5	nsubj	###	SDP	3	market	market	NN	-	-	BV	_	ARG1	_	_	_	_	_	_
+DEPS	4	VBZ	5	aux	###	SDP	4	is	is	VBZ	-	-	_	_	_	_	_	_	_	_	_
+DEPS	5	VBG	14	ccomp	###	SDP	5	beginning	begin	VBG	-	+	_	_	_	_	_	ARG2	_	_	_
+DEPS	6	TO	7	aux	###	SDP	6	to	to	TO	-	-	_	_	_	_	_	_	_	_	_
+DEPS	7	VB	5	xcomp	###	SDP	7	disassociate	_generic_vb_	VB	-	+	_	ARG1	_	ARG1	_	_	_	_	_
+DEPS	8	PRP	7	dobj	###	SDP	8	itself	itself	PRP	-	-	_	_	ARG2	_	_	_	_	_	_
+DEPS	9	IN	7	prep	###	SDP	9	from	from	IN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	10	NNP	11	nn	###	SDP	10	Wall	Wall	NNP	-	+	_	_	_	_	_	_	_	_	_
+DEPS	11	NNP	9	pobj	###	SDP	11	Street	_generic_proper_ne_	NNP	-	-	_	_	_	ARG2	compound	_	_	_	_
+DEPS	12	,	14	punct	###	SDP	12	,	_	,	-	-	_	_	_	_	_	_	_	_	_
+DEPS	13	''	14	punct	###	SDP	13	”	_	''	-	-	_	_	_	_	_	_	_	_	_
+DEPS	14	VBD	0	root	###	SDP	14	said	say	VBD	+	+	_	_	_	_	_	_	_	_	_
+DEPS	15	CD	18	num	###	SDP	15	one	one	CD	-	+	_	_	_	_	_	_	_	_	_
+DEPS	16	NNP	18	nn	###	SDP	16	New	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_
+DEPS	17	NNP	18	nn	###	SDP	17	York	York	NNP	-	+	_	_	_	_	_	_	_	compound	_
+DEPS	18	NN	14	nsubj	###	SDP	18	trader	trader	NN	-	-	_	_	_	_	_	ARG1	ARG1	_	compound
+DEPS	19	.	14	punct	###	SDP	19	.	_	.	-	-	_	_	_	_	_	_	_	_	_
+
+#21735022	#21735022
+DEPS	1	JJ	5	nsubj	###	SDP	1	Many	many	JJ	-	+	_	_	ARG1	_	_	_
+DEPS	2	IN	1	prep	###	SDP	2	of	of	IN	-	-	_	_	_	_	_	_
+DEPS	3	PRP$	4	poss	###	SDP	3	his	his	PRP$	-	+	_	_	_	_	_	_
+DEPS	4	NNS	2	pobj	###	SDP	4	peers	peer	NNS	-	-	ARG1	poss	_	_	_	_
+DEPS	5	VBP	0	root	###	SDP	5	feel	feel	VBP	+	+	_	_	_	_	_	loc
+DEPS	6	DT	8	det	###	SDP	6	the	the	DT	-	+	_	_	_	_	_	_
+DEPS	7	JJ	8	amod	###	SDP	7	same	same	JJ	-	+	_	_	_	_	_	_
+DEPS	8	NN	5	dobj	###	SDP	8	way	way	NN	-	+	_	_	_	BV	ARG1	_
+DEPS	9	.	5	punct	###	SDP	9	.	_	.	-	-	_	_	_	_	_	_
+
+#21738002	#21738002
+DEPS	1	NNP	5	nn	###	SDP	1	Massachusetts	Massachusetts	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NNP	5	nn	###	SDP	2	Attorney	attorney	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NNP	5	nn	###	SDP	3	General	general	NNP	-	+	compound	compound	_	_	_	_	_	_	_	_	_
+DEPS	4	NNP	5	nn	###	SDP	4	James	James	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	NNP	11	nsubj	###	SDP	5	Shannon	Shannon	NNP	-	-	_	_	compound	compound	ARG1	_	ARG1	_	_	_	_
+DEPS	6	,	5	punct	###	SDP	6	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	VBG	5	amod	###	SDP	7	opposing	oppose	VBG	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	DT	9	det	###	SDP	8	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	NN	5	appos	###	SDP	9	license	license	NN	-	-	_	_	_	_	ARG2	BV	_	_	_	_	_
+DEPS	10	,	5	punct	###	SDP	10	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	VBD	0	root	###	SDP	11	said	say	VBD	+	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	PRP	14	nsubj	###	SDP	12	he	he	PRP	-	-	_	_	_	_	_	_	_	ARG1	_	_	_
+DEPS	13	MD	14	aux	###	SDP	13	will	will	MD	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	VB	11	ccomp	###	SDP	14	appeal	appeal	VB	-	+	_	_	_	_	_	_	ARG2	_	_	_	_
+DEPS	15	DT	16	det	###	SDP	15	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	NN	14	dobj	###	SDP	16	ruling	rule	NN	-	-	_	_	_	_	_	_	_	ARG2	BV	ARG1	_
+DEPS	17	IN	14	prep	###	SDP	17	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	JJ	19	amod	###	SDP	18	federal	federal	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	NN	17	pobj	###	SDP	19	court	court	NN	-	-	_	_	_	_	_	_	_	_	_	ARG2	ARG1
+DEPS	20	.	11	punct	###	SDP	20	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_
+
+#21743031	#21743031
+DEPS	1	NNP	5	nn	###	SDP	1	MERRILL	Merrill	NNP	-	+	_	_	_	_	_	_
+DEPS	2	NNP	5	nn	###	SDP	2	LYNCH	_generic_proper_ne_	NNP	-	+	compound	_	_	_	_	_
+DEPS	3	JJ	5	amod	###	SDP	3	READY	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_
+DEPS	4	NNS	5	nn	###	SDP	4	ASSETS	_generic_proper_ne_	NNPS	-	+	_	_	compound	_	_	_
+DEPS	5	NN	0	root	###	SDP	5	TRUST	_generic_proper_ne_	NNP	-	-	_	compound	_	compound	ARG1	_
+DEPS	6	:	5	punct	###	SDP	6	:	_	:	+	+	_	_	_	_	_	_
+DEPS	7	CD	8	num	###	SDP	7	8.50	_generic_card_ne_	CD	-	+	_	_	_	_	_	_
+DEPS	8	NN	5	dep	###	SDP	8	%	%	NN	-	-	_	_	_	_	ARG2	ARG1
+DEPS	9	.	5	punct	###	SDP	9	.	_	.	-	-	_	_	_	_	_	_
+
+#21744022	#21744022
+DEPS	1	NNP	3	nn	###	SDP	1	Ford	Ford	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NNP	3	nn	###	SDP	2	Motor	_generic_proper_ne_	NNP	-	-	compound	compound	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NNP	4	nsubj	###	SDP	3	Co.	co.	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	VBD	0	root	###	SDP	4	said	say	VBD	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	PRP	7	nsubj	###	SDP	5	it	it	PRP	-	-	_	_	_	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	6	MD	7	aux	###	SDP	6	will	will	MD	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	VB	4	ccomp	###	SDP	7	shut	shut	VB	-	+	_	_	ARG2	_	ARG1	_	_	_	_	ARG1	_	_	_
+DEPS	8	RP	7	prt	###	SDP	8	down	down	RP	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	IN	7	prep	###	SDP	9	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	CD	11	num	###	SDP	10	one	one	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	NN	9	pobj	###	SDP	11	week	week	NN	-	-	_	_	_	_	ARG2	ARG1	_	_	_	_	_	_	_
+DEPS	12	PRP$	15	poss	###	SDP	12	its	its	PRP$	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NNP	15	nn	###	SDP	13	Kentucky	Kentucky	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	NNP	15	nn	###	SDP	14	Truck	truck	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	NNP	7	tmod	###	SDP	15	Plant	plant	NNP	-	-	_	_	_	ARG2	_	_	poss	compound	compound	_	_	_	_
+DEPS	16	IN	17	mwe	###	SDP	16	because	because+of	IN	-	-	_	_	_	_	_	_	_	_	_	mwe	_	_	_
+DEPS	17	IN	7	prep	###	SDP	17	of	because+of	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	DT	20	det	###	SDP	18	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	``	20	punct	###	SDP	19	“	_	``	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	NN	17	pobj	###	SDP	20	shortage	shortage	NN	-	+	_	_	_	_	_	_	_	_	_	ARG2	BV	_	_
+DEPS	21	IN	20	prep	###	SDP	21	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	NN	23	nn	###	SDP	22	dealer	dealer	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	NNS	21	pobj	###	SDP	23	orders	order	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	ARG1	compound
+DEPS	24	.	4	punct	###	SDP	24	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	25	''	4	punct	###	SDP	25	”	_	''	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21752006	#21752006
+DEPS	1	NN	2	nsubj	###	SDP	1	Storage	storage	NNP	-	-	ARG1	_	_	_	_	ARG1	_	_	_	_	_	_	_	_
+DEPS	2	VBD	0	root	###	SDP	2	rose	rise	VBD	-	+	_	loc	_	_	ARG1	_	_	_	ARG1	_	_	_	_	_
+DEPS	3	$	2	dobj	###	SDP	3	$	$	$	-	+	_	_	ARG1	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	4	CD	3	num	###	SDP	4	1.125	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	DT	6	det	###	SDP	5	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NN	3	npadvmod	###	SDP	6	share	share	NN	-	-	_	_	_	ARG2	_	_	_	_	_	_	_	_	_	_
+DEPS	7	,	2	punct	###	SDP	7	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	TO	9	aux	###	SDP	8	to	to	TO	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	VB	2	xcomp	###	SDP	9	close	close	VB	-	+	_	_	_	_	ARG2	_	ARG1	_	_	_	_	_	_	_
+DEPS	10	IN	9	prep	###	SDP	10	at	at	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	$	10	pobj	###	SDP	11	$	$	$	-	-	_	_	_	_	_	_	ARG2	ARG1	_	_	_	_	_	_
+DEPS	12	CD	11	num	###	SDP	12	14	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	,	2	punct	###	SDP	13	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	IN	2	prep	###	SDP	14	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	NNP	20	nn	###	SDP	15	New	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	NNP	20	nn	###	SDP	16	York	York	NNP	-	+	_	_	_	_	_	_	_	_	_	compound	_	_	_	_
+DEPS	17	NNP	20	nn	###	SDP	17	Stock	stock	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	NNP	20	nn	###	SDP	18	Exchange	exchange	NNP	-	+	_	_	_	_	_	_	_	_	_	_	compound	compound	_	_
+DEPS	19	JJ	20	amod	###	SDP	19	composite	composite	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	NN	14	pobj	###	SDP	20	trading	trade	NN	-	-	_	_	_	_	_	_	_	_	ARG2	_	_	_	compound	compound
+DEPS	21	.	2	punct	###	SDP	21	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21756009	#21756009
+DEPS	1	DT	2	det	###	SDP	1	The	the	DT	-	+	_	_	_	_	_
+DEPS	2	NNS	5	nsubjpass	###	SDP	2	successors	successor	NNS	-	-	BV	_	ARG2	_	_
+DEPS	3	MD	5	aux	###	SDP	3	would	would	MD	+	+	_	_	_	_	_
+DEPS	4	VB	5	auxpass	###	SDP	4	be	be	VB	-	-	_	_	_	_	_
+DEPS	5	VBN	0	root	###	SDP	5	nominated	nominate	VBN	-	+	_	ARG1	_	_	_
+DEPS	6	IN	5	prep	###	SDP	6	by	by	IN	-	-	_	_	_	_	_
+DEPS	7	DT	9	det	###	SDP	7	the	the	DT	-	+	_	_	_	_	_
+DEPS	8	JJ	9	amod	###	SDP	8	independent	independent	JJ	-	+	_	_	_	_	_
+DEPS	9	NNS	6	pobj	###	SDP	9	directors	director	NNS	-	-	_	_	ARG1	BV	ARG1
+DEPS	10	.	5	punct	###	SDP	10	.	_	.	-	-	_	_	_	_	_
+
+#21760026	#21760026
+DEPS	1	NNP	2	nn	###	SDP	1	Mr.	Mr.	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NNP	3	nsubj	###	SDP	2	Fischer	Fischer	NNP	-	-	compound	ARG1	_	_	ARG1	_	_	_	ARG1	_	_
+DEPS	3	VBZ	0	root	###	SDP	3	plows	plow	VBZ	+	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	PRP$	6	poss	###	SDP	4	his	his	PRP$	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	JJ	6	amod	###	SDP	5	own	own	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NNS	3	dobj	###	SDP	6	fields	field	NNS	-	-	_	ARG2	poss	ARG1	_	_	_	_	_	_	_
+DEPS	7	,	6	punct	###	SDP	7	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	VBZ	6	conj	###	SDP	8	sows	sow	VBZ	-	+	_	conj	_	_	_	_	_	_	_	_	_
+DEPS	9	PRP$	11	poss	###	SDP	9	his	his	PRP$	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	JJ	11	amod	###	SDP	10	own	own	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	NN	8	dobj	###	SDP	11	corn	corn	NN	-	+	_	_	_	_	ARG2	poss	ARG1	_	_	_	_
+DEPS	12	CC	11	cc	###	SDP	12	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NNS	11	conj	###	SDP	13	sunflowers	sunflower	NNS	-	-	_	_	_	_	_	_	_	_and_c	_	_	_
+DEPS	14	,	6	punct	###	SDP	14	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	CC	3	cc	###	SDP	15	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	VBZ	3	conj	###	SDP	16	feeds	feed	VBZ	-	+	_	_	_	_	_and_c	_	_	_	_	_	_
+DEPS	17	PRP$	19	poss	###	SDP	17	his	his	PRP$	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	JJ	19	amod	###	SDP	18	own	own	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	NN	16	dobj	###	SDP	19	sheep	sheep	NN	-	-	_	_	_	_	_	_	_	_	ARG2	poss	ARG1
+DEPS	20	.	3	punct	###	SDP	20	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_
+
+#21761008	#21761008
+DEPS	1	RB	2	neg	###	SDP	1	Not	not	RB	-	+	_	_	_	_
+DEPS	2	NN	3	nsubj	###	SDP	2	everybody	everybody	NN	-	-	ARG1	ARG1	_	_
+DEPS	3	VBZ	0	root	###	SDP	3	agrees	agree	VBZ	+	+	_	_	_	_
+DEPS	4	IN	7	mark	###	SDP	4	that	that	IN	-	-	_	_	_	ARG2
+DEPS	5	PRP	7	nsubj	###	SDP	5	it	it	PRP	-	-	_	_	_	_
+DEPS	6	VBZ	7	cop	###	SDP	6	’s	’s	VBZ	-	-	_	_	_	_
+DEPS	7	NN	3	ccomp	###	SDP	7	time	time	NN	-	+	_	ARG2	_	_
+DEPS	8	TO	9	aux	###	SDP	8	to	to	TO	-	-	_	_	_	_
+DEPS	9	VB	7	vmod	###	SDP	9	trim	trim	VB	-	+	_	_	ARG1	_
+DEPS	10	.	3	punct	###	SDP	10	.	_	.	-	-	_	_	_	_
+
+#21765005	#21765005
+DEPS	1	VBN	4	amod	###	SDP	1	Automated	automate	NNP	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NN	4	nn	###	SDP	2	teller	teller	NN	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NN	4	nn	###	SDP	3	machine	machine	NN	-	+	_	compound	_	_	_	_	_	_	_	_
+DEPS	4	NNS	6	nsubj	###	SDP	4	operations	operation	NNS	-	-	ARG2	_	compound	_	ARG1	ARG1	_	_	_	_
+DEPS	5	RB	6	advmod	###	SDP	5	also	also	RB	-	+	_	_	_	_	_	_	_	_	_	ARG2
+DEPS	6	VBD	15	ccomp	###	SDP	6	were	were	VBD	-	-	_	_	_	_	_	_	_	_	_	_
+DEPS	7	IN	6	advmod	###	SDP	7	up	up	RP	-	+	_	_	_	ARG1	_	_	_	_	_	_
+DEPS	8	CC	7	cc	###	SDP	8	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_
+DEPS	9	VBG	7	conj	###	SDP	9	operating	operate	VBG	-	+	_	_	_	_	_and_c	_	loc	_	_	_
+DEPS	10	NN	6	tmod	###	SDP	10	yesterday	yesterday	NN	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	11	,	15	punct	###	SDP	11	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_
+DEPS	12	DT	14	det	###	SDP	12	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NN	14	nn	###	SDP	13	bank	bank	NN	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	14	NN	15	nsubj	###	SDP	14	spokesman	spokesman	NN	-	-	_	_	_	_	_	_	_	BV	compound	ARG1
+DEPS	15	VBD	0	root	###	SDP	15	said	say	VBD	+	+	_	_	_	_	_	_	_	_	_	_
+DEPS	16	.	15	punct	###	SDP	16	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_
+
+#21767007	#21767007
+DEPS	1	RB	8	advmod	###	SDP	1	Still	still	RB	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	,	8	punct	###	SDP	2	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NNP	5	poss	###	SDP	3	Merkur	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	POS	3	possessive	###	SDP	4	’s	’s	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	NN	8	nsubj	###	SDP	5	demise	demise	NN	-	-	_	poss	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	VBZ	8	cop	###	SDP	6	is	is	VBZ	-	+	ARG1	_	_	_	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	DT	8	det	###	SDP	7	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NN	0	root	###	SDP	8	setback	_generic_nn_	NN	-	-	_	_	ARG2	BV	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	IN	8	prep	###	SDP	9	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NNP	9	pobj	###	SDP	10	Ford	Ford	NNP	-	-	_	_	_	_	ARG2	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	IN	8	prep	###	SDP	11	at	at	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	DT	13	det	###	SDP	12	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NN	11	pobj	###	SDP	13	time	time	NN	-	+	_	_	_	_	_	ARG2	BV	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	WRB	29	advmod	###	SDP	14	when	when	WRB	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	DT	16	det	###	SDP	15	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	NN	18	poss	###	SDP	16	company	company	NN	-	+	_	_	_	_	_	_	_	_	BV	_	_	_	_	_	_	_	_	_	_
+DEPS	17	POS	16	possessive	###	SDP	17	’s	’s	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	NN	29	nsubj	###	SDP	18	image	image	NN	-	-	_	_	_	_	_	_	_	_	_	poss	ARG1	_	_	_	_	_	_	ARG1	_
+DEPS	19	IN	18	prep	###	SDP	19	as	as	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	DT	23	det	###	SDP	20	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	NNP	23	nn	###	SDP	21	U.S.	U.S.	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	NN	23	nn	###	SDP	22	auto	auto	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	NN	19	pobj	###	SDP	23	maker	maker	NN	-	-	_	_	_	_	_	_	_	_	_	_	ARG2	BV	compound	compound	ARG1	_	_	_	_
+DEPS	24	IN	18	prep	###	SDP	24	with	with	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	25	DT	27	det	###	SDP	25	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	26	JJ	27	amod	###	SDP	26	golden	golden	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	27	NN	24	pobj	###	SDP	27	touch	touch	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	ARG1	_	_
+DEPS	28	VBZ	29	aux	###	SDP	28	is	is	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	29	VBG	8	advcl	###	SDP	29	showing	show	VBG	-	+	_	_	_	_	_	_	_	temp	_	_	_	_	_	_	_	_	_	_	_
+DEPS	30	NNS	29	dobj	###	SDP	30	signs	sign	NNS	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	_
+DEPS	31	IN	30	prep	###	SDP	31	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	32	NN	31	pobj	###	SDP	32	strain	strain	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG1
+DEPS	33	.	8	punct	###	SDP	33	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21770010	#21770010
+DEPS	1	PRP	3	nsubj	###	SDP	1	It	it	PRP	-	-	_	ARG1	_	_
+DEPS	2	RB	3	advmod	###	SDP	2	also	also	RB	+	+	_	_	_	_
+DEPS	3	VBZ	0	root	###	SDP	3	sells	sell	VBZ	-	+	ARG1	_	_	ARG1
+DEPS	4	JJ	5	amod	###	SDP	4	single-premium	premium	JJ	-	+	_	_	_	_
+DEPS	5	NNS	3	dobj	###	SDP	5	annuities	_generic_nns_	NNS	-	-	_	ARG2	ARG1	_
+DEPS	6	TO	5	prep	###	SDP	6	to	to	TO	-	+	_	_	_	_
+DEPS	7	NNS	6	pobj	###	SDP	7	individuals	individual	NNS	-	-	_	_	_	ARG2
+DEPS	8	.	3	punct	###	SDP	8	.	_	.	-	-	_	_	_	_
+
+#21777003	#21777003
+DEPS	1	NNP	2	nn	###	SDP	1	Sir	sir	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NNP	7	nsubj	###	SDP	2	Richard	Richard	NNP	-	-	compound	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	3	VBZ	7	cop	###	SDP	3	is	is	VBZ	-	+	_	_	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	4	RB	7	predet	###	SDP	4	also	also	RB	+	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	DT	7	det	###	SDP	5	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	JJ	7	amod	###	SDP	6	non-executive	executive	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NN	0	root	###	SDP	7	director	director	NN	-	-	_	ARG2	_	BV	compound	ARG1	_	_	_	_	_	_
+DEPS	8	IN	7	prep	###	SDP	8	at	at	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	NNP	11	nn	###	SDP	9	National	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NNP	11	nn	###	SDP	10	Westminister	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	compound	_	_	_	_	_
+DEPS	11	NNP	8	pobj	###	SDP	11	Bank	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	ARG2	_	compound	_	_	_	_
+DEPS	12	CC	11	cc	###	SDP	12	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NNP	16	nn	###	SDP	13	NatWest	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	NNP	16	nn	###	SDP	14	Investment	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	compound	_	_
+DEPS	15	NNP	16	nn	###	SDP	15	Bank	bank	NNP	-	+	_	_	_	_	_	_	_	_	_	_	compound	_
+DEPS	16	NNP	11	conj	###	SDP	16	Ltd	_generic_proper_ne_	NNP	-	-	_	_	_	_	_	_	_	_	_and_c	_	_	compound
+DEPS	17	.	7	punct	###	SDP	17	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21778060	#21778060
+DEPS	1	PRP	2	nsubj	###	SDP	1	I	I	PRP	-	-	ARG1	_	_	_	_	_	_	_
+DEPS	2	VBP	0	root	###	SDP	2	think	think	VBP	+	+	_	_	_	_	_	_	_	_
+DEPS	3	DT	4	det	###	SDP	3	a	a+few	DT	-	-	_	mwe	_	_	_	_	_	_
+DEPS	4	JJ	13	nsubj	###	SDP	4	few	a+few	JJ	-	+	_	_	_	_	_	ARG1	_	_
+DEPS	5	IN	4	prep	###	SDP	5	of	of	IN	-	-	_	_	_	_	_	_	_	_
+DEPS	6	DT	7	det	###	SDP	6	the	the	DT	-	+	_	_	_	_	_	_	_	_
+DEPS	7	NNS	5	pobj	###	SDP	7	aftershocks	aftershock	NNS	-	-	_	ARG1	BV	_	_	_	_	_
+DEPS	8	MD	13	aux	###	SDP	8	might	might	MD	-	+	ARG2	_	_	_	_	_	_	_
+DEPS	9	RB	13	advmod	###	SDP	9	just	just	RB	-	+	_	_	_	_	_	_	_	_
+DEPS	10	VB	13	cop	###	SDP	10	be	be	VB	-	+	_	_	_	ARG1	ARG1	_	_	_
+DEPS	11	PRP$	13	poss	###	SDP	11	my	my	PRP$	-	+	_	_	_	_	_	_	_	_
+DEPS	12	NN	13	nn	###	SDP	12	body	body	NN	-	-	_	_	_	_	_	ARG2	poss	ARG1
+DEPS	13	NN	2	ccomp	###	SDP	13	shaking	shake	VBG	-	+	_	_	_	_	_	_	_	_
+DEPS	14	.	2	punct	###	SDP	14	.	_	.	-	-	_	_	_	_	_	_	_	_
+
+#21778120	#21778120
+DEPS	1	NNP	4	nsubj	###	SDP	1	Judy	Judy	NNP	-	+	_	ARG1	_	_	_	_	_	_	_
+DEPS	2	CC	1	cc	###	SDP	2	and	and	CC	-	-	_	_	_	_	_	_	_	_	_
+DEPS	3	PRP	1	conj	###	SDP	3	I	I	PRP	-	-	_and_c	_	_	_	_	_	_	_	_
+DEPS	4	VBD	0	root	###	SDP	4	were	were	VBD	-	-	_	_	_	_	_	_	_	_	_
+DEPS	5	IN	4	prep	###	SDP	5	in	in	IN	-	+	_	_	_	_	ARG1	_	_	_	_
+DEPS	6	PRP$	8	poss	###	SDP	6	our	our	PRP$	-	+	_	_	_	_	_	_	_	_	_
+DEPS	7	JJ	8	dep	###	SDP	7	back	back+yard	JJ	-	-	_	_	_	mwe	_	_	_	_	_
+DEPS	8	NN	5	pobj	###	SDP	8	yard	back+yard	NN	-	+	_	ARG2	poss	_	_	_	_	_	_
+DEPS	9	WRB	12	advmod	###	SDP	9	when	when	WRB	+	+	_	_	_	_	_	_	_	_	_
+DEPS	10	DT	11	det	###	SDP	10	the	the	DT	-	+	_	_	_	_	_	_	_	_	_
+DEPS	11	NN	12	nsubj	###	SDP	11	lawn	lawn	NN	-	-	_	_	_	_	_	BV	ARG1	_	_
+DEPS	12	VBD	4	advcl	###	SDP	12	started	start	VBD	-	+	_	_	_	_	ARG2	_	_	_	_
+DEPS	13	VBG	12	dep	###	SDP	13	rolling	roll	VBG	-	-	_	_	_	_	_	_	ARG2	ARG1	_
+DEPS	14	IN	13	prep	###	SDP	14	like	like	IN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	15	JJ	16	amod	###	SDP	15	ocean	ocean	NN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	16	NNS	14	pobj	###	SDP	16	waves	wave	NNS	-	-	_	_	_	_	_	_	_	ARG2	compound
+DEPS	17	.	4	punct	###	SDP	17	.	_	.	-	-	_	_	_	_	_	_	_	_	_
+
+#21780023	#21780023
+DEPS	1	CC	3	cc	###	SDP	1	But	but	CC	+	+	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NNS	3	nsubj	###	SDP	2	supporters	supporter	NNS	-	-	_	ARG1	_	_	_	_	_	_	_	_
+DEPS	3	VBP	0	root	###	SDP	3	argue	argue	VBP	-	+	ARG2	_	_	_	_	_	_	_	_	_
+DEPS	4	IN	10	mark	###	SDP	4	that	that	IN	-	-	_	_	_	_	_	_	_	_	_	_
+DEPS	5	VBG	10	nsubj	###	SDP	5	grounding	ground	VBG	-	+	_	_	_	_	_	ARG1	_	_	_	_
+DEPS	6	DT	7	det	###	SDP	6	an	an	DT	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NN	5	dobj	###	SDP	7	airline	airline	NN	-	-	_	_	ARG2	BV	_	_	_	_	_	_
+DEPS	8	VBZ	10	cop	###	SDP	8	is	is	VBZ	-	-	_	_	_	_	_	_	_	_	_	_
+DEPS	9	RB	10	advmod	###	SDP	9	so	so	RB	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	10	JJ	3	ccomp	###	SDP	10	drastic	drastic	JJ	-	+	_	ARG2	_	_	ARG1	_	_	_	_	_
+DEPS	11	IN	15	mark	###	SDP	11	that	that	IN	-	-	_	_	_	_	_	_	_	_	_	_
+DEPS	12	DT	13	det	###	SDP	12	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NN	15	nsubj	###	SDP	13	department	department	NN	-	-	_	_	_	_	_	_	BV	_	ARG1	_
+DEPS	14	MD	15	aux	###	SDP	14	would	would	MD	-	+	_	_	_	_	ARG2	_	_	_	_	_
+DEPS	15	VB	10	ccomp	###	SDP	15	hesitate	hesitate	VB	-	+	_	_	_	_	_	_	_	_	_	subord
+DEPS	16	VBG	15	xcomp	###	SDP	16	doing	do	VBG	-	+	_	_	_	_	_	_	_	ARG1	_	_
+DEPS	17	PRP	16	dobj	###	SDP	17	it	it	PRP	-	-	_	_	_	_	_	_	_	_	_	ARG2
+DEPS	18	.	3	punct	###	SDP	18	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_
+
+#21782002	#21782002
+DEPS	1	VBP	2	nsubj	###	SDP	1	Work	work	NNP	-	-	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	VBD	25	ccomp	###	SDP	2	began	begin	VBD	-	+	_	ARG1	_	ARG1	_	_	_	_	_	loc	ARG1	_	_	_	_
+DEPS	3	IN	2	prep	###	SDP	3	on	on	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	NNS	3	pobj	###	SDP	4	homes	home	NNS	-	+	_	ARG2	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	CC	4	cc	###	SDP	5	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NNS	4	conj	###	SDP	6	apartments	apartment	NNS	-	-	_	_	_and_c	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	IN	2	prep	###	SDP	7	at	at	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	DT	10	det	###	SDP	8	an	an	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	JJ	10	amod	###	SDP	9	annual	annual	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NN	7	pobj	###	SDP	10	rate	rate	NN	-	+	_	_	_	ARG2	BV	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	11	IN	10	prep	###	SDP	11	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	CD	13	num	###	SDP	12	1,263,000	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NNS	11	pobj	###	SDP	13	units	unit	NNS	-	-	_	_	_	_	_	_	ARG1	ARG1	_	_	_	_	_	_	_
+DEPS	14	JJ	15	amod	###	SDP	14	last	last	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	NN	10	tmod	###	SDP	15	month	month	NN	-	+	_	_	_	_	_	_	_	_	ARG1	_	_	_	_	_	_
+DEPS	16	,	2	punct	###	SDP	16	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	RB	2	advmod	###	SDP	17	down	down	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	ARG1	_	ARG2
+DEPS	18	CD	19	num	###	SDP	18	5.2	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	NN	17	pobj	###	SDP	19	%	%	NN	-	-	_	_	_	_	_	_	_	_	_	_	ARG2	ARG1	_	_	_
+DEPS	20	IN	17	prep	###	SDP	20	from	from	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	NNP	20	pobj	###	SDP	21	August	August	NNP	-	-	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	_	_
+DEPS	22	,	25	punct	###	SDP	22	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	DT	24	det	###	SDP	23	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	NN	25	nsubj	###	SDP	24	department	department	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	BV	ARG1
+DEPS	25	VBD	0	nsubjpass	###	SDP	25	said	say	VBD	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	26	.	25	punct	###	SDP	26	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21784024	#21784024
+DEPS	1	NNP	3	nn	###	SDP	1	U.S.	U.S.	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	JJ	3	amod	###	SDP	2	pharmaceutical	pharmaceutical	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NNS	4	nsubj	###	SDP	3	sales	sale	NNS	-	-	compound	ARG1	ARG1	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	VBD	0	root	###	SDP	4	rose	rise	VBD	-	+	_	_	_	_	loc	subord	_	_	_	_	_	_	_	_
+DEPS	5	CD	6	num	###	SDP	5	15	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NN	4	dobj	###	SDP	6	%	%	NN	-	+	_	_	_	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	7	,	4	punct	###	SDP	7	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	VBN	4	prep	###	SDP	8	led	lead	VBN	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	IN	8	prep	###	SDP	9	by	by	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NN	15	nn	###	SDP	10	allergy	allergy	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	,	10	punct	###	SDP	11	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	NN	10	conj	###	SDP	12	asthma	asthma	NN	-	+	_	_	_	_	_	_	conj	_	_	_	_	_	_	_
+DEPS	13	CC	10	cc	###	SDP	13	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	JJ	10	conj	###	SDP	14	cold	cold	JJ	-	-	_	_	_	_	_	_	_	_and_c	_	_	_	_	_	_
+DEPS	15	NNS	9	pobj	###	SDP	15	products	product	NNS	-	+	_	_	_	_	_	ARG1	compound	_	_	_	_	_	_	_
+DEPS	16	:	4	punct	###	SDP	16	;	_	:	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	JJ	18	amod	###	SDP	17	dermatological	_generic_jj_	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	NNS	4	dobj	###	SDP	18	products	product	NNS	-	+	_	_	_	_	_	_	_	_	conj	ARG1	_	_	_	_
+DEPS	19	:	4	punct	###	SDP	19	;	_	:	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	NNS	4	dobj	###	SDP	20	anti-infectives	_generic_nns_	NNS	-	+	_	_	_	_	_	_	_	_	_	_	conj	_	_	_
+DEPS	21	CC	20	cc	###	SDP	21	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	JJ	23	amod	###	SDP	22	anti-cancer	cancer	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	NNS	20	conj	###	SDP	23	products	product	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_and_c	compound	_
+DEPS	24	:	4	punct	###	SDP	24	;	_	:	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	25	CC	4	cc	###	SDP	25	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	26	JJ	4	conj	###	SDP	26	cardiovascular	cardiovascular	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	27	NNS	26	amod	###	SDP	27	products	product	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_and_c	_	ARG1
+DEPS	28	.	4	punct	###	SDP	28	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21789031	#21789031
+DEPS	1	RB	0	root	###	SDP	1	Also	also	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2
+DEPS	2	,	1	punct	###	SDP	2	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	IN	4	mwe	###	SDP	3	because	because+of	IN	-	-	_	mwe	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	IN	1	prep	###	SDP	4	of	because+of	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	PRP$	8	poss	###	SDP	5	its	its	PRP$	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	JJ	8	amod	###	SDP	6	reduced	reduce	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NN	8	nn	###	SDP	7	capital	capital	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NN	4	pobj	###	SDP	8	budget	budget	NN	-	-	_	ARG2	poss	ARG2	ARG1	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	,	8	punct	###	SDP	9	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NNP	12	nsubj	###	SDP	10	Pemex	_generic_proper_ne_	NNP	-	-	_	_	_	_	_	ARG1	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	VBZ	12	aux	###	SDP	11	has	has	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	VBN	8	rcmod	###	SDP	12	phased	phase	VBN	-	+	_	ARG1	_	_	_	_	_	_	_	_	subord	_	_	_	_	_	_
+DEPS	13	RP	12	prt	###	SDP	13	out	out	RP	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	IN	15	quantmod	###	SDP	14	about	about	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	CD	18	num	###	SDP	15	50,000	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	16	NN	18	nn	###	SDP	16	transitory	_generic_jj_	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	NN	18	nn	###	SDP	17	construction	construction	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	NNS	12	dobj	###	SDP	18	workers	worker	NNS	-	-	_	_	_	_	_	ARG2	_	ARG1	ARG1	compound	_	_	_	_	_	_	_
+DEPS	19	,	12	punct	###	SDP	19	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	VBG	12	xcomp	###	SDP	20	reducing	reduce	VBG	-	+	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	ARG1	_	_	_
+DEPS	21	DT	23	det	###	SDP	21	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	NN	23	nn	###	SDP	22	work	work	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	NN	20	dobj	###	SDP	23	force	force	NN	-	-	_	_	_	_	_	_	_	_	_	_	ARG2	BV	compound	_	_	_	_
+DEPS	24	TO	20	prep	###	SDP	24	to	to	TO	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	25	IN	31	prep	###	SDP	25	about	about	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	26	CD	25	pobj	###	SDP	26	140,000	_generic_card_ne_	CD	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	_	_	_
+DEPS	27	,	31	punct	###	SDP	27	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	28	DT	30	det	###	SDP	28	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	29	NN	30	nn	###	SDP	29	union	union	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	30	NN	31	nsubj	###	SDP	30	leader	leader	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	BV	compound	ARG1
+DEPS	31	VBZ	24	pcomp	###	SDP	31	says	say	VBZ	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	32	.	1	punct	###	SDP	32	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21790041	#21790041
+DEPS	1	VB	0	root	###	SDP	1	ARE	are	VBP	-	-	_	_	_
+DEPS	2	JJ	3	amod	###	SDP	2	CORPORATE	_generic_proper_ne_	JJ	-	+	_	_	_
+DEPS	3	NNS	4	nsubj	###	SDP	3	profits	profit	NNS	-	-	compound	ARG2	_
+DEPS	4	VBD	1	ccomp	###	SDP	4	distributed	distribute	VBN	+	+	_	_	ARG1
+DEPS	5	RB	4	advmod	###	SDP	5	fairly	fairly	RB	-	+	_	_	_
+DEPS	6	.	1	punct	###	SDP	6	?	_	.	-	-	_	_	_
+
+#21793007	#21793007
+DEPS	1	IN	5	mark	###	SDP	1	While	while	IN	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NN	3	nn	###	SDP	2	utilization	utilization	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NN	5	nsubj	###	SDP	3	management	management	NN	-	-	_	compound	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	RB	5	advmod	###	SDP	4	frequently	frequently	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	VBZ	13	advcl	###	SDP	5	reduces	reduce	VBZ	-	+	ARG2	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NN	7	nn	###	SDP	6	hospitalization	_generic_nn_	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NNS	5	dobj	###	SDP	7	costs	cost	NNS	-	-	_	_	_	ARG2	compound	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	,	13	punct	###	SDP	8	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	DT	10	det	###	SDP	9	these	these	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NNS	13	nsubjpass	###	SDP	10	savings	savings	NNS	-	-	_	_	_	_	_	BV	_	ARG2	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	VBP	13	auxpass	###	SDP	11	are	are	VBP	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	RB	13	advmod	###	SDP	12	often	often	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	VBN	0	root	###	SDP	13	offset	offset	VBN	-	+	ARG1	_	_	_	_	_	ARG1	_	_	_	_	_	_	ARG1	_	_	_	_	_
+DEPS	14	IN	13	prep	###	SDP	14	by	by	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	NNS	14	pobj	###	SDP	15	increases	increase	NNS	-	+	_	_	_	_	_	_	_	ARG1	_	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	16	IN	15	prep	###	SDP	16	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	NN	18	nn	###	SDP	17	outpatient	_generic_nn_	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	NNS	16	pobj	###	SDP	18	services	service	NNS	-	-	_	_	_	_	_	_	_	_	_	ARG2	compound	_	_	_	_	_	_	_	_
+DEPS	19	CC	13	cc	###	SDP	19	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	JJR	22	amod	###	SDP	20	higher	higher	JJR	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	JJ	22	amod	###	SDP	21	administrative	administrative	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	NNS	13	conj	###	SDP	22	costs	cost	NNS	-	-	_	_	_	_	_	_	_	_	_and_c	_	_	ARG1	ARG1	_	_	_	_	_	_
+DEPS	23	,	22	punct	###	SDP	23	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	VBG	22	prep	###	SDP	24	according	according+to	VBG	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	mwe	_	_	_	_	_
+DEPS	25	TO	24	pcomp	###	SDP	25	to	according+to	TO	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	26	DT	27	det	###	SDP	26	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	27	NN	25	pobj	###	SDP	27	report	report	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	ARG1	_	_	_
+DEPS	28	IN	25	prep	###	SDP	28	by	by	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	29	DT	30	det	###	SDP	29	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	30	NN	28	pobj	###	SDP	30	panel	panel	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	_	_
+DEPS	31	IN	30	prep	###	SDP	31	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	32	NN	33	nn	###	SDP	32	health-care	care	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	33	NNS	31	pobj	###	SDP	33	experts	expert	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG1	compound
+DEPS	34	.	13	punct	###	SDP	34	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21795035	#21795035
+DEPS	1	WRB	11	advmod	###	SDP	1	How	how	WRB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	MD	11	aux	###	SDP	2	should	should	MD	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	DT	5	det	###	SDP	3	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	JJ	5	amod	###	SDP	4	reasonable	reasonable	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	NN	11	nsubj	###	SDP	5	member	member	NN	-	+	_	_	BV	ARG1	_	_	_	_	ARG1	_	_	_	_	_	_	_
+DEPS	6	IN	5	prep	###	SDP	6	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	DT	10	det	###	SDP	7	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NNP	10	nn	###	SDP	8	Federal	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	NNP	10	nn	###	SDP	9	Reserve	reserve	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NNP	6	pobj	###	SDP	10	Board	board	NNP	-	-	_	_	_	_	ARG1	BV	compound	compound	_	_	_	_	_	_	_	_
+DEPS	11	VB	0	root	###	SDP	11	interpret	interpret	VB	-	+	unspec_manner	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	DT	14	det	###	SDP	12	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	JJ	14	amod	###	SDP	13	congressional	congressional	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	NN	11	dobj	###	SDP	14	decision	decision	NN	-	+	_	_	_	_	_	_	_	_	ARG2	BV	ARG1	_	_	_	_	_
+DEPS	15	TO	16	aux	###	SDP	15	to	to	TO	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	VB	14	vmod	###	SDP	16	put	put	VB	-	+	_	_	_	_	_	_	_	_	_	_	_	ARG1	_	_	_	_
+DEPS	17	DT	18	det	###	SDP	17	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	NN	16	dobj	###	SDP	18	secretary	secretary	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	ARG1	_
+DEPS	19	IN	16	prep	###	SDP	19	on	on	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	ARG3	_	_	_
+DEPS	20	DT	21	det	###	SDP	20	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	NN	19	pobj	###	SDP	21	board	board	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV
+DEPS	22	.	11	punct	###	SDP	22	?	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21798007	#21798007
+DEPS	1	:	4	punct	###	SDP	1	–	–	:	+	+	_	_	_
+DEPS	2	NNP	4	nn	###	SDP	2	Marrill	_generic_proper_ne_	NNP	-	+	_	_	_
+DEPS	3	NNP	4	nn	###	SDP	3	J.	j	NNP	-	+	_	compound	_
+DEPS	4	NNP	0	root	###	SDP	4	Pederson	_generic_proper_ne_	NNP	-	-	discourse	_	compound
+DEPS	5	.	4	punct	###	SDP	5	.	_	.	-	-	_	_	_
+
+#21803010	#21803010
+DEPS	1	DT	11	nsubj	###	SDP	1	This	this	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	-LRB-	3	punct	###	SDP	2	{	_	(	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NNP	11	dep	###	SDP	3	Wednesday	Wednesday	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	-RRB-	3	punct	###	SDP	4	}	_	)	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	VBG	11	aux	###	SDP	5	morning	morning	NN	-	+	BV	parenthetical	_	_	_	_	_	_	_	_	_	_
+DEPS	6	DT	9	det	###	SDP	6	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NNP	9	nn	###	SDP	7	San	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NNP	9	nn	###	SDP	8	Mateo	Mateo	NNP	-	+	_	_	_	_	compound	_	_	_	_	_	_	_
+DEPS	9	NN	11	nsubj	###	SDP	9	bridge	bridge	NN	-	-	_	_	_	BV	_	compound	ARG1	_	_	_	_	_
+DEPS	10	VBD	11	cop	###	SDP	10	was	was	VBD	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	NN	0	root	###	SDP	11	open	open	JJ	-	+	_	_	loc	_	_	_	_	_	_	_	_	ARG2
+DEPS	12	CC	11	cc	###	SDP	12	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	RB	16	advmod	###	SDP	13	now	now	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	PRP	16	nsubj	###	SDP	14	we	we	PRP	-	-	_	_	_	_	_	_	_	_	ARG2	_	_	_
+DEPS	15	VBP	16	cop	###	SDP	15	are	are	VBP	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	JJ	11	conj	###	SDP	16	informed	inform	VBN	-	+	_	_	_	_	_	_	_and_c	loc	_	_	_	_
+DEPS	17	IN	20	mark	###	SDP	17	that	that	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	PRP	20	nsubj	###	SDP	18	it	it	PRP	-	-	_	_	_	_	_	_	_	_	_	ARG1	_	_
+DEPS	19	VBZ	20	cop	###	SDP	19	is	is	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	JJ	16	ccomp	###	SDP	20	closed	closed	VBN	-	+	_	_	_	_	_	_	_	_	ARG3	_	_	_
+DEPS	21	,	20	punct	###	SDP	21	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	''	25	punct	###	SDP	22	”	_	''	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	NNP	24	nn	###	SDP	23	Mr.	Mr.	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	NNP	25	nsubj	###	SDP	24	Schumacher	_generic_proper_ne_	NNP	-	-	_	_	_	_	_	_	_	_	_	_	compound	ARG1
+DEPS	25	VBD	20	advcl	###	SDP	25	said	say	VBD	+	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	26	.	11	punct	###	SDP	26	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21804028	#21804028
+DEPS	1	NNP	10	nsubj	###	SDP	1	Brown-Forman	_generic_proper_ne_	NNP	-	-	_	_	_	appos	_	ARG1	ARG1
+DEPS	2	,	1	punct	###	SDP	2	,	_	,	-	-	_	_	_	_	_	_	_
+DEPS	3	DT	7	det	###	SDP	3	a	a	DT	-	+	_	_	_	_	_	_	_
+DEPS	4	NNP	7	dep	###	SDP	4	Louisville	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_
+DEPS	5	,	4	punct	###	SDP	5	,	_	,	-	-	_	_	_	_	_	_	_
+DEPS	6	NNP	4	dep	###	SDP	6	Ky.	KY.	NNP	-	+	_	compound	_	_	_	_	_
+DEPS	7	NN	1	appos	###	SDP	7	distiller	distiller	NN	-	+	BV	_	compound	_	_	_	_
+DEPS	8	,	1	punct	###	SDP	8	,	_	,	-	-	_	_	_	_	_	_	_
+DEPS	9	RB	10	advmod	###	SDP	9	also	also	RB	+	+	_	_	_	_	_	_	_
+DEPS	10	VBD	0	root	###	SDP	10	declined	decline	VBD	-	+	_	_	_	_	ARG1	_	_
+DEPS	11	TO	12	aux	###	SDP	11	to	to	TO	-	-	_	_	_	_	_	_	_
+DEPS	12	VB	10	xcomp	###	SDP	12	comment	comment	VB	-	+	_	_	_	_	_	ARG2	_
+DEPS	13	.	10	punct	###	SDP	13	.	_	.	-	-	_	_	_	_	_	_	_
+
+#21809023	#21809023
+DEPS	1	DT	3	det	###	SDP	1	The	the	DT	-	+	_	_	_	_	_	_
+DEPS	2	JJ	3	amod	###	SDP	2	heightened	heighten	JJ	-	+	_	_	_	_	_	_
+DEPS	3	NN	5	nsubj	###	SDP	3	competition	competition	NN	-	-	BV	ARG2	ARG1	_	_	_
+DEPS	4	MD	5	aux	###	SDP	4	will	will	MD	-	-	_	_	_	_	_	_
+DEPS	5	VB	0	root	###	SDP	5	hit	hit	VB	+	+	_	_	_	ARG1	_	_
+DEPS	6	NNP	5	tmod	###	SDP	6	IBM	IBM	NNP	-	-	_	_	ARG2	_	_	_
+DEPS	7	IN	5	prep	###	SDP	7	at	at	IN	-	+	_	_	_	_	_	_
+DEPS	8	DT	10	det	###	SDP	8	a	a	DT	-	+	_	_	_	_	_	_
+DEPS	9	JJ	10	amod	###	SDP	9	difficult	difficult	JJ	-	+	_	_	_	_	_	_
+DEPS	10	NN	7	pobj	###	SDP	10	time	time	NN	-	-	_	_	_	ARG2	BV	ARG1
+DEPS	11	.	5	punct	###	SDP	11	.	_	.	-	-	_	_	_	_	_	_
+
+#21810020	#21810020
+DEPS	1	NN	2	nn	###	SDP	1	Stock	stock	NNP	-	+	_	_
+DEPS	2	NNS	3	nsubj	###	SDP	2	prices	price	NNS	-	-	compound	ARG1
+DEPS	3	VBD	0	root	###	SDP	3	rose	rise	VBD	+	+	_	_
+DEPS	4	.	3	punct	###	SDP	4	.	_	.	-	-	_	_
+
+#21815013	#21815013
+DEPS	1	NNS	18	nsubj	###	SDP	1	Thanks	thanks	NNS	+	+	_	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	RB	3	advmod	###	SDP	2	largely	largely	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	TO	18	prep	###	SDP	3	to	to	TO	-	+	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	DT	6	det	###	SDP	4	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	VBN	6	amod	###	SDP	5	continued	continue	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NN	3	pobj	###	SDP	6	growth	growth	NN	-	+	_	_	ARG2	BV	ARG2	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	IN	6	prep	###	SDP	7	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	DT	10	det	###	SDP	8	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	NNP	10	nn	###	SDP	9	U.S.	U.S.	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NN	7	pobj	###	SDP	10	economy	economy	NN	-	-	_	_	_	_	_	ARG1	BV	compound	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	,	18	punct	###	SDP	11	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	DT	14	det	###	SDP	12	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NN	14	nn	###	SDP	13	poverty	poverty	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	NN	18	nsubj	###	SDP	14	rate	rate	NN	-	-	_	_	_	_	_	_	_	_	BV	compound	_	_	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	15	VBZ	18	cop	###	SDP	15	is	is	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	RB	17	advmod	###	SDP	16	now	now	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	RB	18	npadvmod	###	SDP	17	substantially	substantially	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	JJR	0	root	###	SDP	18	lower	lower	JJR	-	+	conj	_	_	_	_	_	_	_	_	_	ARG1	ARG1	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	IN	18	prep	###	SDP	19	than	than	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	DT	22	det	###	SDP	20	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	CD	22	num	###	SDP	21	1983	_generic_year_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	NN	19	pobj	###	SDP	22	peak	peak	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	compound	ARG1	_	_	_	_	_	_	_
+DEPS	23	IN	22	prep	###	SDP	23	of	of	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	CD	25	num	###	SDP	24	15.3	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	25	NN	23	pobj	###	SDP	25	%	%	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	ARG1	_	_	_	_	_	_
+DEPS	26	,	18	punct	###	SDP	26	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	27	CC	18	cc	###	SDP	27	but	but	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	28	DT	29	det	###	SDP	28	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	29	NNS	32	nsubj	###	SDP	29	improvements	improvement	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	BV	ARG1	_	_	_	_
+DEPS	30	VBP	32	aux	###	SDP	30	have	have	VBP	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	31	VBN	32	cop	###	SDP	31	been	been	VBN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	32	JJ	18	conj	###	SDP	32	modest	modest	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_but_c	_	_	_	_	_	_	ARG1	_	_	_
+DEPS	33	IN	32	prep	###	SDP	33	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	34	DT	36	det	###	SDP	34	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	35	JJ	36	amod	###	SDP	35	past	past	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	36	NN	33	pobj	###	SDP	36	couple	couple	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	ARG1	_
+DEPS	37	IN	36	prep	###	SDP	37	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	38	NNS	37	pobj	###	SDP	38	years	year	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG1
+DEPS	39	.	18	punct	###	SDP	39	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21817034	#21817034
+DEPS	1	RB	2	neg	###	SDP	1	Not	not	RB	-	-	_	_	_	_	_
+DEPS	2	DT	11	nsubj	###	SDP	2	all	all	DT	-	+	_	_	_	_	ARG1
+DEPS	3	IN	2	prep	###	SDP	3	of	of	IN	-	-	_	_	_	_	_
+DEPS	4	NNP	7	poss	###	SDP	4	NASA	NASA	NNP	-	+	_	_	_	_	_
+DEPS	5	POS	4	possessive	###	SDP	5	’s	’s	NNS	-	-	_	_	_	_	_
+DEPS	6	NN	7	nn	###	SDP	6	space-science	science	NN	-	+	_	_	_	_	_
+DEPS	7	NN	3	pobj	###	SDP	7	work	work	NN	-	-	ARG1	poss	compound	_	_
+DEPS	8	MD	11	aux	###	SDP	8	will	will	MD	-	-	_	_	_	_	_
+DEPS	9	VB	11	cop	###	SDP	9	be	be	VB	-	-	_	_	_	_	_
+DEPS	10	RB	11	advmod	###	SDP	10	so	so	RB	-	+	_	_	_	_	_
+DEPS	11	JJ	0	root	###	SDP	11	auspicious	_generic_jj_	JJ	+	+	_	_	_	ARG1	_
+DEPS	12	,	11	punct	###	SDP	12	,	_	,	-	-	_	_	_	_	_
+DEPS	13	RB	11	advmod	###	SDP	13	though	though	RB	-	-	_	_	_	_	_
+DEPS	14	.	11	punct	###	SDP	14	.	_	.	-	-	_	_	_	_	_
+
+#21819052	#21819052
+DEPS	1	NNP	2	nn	###	SDP	1	Mr.	Mr.	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NNP	4	nsubj	###	SDP	2	Mastro	_generic_proper_ne_	NNP	-	-	compound	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	3	MD	4	aux	###	SDP	3	will	will	MD	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	VB	0	root	###	SDP	4	do	do	VB	+	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	JJ	6	amod	###	SDP	5	civil	civil	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NN	4	dobj	###	SDP	6	litigation	litigation	NN	-	+	_	ARG2	ARG1	_	_	_	ARG1	_	_	_	_
+DEPS	7	CC	6	cc	###	SDP	7	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NN	10	nn	###	SDP	8	white-collar	collar	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	NN	10	nn	###	SDP	9	defense	defense	NN	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NN	6	conj	###	SDP	10	work	work	NN	-	-	_	_	_	_and_c	compound	compound	_	_	_	_	_
+DEPS	11	IN	10	prep	###	SDP	11	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	NNP	13	nn	###	SDP	12	Gibson	Gibson	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NNP	11	pobj	###	SDP	13	Dunn	_generic_proper_ne_	NNP	-	-	_	_	_	_	_	_	ARG2	compound	ARG2	ARG1	_
+DEPS	14	,	13	punct	###	SDP	14	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	WDT	17	nsubjpass	###	SDP	15	which	which	WDT	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	VBZ	17	auxpass	###	SDP	16	is	is	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	VBN	13	rcmod	###	SDP	17	based	base	VBN	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	IN	17	prep	###	SDP	18	in	in	IN	-	+	_	_	_	_	_	_	_	_	ARG3	_	_
+DEPS	19	NNP	20	nn	###	SDP	19	Los	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	NNP	18	pobj	###	SDP	20	Angeles	_generic_proper_ne_	NNP	-	-	_	_	_	_	_	_	_	_	_	ARG2	compound
+DEPS	21	.	4	punct	###	SDP	21	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_
+
+#21822032	#21822032
+DEPS	1	CC	7	cc	###	SDP	1	But	but	CC	+	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	DT	3	det	###	SDP	2	those	those	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NNS	7	nsubj	###	SDP	3	holders	holder	NNS	-	-	_	BV	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	4	VBP	7	cop	###	SDP	4	are	are	VBP	-	+	ARG2	_	_	ARG1	_	_	_	_	_	_	_	_
+DEPS	5	RB	7	advmod	###	SDP	5	often	often	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	JJ	7	amod	###	SDP	6	foreign	foreign	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NNS	0	root	###	SDP	7	investors	investor	NNS	-	+	_	_	ARG2	_	ARG1	_	_	_	_	ARG1	_	_
+DEPS	8	CC	7	cc	###	SDP	8	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	JJ	11	amod	###	SDP	9	tax-exempt	exempt	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NN	11	nn	###	SDP	10	pension	pension	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	NNS	7	conj	###	SDP	11	funds	fund	NNS	-	-	_	_	_	_	_	_and_c	ARG1	compound	_	_	_	_
+DEPS	12	WDT	15	nsubj	###	SDP	12	that	that	WDT	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	VBP	15	aux	###	SDP	13	do	don’t	VBP	-	-	_	_	_	_	_	_	_	_	neg	_	_	_
+DEPS	14	RB	15	neg	###	SDP	14	n’t	don’t	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	VB	11	rcmod	###	SDP	15	pay	pay	VB	-	+	_	_	_	_	_	_	_	_	ARG1	_	_	_
+DEPS	16	NNS	15	dobj	###	SDP	16	taxes	tax	NNS	-	-	_	_	_	_	_	_	_	_	_	ARG2	ARG1	_
+DEPS	17	IN	16	prep	###	SDP	17	on	on	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	PRP$	19	poss	###	SDP	18	their	their	PRP$	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	NNS	17	pobj	###	SDP	19	holdings	holding	NNS	-	-	_	_	_	_	_	_	_	_	_	_	ARG2	poss
+DEPS	20	.	7	punct	###	SDP	20	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21825002	#21825002
+DEPS	1	CC	5	cc	###	SDP	1	But	but	CC	+	+	_	_	_
+DEPS	2	WRB	3	advmod	###	SDP	2	how	how	WRB	-	-	_	_	_
+DEPS	3	RB	5	nsubj	###	SDP	3	much	much	RB	-	+	_	_	_
+DEPS	4	MD	5	aux	###	SDP	4	will	will	MD	-	-	_	_	_
+DEPS	5	VB	0	root	###	SDP	5	shoppers	shopper	NNS	-	-	_	_	ARG1
+DEPS	6	NN	5	dobj	###	SDP	6	benefit	benefit	VB	-	+	ARG2	ARG1	_
+DEPS	7	.	5	punct	###	SDP	7	?	_	.	-	-	_	_	_
+
+#21826003	#21826003
+DEPS	1	NNP	2	nn	###	SDP	1	Yuba	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_
+DEPS	2	NNP	8	nsubj	###	SDP	2	City	_generic_proper_ne_	NNP	-	+	compound	_	_	_	_	_	_	_	_
+DEPS	3	,	2	punct	###	SDP	3	,	_	,	-	-	_	_	_	_	_	_	_	_	_
+DEPS	4	NNP	2	appos	###	SDP	4	Calif.	Calif.	NNP	-	-	_	compound	ARG1	ARG1	_	_	_	_	_
+DEPS	5	,	8	punct	###	SDP	5	,	_	,	-	-	_	_	_	_	_	_	_	_	_
+DEPS	6	RB	8	advmod	###	SDP	6	meanwhile	meanwhile	RB	-	+	_	_	_	_	_	_	_	_	_
+DEPS	7	,	8	punct	###	SDP	7	,	_	,	-	-	_	_	_	_	_	_	_	_	_
+DEPS	8	VBD	0	root	###	SDP	8	ranked	rank	VBD	-	+	_	_	_	_	_	subord	_	_	_
+DEPS	9	JJ	8	acomp	###	SDP	9	dead	dead	RB	-	+	_	_	_	_	_	_	_	_	_
+DEPS	10	JJ	9	amod	###	SDP	10	last	last	JJ	+	+	_	_	_	_	compound	_	ARG1	_	_
+DEPS	11	IN	10	prep	###	SDP	11	among	among	IN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	12	CD	14	num	###	SDP	12	329	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_
+DEPS	13	NN	14	nn	###	SDP	13	metro	metro	NN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	14	NNS	11	pobj	###	SDP	14	areas	area	NNS	-	-	_	_	_	_	_	_	ARG2	ARG1	compound
+DEPS	15	.	8	punct	###	SDP	15	.	_	.	-	-	_	_	_	_	_	_	_	_	_
+
+#21829014	#21829014
+DEPS	1	NNP	3	nn	###	SDP	1	Sun	Sun	NNP	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NNPS	3	nn	###	SDP	2	Microsystems	_generic_proper_ne_	NNPS	-	+	compound	_	compound	_	_	_	ARG1	_	_	_
+DEPS	3	NNP	9	nsubj	###	SDP	3	Inc.	Inc.	NNP	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	4	CC	3	cc	###	SDP	4	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_
+DEPS	5	NNP	7	nn	###	SDP	5	Tandem	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NNPS	7	nn	###	SDP	6	Computers	_generic_proper_ne_	NNPS	-	-	_	_and_c	_	compound	compound	_	_	_	_	_
+DEPS	7	NNP	3	conj	###	SDP	7	Inc.	Inc.	NNP	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	8	RB	9	advmod	###	SDP	8	also	also	RB	+	+	_	_	_	_	_	_	_	_	_	_
+DEPS	9	VBD	0	root	###	SDP	9	signaled	signal	VBD	-	+	_	_	_	_	_	ARG1	_	_	_	_
+DEPS	10	IN	13	mark	###	SDP	10	that	that	IN	-	-	_	_	_	_	_	_	_	_	_	_
+DEPS	11	PRP	13	nsubj	###	SDP	11	they	they	PRP	-	-	_	_	_	_	_	_	_	_	ARG1	_
+DEPS	12	MD	13	aux	###	SDP	12	should	should	MD	-	+	_	_	_	_	_	_	ARG2	_	_	_
+DEPS	13	VB	9	ccomp	###	SDP	13	recover	recover	VB	-	+	_	_	_	_	_	_	_	ARG1	_	ARG1
+DEPS	14	RB	13	advmod	###	SDP	14	quickly	quickly	RB	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	15	.	9	punct	###	SDP	15	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_
+
+#21830036	#21830036
+DEPS	1	JJ	17	nsubj	###	SDP	1	Unfortunately	unfortunately	RB	+	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	IN	1	prep	###	SDP	2	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NNP	4	nn	###	SDP	3	Mr.	Mr.	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	NNP	2	pobj	###	SDP	4	Maynard	_generic_proper_ne_	NNP	-	-	_	ARG2	compound	_	_	_	_	_	_	_	_	_
+DEPS	5	,	4	punct	###	SDP	5	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	DT	7	det	###	SDP	6	another	another	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NN	4	appos	###	SDP	7	branch	branch	NN	-	+	_	_	_	BV	_	_	_	_	_	appos	ARG1	_
+DEPS	8	IN	7	prep	###	SDP	8	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	DT	15	det	###	SDP	9	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NNP	15	dep	###	SDP	10	USDA	_generic_proper_ne_	NNP	-	-	_	_	_	_	ARG1	BV	_	_	_	_	_	_
+DEPS	11	,	10	punct	###	SDP	11	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	DT	15	det	###	SDP	12	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NNP	15	nn	###	SDP	13	Agricultural	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	NNP	15	nn	###	SDP	14	Marketing	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	compound	_	_	_	_
+DEPS	15	NNP	8	pobj	###	SDP	15	Service	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	BV	_	compound	_	_	_
+DEPS	16	,	4	punct	###	SDP	16	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	VBD	0	root	###	SDP	17	was	was	VBD	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	IN	17	prep	###	SDP	18	in	in	IN	-	+	ARG1	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	19	NN	18	pobj	###	SDP	19	charge	charge	NN	-	+	_	_	_	_	_	_	_	_	_	_	ARG2	_
+DEPS	20	IN	19	prep	###	SDP	20	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	NNS	20	pobj	###	SDP	21	eggs	egg	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	ARG1
+DEPS	22	.	17	punct	###	SDP	22	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21835001	#21835001
+DEPS	1	NNP	3	nn	###	SDP	1	Denis	Denis	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NNP	3	nn	###	SDP	2	C.	c	NNP	-	+	compound	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NNP	5	nsubjpass	###	SDP	3	Smith	Smith	NNP	-	-	_	compound	ARG2	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	VBD	5	auxpass	###	SDP	4	was	was	VBD	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	VBN	0	root	###	SDP	5	named	name	VBN	+	+	_	_	_	ARG1	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	TO	5	prep	###	SDP	6	to	to	TO	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	DT	9	det	###	SDP	7	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	JJ	9	amod	###	SDP	8	new	new	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	NN	6	pobj	###	SDP	9	post	post	NN	-	+	_	_	_	ARG2	BV	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	10	IN	9	prep	###	SDP	10	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	NN	12	nn	###	SDP	11	vice	vice	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	NN	10	pobj	###	SDP	12	president	president	NN	-	+	_	_	_	_	_	_	ARG1	compound	_	_	_	_	_	_	_
+DEPS	13	IN	12	prep	###	SDP	13	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	JJ	17	amod	###	SDP	14	world-wide	wide	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	VBN	17	amod	###	SDP	15	advanced	advanced	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	NNS	17	nn	###	SDP	16	materials	materials	NNS	-	+	_	_	_	_	_	_	_	_	_	_	ARG1	_	_	_	_
+DEPS	17	NNS	13	pobj	###	SDP	17	operations	operation	NNS	-	-	_	_	_	_	_	_	_	_	ARG1	ARG1	_	compound	ARG1	_	_
+DEPS	18	IN	12	prep	###	SDP	18	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	DT	21	det	###	SDP	19	this	this	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	NNS	21	nn	###	SDP	20	chemicals	chemicals	NNS	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	NN	18	pobj	###	SDP	21	concern	concern	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	compound
+DEPS	22	.	5	punct	###	SDP	22	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21843027	#21843027
+DEPS	1	DT	4	det	###	SDP	1	The	the	DT	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	2	JJ	4	amod	###	SDP	2	seven-day	day	JJ	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NN	4	nn	###	SDP	3	compound	compound	NN	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	4	NN	13	nsubj	###	SDP	4	yield	yield	NN	-	-	BV	compound	compound	ARG1	_	_	_	_	ARG1	_
+DEPS	5	IN	4	prep	###	SDP	5	of	of	IN	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	6	DT	10	det	###	SDP	6	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NNP	10	nn	###	SDP	7	Dreyfus	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NNP	10	nn	###	SDP	8	Worldwide	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	compound	_	_	_	_
+DEPS	9	NNP	10	nn	###	SDP	9	Dollar	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NNP	5	pobj	###	SDP	10	Fund	_generic_proper_ne_	NNP	-	-	_	_	_	ARG2	BV	_	compound	compound	_	_
+DEPS	11	VBD	13	cop	###	SDP	11	was	was	VBD	+	+	_	_	_	_	_	_	_	_	_	_
+DEPS	12	CD	13	num	###	SDP	12	9.51	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NN	0	root	###	SDP	13	%	%	NN	-	-	_	_	_	_	_	_	_	_	ARG2	ARG1
+DEPS	14	.	13	punct	###	SDP	14	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_
+
+#21844063	#21844063
+DEPS	1	PRP	4	nsubj	###	SDP	1	He	he	PRP	-	-	ARG1	_	_	_	_	_	_
+DEPS	2	VBD	4	aux	###	SDP	2	had	had	VBD	-	-	_	_	_	_	_	_	_
+DEPS	3	VBN	4	cop	###	SDP	3	been	been	VBN	+	+	_	_	_	_	_	_	_
+DEPS	4	NN	0	root	###	SDP	4	president	president	NN	-	+	ARG2	_	_	_	ARG1	_	_
+DEPS	5	CC	4	cc	###	SDP	5	and	and	CC	-	-	_	_	_	_	_	_	_
+DEPS	6	NN	8	nn	###	SDP	6	chief	chief	JJ	-	+	_	_	_	_	_	_	_
+DEPS	7	VBG	8	amod	###	SDP	7	operating	operate	NN	-	+	_	_	_	_	_	_	_
+DEPS	8	NN	4	conj	###	SDP	8	officer	officer	NN	-	-	_	_and_c	compound	compound	_	_	_
+DEPS	9	IN	4	prep	###	SDP	9	of	of	IN	-	+	_	_	_	_	_	_	_
+DEPS	10	NNP	13	nn	###	SDP	10	Ogilvy	_generic_proper_ne_	NNP	-	+	_	_	_	_	ARG2	_	_
+DEPS	11	CC	10	cc	###	SDP	11	&	&	CC	-	-	_	_	_	_	_	_	_
+DEPS	12	NNP	10	conj	###	SDP	12	Mather	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_
+DEPS	13	NNP	9	pobj	###	SDP	13	Direct	_generic_proper_ne_	NNP	-	-	_	_	_	_	_	_and_c	compound
+DEPS	14	.	4	punct	###	SDP	14	.	_	.	-	-	_	_	_	_	_	_	_
+
+#21847017	#21847017
+DEPS	1	PRP	2	nsubj	###	SDP	1	She	she	PRP	-	-	ARG1	_	_	_	_	_
+DEPS	2	VBZ	0	root	###	SDP	2	says	say	VBZ	+	+	_	_	_	_	_	_
+DEPS	3	PRP	5	nsubj	###	SDP	3	it	it	PRP	-	-	_	_	ARG1	_	ARG1	_
+DEPS	4	MD	5	aux	###	SDP	4	’d	’d	VBD	-	+	ARG2	_	_	_	_	_
+DEPS	5	VB	2	ccomp	###	SDP	5	create	create	VB	-	+	_	ARG1	_	_	_	_
+DEPS	6	CD	7	num	###	SDP	6	600	_generic_card_ne_	CD	-	+	_	_	_	_	_	_
+DEPS	7	NNS	5	tmod	###	SDP	7	jobs	job	NNS	-	-	_	_	ARG2	ARG1	_	_
+DEPS	8	CC	5	cc	###	SDP	8	and	and	CC	-	-	_	_	_	_	_	_
+DEPS	9	VB	5	conj	###	SDP	9	bring	bring	VB	-	+	_	_	_and_c	_	_	_
+DEPS	10	JJ	12	dep	###	SDP	10	Cleveland	Cleveland	NNP	-	-	_	_	_	_	ARG3	_
+DEPS	11	NN	12	nn	###	SDP	11	tourist	tourist	NN	-	+	_	_	_	_	_	_
+DEPS	12	NN	9	dobj	###	SDP	12	revenue	revenue	NN	-	-	_	_	_	_	ARG2	compound
+DEPS	13	.	2	punct	###	SDP	13	.	_	.	-	-	_	_	_	_	_	_
+
+#21849040	#21849040
+DEPS	1	IN	14	prep	###	SDP	1	Without	without	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NN	1	pobj	###	SDP	2	liquidity	liquidity	NN	-	+	ARG2	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	IN	2	prep	###	SDP	3	from	from	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	DT	6	det	###	SDP	4	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	NN	6	nn	###	SDP	5	junk-bond	bond	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NN	3	pobj	###	SDP	6	market	market	NN	-	-	_	_	ARG2	BV	compound	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	CC	2	cc	###	SDP	7	or	or	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NN	9	nn	###	SDP	8	cash	cash	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	NN	2	conj	###	SDP	9	flow	flow	NN	-	-	_	_or_c	_	_	_	compound	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	IN	9	prep	###	SDP	10	from	from	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	NNS	10	pobj	###	SDP	11	profits	profit	NNS	-	-	_	_	_	_	_	_	ARG2	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	,	14	punct	###	SDP	12	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	PRP	14	nsubj	###	SDP	13	they	they	PRP	-	-	_	_	_	_	_	_	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	VBP	0	root	###	SDP	14	look	look	VBP	+	+	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	TO	14	prep	###	SDP	15	to	to	TO	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	DT	17	det	###	SDP	16	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	NN	15	pobj	###	SDP	17	government	government	NN	-	-	_	_	_	_	_	_	_	ARG2	BV	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	,	17	punct	###	SDP	18	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	WDT	21	nsubj	###	SDP	19	which	which	WDT	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	RB	21	advmod	###	SDP	20	obediently	_generic_rb_	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	VBZ	17	rcmod	###	SDP	21	assists	assist	VBZ	-	+	_	_	_	_	_	_	_	_	_	ARG1	_	_	_	_	_	_	ARG1	_	_	_	_	_	_	_	_
+DEPS	22	DT	24	det	###	SDP	22	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	JJ	24	amod	###	SDP	23	natural	natural	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	NNS	21	dobj	###	SDP	24	motions	motion	NNS	-	-	_	_	_	_	_	_	_	_	_	_	ARG2	BV	ARG1	ARG1	_	_	_	_	_	_	_	_	_	_	_
+DEPS	25	IN	24	prep	###	SDP	25	of	of	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	26	DT	28	det	###	SDP	26	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	27	JJ	28	amod	###	SDP	27	capitalist	capitalist	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	28	NN	25	pobj	###	SDP	28	economy	economy	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	29	IN	24	prep	###	SDP	29	with	with	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	30	NN	29	pobj	###	SDP	30	charity	charity	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	ARG1	_	_	_	_	_	_	_
+DEPS	31	IN	24	prep	###	SDP	31	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	32	DT	33	det	###	SDP	32	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	33	NN	31	pobj	###	SDP	33	form	form	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	_	_	_	_	_	_
+DEPS	34	IN	24	prep	###	SDP	34	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	35	NNS	34	pobj	###	SDP	35	cuts	cut	NNS	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG1	_	ARG1	_	_	_
+DEPS	36	IN	35	prep	###	SDP	36	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	37	DT	40	det	###	SDP	37	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	38	NNS	40	nn	###	SDP	38	capital-gains	gains	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	39	NN	40	nn	###	SDP	39	tax	tax	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	40	NN	36	pobj	###	SDP	40	rate	rate	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	compound	compound
+DEPS	41	CC	40	cc	###	SDP	41	or	or	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	42	NNS	40	conj	###	SDP	42	bailouts	_generic_nns_	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_or_c	_	_	_	_
+DEPS	43	.	14	punct	###	SDP	43	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21852008	#21852008
+DEPS	1	NN	3	nsubj	###	SDP	1	Trading	trade	NNP	-	-	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	VBD	3	cop	###	SDP	2	was	was	VBD	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	JJ	0	root	###	SDP	3	light	light	JJ	-	+	_	ARG1	_	_	_	loc	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	IN	3	prep	###	SDP	4	on	on	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	DT	8	det	###	SDP	5	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NNP	8	nn	###	SDP	6	Pacific	Pacific	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NNP	8	nn	###	SDP	7	Stock	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NNP	4	pobj	###	SDP	8	Exchange	_generic_proper_ne_	NNP	-	-	_	ARG2	BV	compound	compound	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	NN	3	tmod	###	SDP	9	yesterday	yesterday	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	,	3	punct	###	SDP	10	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	IN	3	prep	###	SDP	11	with	with	IN	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	NNS	11	pobj	###	SDP	12	workers	worker	NNS	-	-	_	_	_	_	_	_	_	ARG1	_	_	_	_	_	ARG1	ARG1	_	_	_	_	_	_	_
+DEPS	13	IN	12	prep	###	SDP	13	at	at	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	DT	15	det	###	SDP	14	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	NN	18	poss	###	SDP	15	exchange	exchange	NN	-	+	_	_	_	_	_	_	_	_	BV	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	POS	15	possessive	###	SDP	16	’s	’s	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	JJ	18	amod	###	SDP	17	main	main	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	NN	13	pobj	###	SDP	18	floor	floor	NN	-	-	_	_	_	_	_	_	_	ARG2	_	poss	ARG1	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	19	IN	12	prep	###	SDP	19	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	NNP	21	nn	###	SDP	20	San	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	NNP	19	pobj	###	SDP	21	Francisco	Francisco	NNP	-	-	_	_	_	_	_	_	_	_	_	_	_	ARG2	compound	_	_	_	_	_	_	_	_	_
+DEPS	22	VBG	12	vmod	###	SDP	22	struggling	struggle	VBG	-	+	_	_	_	_	_	_	ARG2	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	TO	24	aux	###	SDP	23	to	to	TO	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	VB	22	xcomp	###	SDP	24	execute	execute	VB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	_	ARG1	ARG1	_	_	_	_	_
+DEPS	25	NNS	24	dobj	###	SDP	25	orders	order	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	_	_	_	_	_	_	_
+DEPS	26	IN	24	prep	###	SDP	26	by	by	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	27	NN	26	pobj	###	SDP	27	flashlight	flashlight	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	_	_	_	_	_	_
+DEPS	28	IN	24	prep	###	SDP	28	as	as	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	29	DT	30	det	###	SDP	29	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	30	NN	28	pobj	###	SDP	30	result	result	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	_	_	_	_
+DEPS	31	IN	30	prep	###	SDP	31	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	32	DT	35	det	###	SDP	32	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	33	VBG	35	amod	###	SDP	33	continuing	continue	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	34	NN	35	nn	###	SDP	34	power	power	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	35	NN	31	pobj	###	SDP	35	outage	_generic_nn_	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG1	BV	ARG1	compound
+DEPS	36	.	3	punct	###	SDP	36	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21853022	#21853022
+DEPS	1	DT	3	det	###	SDP	1	The	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	JJ	3	amod	###	SDP	2	strong	strong	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NN	22	nsubjpass	###	SDP	3	dollar	dollar	NN	-	-	BV	ARG1	ARG1	_	_	_	_	_	_	_	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	4	,	3	punct	###	SDP	4	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	WDT	6	nsubj	###	SDP	5	which	which	WDT	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	VBZ	3	rcmod	###	SDP	6	reduces	reduce	VBZ	-	+	_	_	_	_	_	_	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	DT	8	det	###	SDP	7	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NN	6	dobj	###	SDP	8	value	value	NN	-	-	_	_	ARG2	BV	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	IN	8	prep	###	SDP	9	of	of	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	JJ	11	amod	###	SDP	10	overseas	overseas	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	NNS	9	pobj	###	SDP	11	earnings	earnings	NNS	-	+	_	_	_	_	ARG2	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	CC	11	cc	###	SDP	12	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NN	11	conj	###	SDP	13	revenue	revenue	NN	-	-	_	_	_	_	_	_	_and_c	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	WRB	17	advmod	###	SDP	14	when	when	WRB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	PRP	17	nsubjpass	###	SDP	15	they	they	PRP	-	-	_	_	_	_	_	_	_	_	ARG2	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	VBP	17	auxpass	###	SDP	16	are	are	VBP	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	VBN	6	advcl	###	SDP	17	translated	translate	VBN	-	+	_	_	_	_	_	_	_	ARG2	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	IN	17	prep	###	SDP	18	into	into	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	NNS	18	pobj	###	SDP	19	dollars	dollar	NNS	-	-	_	_	_	_	_	_	_	_	ARG3	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	,	3	punct	###	SDP	20	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	VBZ	22	auxpass	###	SDP	21	is	is	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	VBN	0	root	###	SDP	22	expected	expect	VBN	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	TO	24	aux	###	SDP	23	to	to	TO	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	VB	22	xcomp	###	SDP	24	knock	knock	VB	-	+	_	_	_	_	_	_	_	_	_	ARG2	_	_	_	_	_	_	_	_	_	_
+DEPS	25	CD	24	dobj	###	SDP	25	80	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	26	TO	24	prep	###	SDP	26	to	to	TO	-	+	_	_	_	_	_	_	_	_	_	_	_	ARG1	_	ARG1	_	_	_	_	_	_
+DEPS	27	CD	28	num	###	SDP	27	85	_generic_card_ne_	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	28	NNS	26	pobj	###	SDP	28	cents	cent	NNS	-	-	_	_	_	_	_	_	_	_	_	_	ARG2	_	loc	_	ARG1	_	_	_	_	_
+DEPS	29	IN	24	prep	###	SDP	29	off	off	IN	-	+	_	_	_	_	_	_	_	_	_	_	ARG3	_	_	_	_	_	_	_	_	_
+DEPS	30	NNP	33	poss	###	SDP	30	IBM	IBM	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	31	POS	30	possessive	###	SDP	31	’s	’s	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	32	JJ	33	amod	###	SDP	32	per-share	share	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	33	NNS	29	pobj	###	SDP	33	earnings	earnings	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	poss	compound	ARG1	_	_
+DEPS	34	IN	33	prep	###	SDP	34	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	35	DT	37	det	###	SDP	35	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	36	JJ	37	amod	###	SDP	36	full	full	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	37	NN	34	pobj	###	SDP	37	year	year	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	ARG1
+DEPS	38	.	22	punct	###	SDP	38	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21856018	#21856018
+DEPS	1	``	10	punct	###	SDP	1	“	_	``	-	-	_	_	_	_	_	_	_	_	_
+DEPS	2	IN	10	prep	###	SDP	2	Without	without	IN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	3	DT	6	det	###	SDP	3	some	some	DT	-	+	_	_	_	_	_	_	_	_	_
+DEPS	4	JJ	6	amod	###	SDP	4	real	real	JJ	-	+	_	_	_	_	_	_	_	_	_
+DEPS	5	NN	6	nn	###	SDP	5	product	product	NN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	6	NNS	2	pobj	###	SDP	6	improvements	improvement	NNS	-	-	ARG2	BV	ARG1	compound	_	_	_	_	_
+DEPS	7	,	10	punct	###	SDP	7	,	_	,	-	-	_	_	_	_	_	_	_	_	_
+DEPS	8	PRP	10	nsubj	###	SDP	8	it	it	PRP	-	-	_	_	_	_	_	_	_	_	_
+DEPS	9	VBZ	10	aux	###	SDP	9	’s	’s	VBZ	-	-	_	_	_	_	_	_	_	_	_
+DEPS	10	VBG	0	root	###	SDP	10	going	going	VBG	+	+	_	_	_	_	_	_	_	_	_
+DEPS	11	TO	13	aux	###	SDP	11	to	to	TO	-	-	_	_	_	_	_	_	_	_	_
+DEPS	12	VB	13	cop	###	SDP	12	be	be	VB	-	-	_	_	_	_	_	_	_	_	_
+DEPS	13	JJ	10	xcomp	###	SDP	13	difficult	difficult	JJ	-	+	ARG1	_	_	_	ARG1	_	_	_	_
+DEPS	14	TO	15	aux	###	SDP	14	to	to	TO	-	-	_	_	_	_	_	_	_	_	_
+DEPS	15	VB	13	xcomp	###	SDP	15	win	win	VB	-	+	_	_	_	_	_	ARG1	_	_	loc
+DEPS	16	DT	17	det	###	SDP	16	that	that	DT	-	+	_	_	_	_	_	_	_	_	_
+DEPS	17	NN	15	dobj	###	SDP	17	loyalty	loyalty	NN	-	-	_	_	_	_	_	_	ARG2	BV	_
+DEPS	18	RB	15	advmod	###	SDP	18	back	back	RB	-	+	_	_	_	_	_	_	_	_	_
+DEPS	19	.	10	punct	###	SDP	19	.	_	.	-	-	_	_	_	_	_	_	_	_	_
+DEPS	20	''	10	punct	###	SDP	20	”	_	''	-	-	_	_	_	_	_	_	_	_	_
+
+#21856078	#21856078
+DEPS	1	PRP$	3	poss	###	SDP	1	Our	our	PRP$	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	JJ	3	amod	###	SDP	2	heavy	heavy	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NNS	4	nsubj	###	SDP	3	users	user	NNS	-	-	poss	ARG1	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	4	VBP	0	root	###	SDP	4	consume	consume	VBP	+	+	_	_	_	_	_	_	_	_	loc	_	_	_
+DEPS	5	CD	7	number	###	SDP	5	two	two	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	TO	7	dep	###	SDP	6	to	to	TO	-	+	_	_	_	ARG1	_	ARG1	_	_	_	_	_	_
+DEPS	7	CD	8	num	###	SDP	7	three	three	CD	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NNS	17	nsubj	###	SDP	8	cans	can	NNS	-	-	_	_	ARG2	_	loc	_	ARG1	_	_	_	_	_
+DEPS	9	IN	8	prep	###	SDP	9	of	of	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	NN	9	pobj	###	SDP	10	soup	soup	NN	-	-	_	_	_	_	_	_	ARG2	_	_	_	_	_
+DEPS	11	DT	12	det	###	SDP	11	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	NN	8	npadvmod	###	SDP	12	week	week	NN	-	+	_	_	_	_	_	_	_	ARG1	_	_	_	_
+DEPS	13	,	8	punct	###	SDP	13	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	CC	8	cc	###	SDP	14	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	PRP	8	conj	###	SDP	15	we	we	PRP	-	-	_	_	_	_	_	_	_	_	_	_	ARG1	ARG1
+DEPS	16	MD	17	aux	###	SDP	16	’d	’d	VBD	-	+	_	_	_and_c	_	_	_	_	_	_	_	_	_
+DEPS	17	VB	4	root	###	SDP	17	like	like	IN	-	+	_	_	_	_	_	_	_	_	_	ARG1	_	_
+DEPS	18	TO	19	aux	###	SDP	18	to	to	TO	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	VB	17	xcomp	###	SDP	19	increase	increase	VB	-	+	_	_	_	_	_	_	_	_	_	_	ARG2	_
+DEPS	20	DT	19	dobj	###	SDP	20	that	that	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	ARG2
+DEPS	21	.	17	punct	###	SDP	21	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	''	17	punct	###	SDP	22	”	_	''	-	-	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21860005	#21860005
+DEPS	1	NNP	2	nsubj	###	SDP	1	Jaguar	Jaguar	NNP	-	-	ARG1	_	_	_	_	_	_	_	_
+DEPS	2	VBZ	0	root	###	SDP	2	figures	figure	VBZ	+	+	_	_	_	_	_	_	_	_	_
+DEPS	3	DT	5	det	###	SDP	3	a	a	DT	-	+	_	_	_	_	_	_	_	_	_
+DEPS	4	JJ	5	amod	###	SDP	4	friendly	friendly	JJ	-	+	_	_	_	_	_	_	_	_	_
+DEPS	5	NN	9	nsubj	###	SDP	5	alliance	alliance	NN	-	-	_	BV	ARG1	ARG1	ARG1	_	_	_	_
+DEPS	6	IN	5	prep	###	SDP	6	with	with	IN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	7	NNP	6	pobj	###	SDP	7	GM	_generic_proper_ne_	NNP	-	-	_	_	_	ARG2	_	_	_	_	_
+DEPS	8	MD	9	aux	###	SDP	8	will	will	MD	-	-	_	_	_	_	_	_	_	_	_
+DEPS	9	VB	2	ccomp	###	SDP	9	fend	fend	VB	-	+	ARG2	_	_	_	_	_	_	_	_
+DEPS	10	RP	9	prt	###	SDP	10	off	off	RP	-	-	_	_	_	_	_	_	_	_	_
+DEPS	11	JJ	12	amod	###	SDP	11	unwelcome	unwelcome	JJ	-	+	_	_	_	_	_	_	_	_	_
+DEPS	12	NNS	9	dobj	###	SDP	12	advances	advance	NNS	-	-	_	_	_	_	ARG2	ARG1	ARG1	_	_
+DEPS	13	IN	12	prep	###	SDP	13	from	from	IN	-	+	_	_	_	_	_	_	_	_	_
+DEPS	14	NNP	16	nn	###	SDP	14	Ford	Ford	NNP	-	+	_	_	_	_	_	_	_	_	_
+DEPS	15	NNP	16	nn	###	SDP	15	Motor	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_
+DEPS	16	NNP	13	pobj	###	SDP	16	Co	_generic_proper_ne_	NNP	-	-	_	_	_	_	_	_	ARG2	compound	compound
+DEPS	17	.	2	punct	###	SDP	17	.	_	.	-	-	_	_	_	_	_	_	_	_	_
+
+#21863006	#21863006
+DEPS	1	CC	13	cc	###	SDP	1	But	but	CC	+	+	_	_	_	_	_	_	_	_
+DEPS	2	IN	5	mark	###	SDP	2	as	as	IN	-	+	ARG2	_	_	_	_	_	_	_
+DEPS	3	DT	4	det	###	SDP	3	the	the	DT	-	+	_	_	_	_	_	_	_	_
+DEPS	4	NN	5	nsubj	###	SDP	4	outcry	_generic_nn_	NN	-	-	_	_	BV	ARG1	_	_	_	_
+DEPS	5	VBD	13	advcl	###	SDP	5	faded	fade	VBN	-	+	_	ARG2	_	_	ARG1	_	_	_
+DEPS	6	IN	5	prep	###	SDP	6	by	by	IN	-	+	_	_	_	_	_	_	_	_
+DEPS	7	DT	8	det	###	SDP	7	the	the	DT	-	+	_	_	_	_	_	_	_	_
+DEPS	8	NN	6	pobj	###	SDP	8	spring	spring	NN	-	-	_	_	_	_	ARG2	BV	ARG1	_
+DEPS	9	IN	8	prep	###	SDP	9	of	of	IN	-	+	_	_	_	_	_	_	_	_
+DEPS	10	CD	9	pobj	###	SDP	10	1988	_generic_year_ne_	CD	-	-	_	_	_	_	_	_	ARG2	_
+DEPS	11	,	13	punct	###	SDP	11	,	_	,	-	-	_	_	_	_	_	_	_	_
+DEPS	12	PRP	13	nsubj	###	SDP	12	they	they	PRP	-	-	_	_	_	_	_	_	_	ARG1
+DEPS	13	VBD	0	root	###	SDP	13	resumed	resume	VBD	-	+	_	ARG1	_	_	_	_	_	_
+DEPS	14	.	13	punct	###	SDP	14	.	_	.	-	-	_	_	_	_	_	_	_	_
+
+#21866020	#21866020
+DEPS	1	CC	6	cc	###	SDP	1	But	but	CC	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	DT	3	det	###	SDP	2	those	those	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	NNS	6	nsubj	###	SDP	3	dollars	dollar	NNS	-	-	_	BV	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	VBP	6	aux	###	SDP	4	have	have	VBP	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	VBN	6	aux	###	SDP	5	been	been	VBN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	VBG	0	root	###	SDP	6	going	go	VBG	-	+	ARG2	_	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	IN	6	prep	###	SDP	7	into	into	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	JJ	12	amod	###	SDP	8	such	such	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	``	12	punct	###	SDP	9	“	_	``	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	JJ	12	amod	###	SDP	10	safe	safe	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	''	12	punct	###	SDP	11	”	_	''	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	NNS	7	pobj	###	SDP	12	products	product	NNS	-	-	_	_	_	ARG2	BV	ARG1	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	13	IN	6	prep	###	SDP	13	as	as	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	NN	16	nn	###	SDP	14	money	money	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	NN	16	nn	###	SDP	15	market	market	NN	-	+	_	_	_	_	_	_	_	compound	_	_	_	_	_	_	_	_	_
+DEPS	16	NNS	13	pobj	###	SDP	16	funds	fund	NNS	-	-	_	_	_	_	_	_	ARG2	_	compound	_	ARG1	_	_	_	_	_	_
+DEPS	17	,	16	punct	###	SDP	17	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	WDT	21	nsubj	###	SDP	18	which	which	WDT	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	VBP	21	aux	###	SDP	19	do	don’t	VBP	-	-	_	_	_	_	_	_	_	_	_	neg	_	_	_	_	_	_	_
+DEPS	20	RB	21	neg	###	SDP	20	n’t	don’t	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	VB	16	rcmod	###	SDP	21	generate	generate	VB	-	+	_	_	_	_	_	_	_	_	_	ARG1	_	ARG1	_	_	_	_	_
+DEPS	22	JJ	21	dobj	###	SDP	22	much	much	RB	-	-	_	_	_	_	_	_	_	_	_	_	ARG2	_	_	_	_	_	_
+DEPS	23	IN	22	prep	###	SDP	23	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	DT	25	det	###	SDP	24	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	25	NN	23	pobj	###	SDP	25	way	way	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	ARG1	_	_	_
+DEPS	26	IN	22	prep	###	SDP	26	of	of	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	27	NNS	26	pobj	###	SDP	27	commissions	commission	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	ARG1	_	_
+DEPS	28	IN	22	prep	###	SDP	28	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	29	DT	31	det	###	SDP	29	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	30	NN	31	nn	###	SDP	30	brokerage	_generic_nn_	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	31	NNS	28	pobj	###	SDP	31	firms	firm	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	compound
+DEPS	32	.	6	punct	###	SDP	32	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21867047	#21867047
+DEPS	1	NNS	0	root	###	SDP	1	Fees	fee	NNS	+	-
+DEPS	2	CD	1	num	###	SDP	2	2	_generic_card_ne_	CD	-	-
+DEPS	3	.	1	punct	###	SDP	3	.	_	.	-	-
+
+#21870015	#21870015
+DEPS	1	JJ	3	amod	###	SDP	1	Few	few	JJ	-	+	_	_	_
+DEPS	2	NN	3	nn	###	SDP	2	telephone	telephone	NN	-	+	_	_	_
+DEPS	3	NNS	4	nsubj	###	SDP	3	lines	line	NNS	-	-	ARG1	compound	ARG1
+DEPS	4	VBD	0	root	###	SDP	4	snapped	snap	VBD	+	+	_	_	_
+DEPS	5	.	4	punct	###	SDP	5	.	_	.	-	-	_	_	_
+
+#21870079	#21870079
+DEPS	1	PRP	4	nsubj	###	SDP	1	We	we	PRP	-	-	_	ARG1	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	RB	4	advmod	###	SDP	2	really	really	RB	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	VBP	4	aux	###	SDP	3	are	are	VBP	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	VBG	0	root	###	SDP	4	talking	talk	VBG	-	+	ARG1	_	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	5	IN	4	prep	###	SDP	5	about	about	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	VBG	5	pcomp	###	SDP	6	shutting	shut	VBG	-	+	_	_	ARG2	_	_	_	_	ARG1	_	_	_	ARG1	_
+DEPS	7	RP	6	prt	###	SDP	7	down	down	RP	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	DT	11	det	###	SDP	8	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	JJ	11	amod	###	SDP	9	major	major	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	JJ	11	amod	###	SDP	10	American	American	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	NN	6	dobj	###	SDP	11	city	city	NN	-	-	_	_	_	ARG2	BV	ARG1	ARG1	_	_	_	_	_	_
+DEPS	12	IN	11	prep	###	SDP	12	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	DT	14	det	###	SDP	13	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	NN	12	pobj	###	SDP	14	number	number	NN	-	+	_	_	_	_	_	_	_	ARG2	BV	_	_	_	_
+DEPS	15	IN	14	prep	###	SDP	15	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	NNS	15	pobj	###	SDP	16	days	day	NNS	-	-	_	_	_	_	_	_	_	_	_	ARG1	_	_	_
+DEPS	17	,	4	punct	###	SDP	17	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	RB	4	advmod	###	SDP	18	maybe	maybe	RB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	IN	4	prep	###	SDP	19	for	for	IN	-	+	_	_	_	_	_	_	_	_	_	_	ARG1	_	_
+DEPS	20	DT	22	det	###	SDP	20	a	a+few	DT	-	-	_	_	_	_	_	_	_	_	_	_	_	_	mwe
+DEPS	21	JJ	22	amod	###	SDP	21	few	a+few	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	NNS	19	pobj	###	SDP	22	weeks	week	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	ARG2	ARG1
+DEPS	23	.	4	punct	###	SDP	23	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	''	4	punct	###	SDP	24	”	_	''	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21874002	#21874002
+DEPS	1	RB	5	advmod	###	SDP	1	Early	early	RB	-	+	_	loc	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	NN	5	tmod	###	SDP	2	yesterday	yesterday	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	,	5	punct	###	SDP	3	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	NNS	5	nsubj	###	SDP	4	bonds	bond	NNS	-	-	_	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	VBD	0	root	###	SDP	5	rose	rise	VBD	-	+	loc	_	_	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	IN	8	mark	###	SDP	6	as	as	IN	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NNS	8	nsubj	###	SDP	7	investors	investor	NNS	-	-	_	_	_	_	ARG1	ARG1	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	VBD	5	advcl	###	SDP	8	rushed	rush	VBD	-	+	_	_	_	ARG2	_	_	_	ARG1	_	_	_	_	_	_	_	_	_	_
+DEPS	9	TO	10	aux	###	SDP	9	to	to	TO	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	VB	8	xcomp	###	SDP	10	buy	buy	VB	-	+	_	_	_	_	ARG2	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	NNP	12	nn	###	SDP	11	Treasury	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	NNS	10	dobj	###	SDP	12	securities	security	NNS	-	-	_	_	_	_	_	ARG2	compound	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	IN	12	prep	###	SDP	13	on	on	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	DT	15	det	###	SDP	14	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	NN	13	pobj	###	SDP	15	prospect	prospect	NN	-	+	_	_	_	_	_	_	_	ARG2	BV	_	_	_	_	_	_	_	_	_
+DEPS	16	IN	19	mark	###	SDP	16	that	that	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	NNS	19	nsubj	###	SDP	17	stocks	stock	NNS	-	-	_	_	_	_	_	_	_	_	_	_	_	ARG1	_	_	_	_	_	_
+DEPS	18	MD	19	aux	###	SDP	18	would	would	MD	-	+	_	_	_	_	_	_	_	_	_	ARG1	_	_	_	_	_	_	_	_
+DEPS	19	VB	10	advcl	###	SDP	19	plummet	plummet	VB	-	+	_	_	_	_	_	_	_	_	_	_	ARG1	_	ARG1	_	_	_	_	_
+DEPS	20	IN	19	prep	###	SDP	20	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	DT	22	det	###	SDP	21	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	NN	20	pobj	###	SDP	22	aftermath	aftermath	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	ARG1	_	_	_
+DEPS	23	IN	19	prep	###	SDP	23	of	of	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	DT	27	det	###	SDP	24	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	25	JJ	27	amod	###	SDP	25	massive	massive	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	26	NNP	27	nn	###	SDP	26	California	California	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	27	NN	23	pobj	###	SDP	27	earthquake	earthquake	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	ARG1	compound
+DEPS	28	.	5	punct	###	SDP	28	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21874058	#21874058
+DEPS	1	NNP	2	nn	###	SDP	1	Mortgage	mortgage	NNP	-	+	_	_	_	_	_	_
+DEPS	2	NNS	5	nsubjpass	###	SDP	2	securities	security	NNS	-	-	compound	ARG1	_	_	_	_
+DEPS	3	VBD	5	auxpass	###	SDP	3	ended	end	VBD	-	+	_	_	_	subord	ARG1	_
+DEPS	4	RB	5	advmod	###	SDP	4	little	little	RB	-	+	_	_	_	_	_	_
+DEPS	5	VBN	0	root	###	SDP	5	changed	change	VBN	+	+	_	_	ARG1	_	_	_
+DEPS	6	IN	5	prep	###	SDP	6	after	after	IN	-	+	_	_	_	_	_	_
+DEPS	7	JJ	8	amod	###	SDP	7	light	light	JJ	-	+	_	_	_	_	_	_
+DEPS	8	NNS	6	pobj	###	SDP	8	dealings	dealings	NNS	-	-	_	_	_	_	ARG2	ARG1
+DEPS	9	.	5	punct	###	SDP	9	.	_	.	-	-	_	_	_	_	_	_
+
+#21875043	#21875043
+DEPS	1	RB	21	advmod	###	SDP	1	Indeed	indeed	RB	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	,	21	punct	###	SDP	2	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	VBG	21	prep	###	SDP	3	according	according+to	VBG	-	-	_	mwe	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	TO	3	pcomp	###	SDP	4	to	according+to	TO	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	JJ	6	amod	###	SDP	5	West	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	JJ	8	amod	###	SDP	6	German	German	JJ	-	+	_	_	compound	_	_	_	_	_	_	_	_	_	_
+DEPS	7	NN	8	nn	###	SDP	7	government	government	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	NNS	4	pobj	###	SDP	8	sources	source	NNS	-	-	_	ARG2	_	ARG1	compound	_	_	_	_	_	_	_	_
+DEPS	9	,	21	punct	###	SDP	9	,	_	,	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	PRP	12	nsubj	###	SDP	10	he	he	PRP	-	-	_	_	_	_	_	ARG1	_	_	_	_	_	_	_
+DEPS	11	VBD	12	cop	###	SDP	11	was	was	VBD	-	+	ARG1	ARG1	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	CD	21	ccomp	###	SDP	12	one	one	CD	-	+	_	_	_	_	_	ARG2	_	_	_	_	_	_	_
+DEPS	13	IN	12	prep	###	SDP	13	of	of	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	DT	15	det	###	SDP	14	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	NNS	13	pobj	###	SDP	15	leaders	leader	NNS	-	-	_	_	_	_	_	_	ARG1	BV	ARG1	_	_	_	_
+DEPS	16	IN	12	prep	###	SDP	16	in	in	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	DT	19	det	###	SDP	17	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	18	NN	19	nn	###	SDP	18	power	power	NN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	NN	16	pobj	###	SDP	19	struggle	struggle	NN	-	-	_	_	_	_	_	_	_	_	ARG2	BV	compound	ARG1	_
+DEPS	20	WDT	21	nsubj	###	SDP	20	that	that	WDT	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	VBD	0	root	###	SDP	21	toppled	_generic_vbd_	VBD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	22	NNP	23	nn	###	SDP	22	Mr.	Mr.	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	NNP	21	nsubj	###	SDP	23	Honecker	_generic_proper_ne_	NNP	-	-	_	_	_	_	_	_	_	_	_	_	_	ARG2	compound
+DEPS	24	.	21	punct	###	SDP	24	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_
+
+#21875097	#21875097
+DEPS	1	PRP	6	nsubj	###	SDP	1	He	he	PRP	-	-	ARG1	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	2	VBD	6	cop	###	SDP	2	was	was	VBD	+	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	3	DT	6	det	###	SDP	3	a	a	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	4	``	6	punct	###	SDP	4	“	_	``	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	5	JJ	6	amod	###	SDP	5	socialist	socialist	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	6	NN	0	root	###	SDP	6	warrior	warrior	NN	-	-	ARG2	BV	ARG1	ARG1	ARG2	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	7	''	6	punct	###	SDP	7	”	_	''	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	8	WP	10	nsubjpass	###	SDP	8	who	who	WP	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	9	VBD	10	auxpass	###	SDP	9	felt	feel	VBD	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	10	VBN	6	root	###	SDP	10	rankled	_generic_vbn_	VBN	-	+	_	_	_	ARG2	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	11	IN	10	prep	###	SDP	11	by	by	IN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	12	NNP	13	nn	###	SDP	12	West	_generic_proper_ne_	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	13	NNP	17	poss	###	SDP	13	Germany	Germany	NNP	-	+	_	_	_	_	_	compound	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	14	POS	13	possessive	###	SDP	14	’s	’s	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	15	JJ	17	nn	###	SDP	15	enormous	enormous	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	16	NN	17	nn	###	SDP	16	postwar	_generic_jj_	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	17	NN	11	pobj	###	SDP	17	prosperity	prosperity	NN	-	+	_	_	_	_	ARG1	_	poss	ARG1	ARG1	_	_	_	_	_	_	_	_	_
+DEPS	18	CC	10	cc	###	SDP	18	and	and	CC	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	19	DT	21	det	###	SDP	19	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	20	NNP	21	nn	###	SDP	20	Bonn	Bonn	NNP	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	21	NN	24	poss	###	SDP	21	government	government	NN	-	+	_	_	_	_	_	_	_	_	_	_	BV	compound	_	_	_	_	_	_
+DEPS	22	POS	21	possessive	###	SDP	22	’s	’s	VBZ	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	23	JJ	24	amod	###	SDP	23	steadfast	_generic_jj_	JJ	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	24	NN	10	conj	###	SDP	24	refusal	refusal	NN	-	-	_	_	_	_	_	_	_	_	_	_and_c	_	_	poss	ARG1	_	_	_	_
+DEPS	25	TO	26	aux	###	SDP	25	to	to	TO	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	26	VB	24	vmod	###	SDP	26	recognize	recognize	VB	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	27	DT	28	det	###	SDP	27	the	the	DT	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	28	NN	26	dobj	###	SDP	28	legitimacy	_generic_nn_	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	BV	ARG1	_
+DEPS	29	IN	28	prep	###	SDP	29	of	of	IN	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	30	PRP$	31	poss	###	SDP	30	his	his	PRP$	-	+	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+DEPS	31	NN	29	pobj	###	SDP	31	state	state	NN	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	ARG2	poss
+DEPS	32	.	10	punct	###	SDP	32	.	_	.	-	-	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_	_
+

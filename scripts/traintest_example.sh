@@ -3,11 +3,11 @@ set -eu
 modelfile=mymodel
 predfile=mypred
 
-trainfile=../data/splits/first100.dm.sdp
-traindeps=../data/splits/first100.dm.sdp.dependencies
+trainfile=lildata/liltrain.dm.sdp
+traindeps=lildata/liltrain.dm.sdp.dependencies
 
-testfile=../data/splits/dev.dm.sdp
-testdeps=../data/splits/dev.dm.sdp.dependencies
+testfile=lildata/lildev.dm.sdp
+testdeps=lildata/lildev.dm.sdp.dependencies
 
 set -x
 ./java.sh lr.LRParser train $modelfile $trainfile $traindeps
