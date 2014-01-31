@@ -45,16 +45,16 @@ public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE
 	}
 
 	@Override
-	public void features(int srcTokenIdx, int destTokenIdx, String label, FeatureAdder fa) {
+	public void features(int srcTokenIdx, int destTokenIdx, FeatureAdder fa) {
         final String srcPostag = sent.pos()[srcTokenIdx];
         final String destPostag = sent.pos()[destTokenIdx];
 		final String srcLemma = lemmaPostags[srcTokenIdx];
 		final String destLemma = lemmaPostags[destTokenIdx];
         final String dir = srcTokenIdx > destTokenIdx ? "dir=i>j" : "dir=i<j";
 
-        fa.add(U.sf("lem:bg:%s_%s_%s", srcLemma, destLemma, label));
-		fa.add(U.sf("pos:bg:%s_%s_%s", srcPostag, destPostag, label));
-		fa.add(U.sf("pos:bg:%s_%s_%s_%s", srcPostag, destPostag, dir, label));
+        fa.add(U.sf("lem:bg:%s_%s", srcLemma, destLemma));
+		fa.add(U.sf("pos:bg:%s_%s", srcPostag, destPostag));
+		fa.add(U.sf("pos:bg:%s_%s_%s", srcPostag, destPostag, dir));
 	}
 
 	@Override

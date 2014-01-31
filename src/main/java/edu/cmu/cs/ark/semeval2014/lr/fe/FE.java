@@ -40,7 +40,7 @@ public class FE {
 	
 	/** If you implement this, you're saying: I know how to extract directed edge (token pair) features. */
 	public static interface EdgeFE {
-		abstract public void features(int srcTokenIdx, int destTokenIdx, String label, FeatureAdder fa);
+		abstract public void features(int srcTokenIdx, int destTokenIdx, FeatureAdder fa);
 	}
 	
 	/** this is the callback thingy that the framework passes in to the FeatureExtractor object. */
