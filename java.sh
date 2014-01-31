@@ -18,6 +18,7 @@ shift
 export JAVA_OPTS="-ea -Dfile.encoding=UTF-8 -XX:ParallelGCThreads=2 -Xmx4g"
 export SBT_OPTS=$JAVA_OPTS
 
-sbt "run-main $klass $*"
+set -x
+$(dirname $0)/scripts/sbt "run-main $klass $*"
 ## alternatively, run "sbt assembly" then you can put the uberjar on the classpath like below
 # java ${JAVA_OPTS} -cp target/scala-2.10/semeval2014-assembly-0.1-SNAPSHOT.jar $klass $@
