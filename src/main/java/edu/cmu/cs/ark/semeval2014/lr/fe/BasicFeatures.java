@@ -11,19 +11,19 @@ import java.util.Set;
 
 public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE.EdgeFE {
 	private final MorphaLemmatizer morpha = new MorphaLemmatizer();
-	Set<String> whitelist;
+//	Set<String> whitelist;
 	private String[] lemmaPostags;
 
 	@Override
 	public void initializeAtStartup() {
-		whitelist = new HashSet<>();
-		for (String line : BasicFileIO.openFileLines("resources/train_vocab.txt")) {
-			String[] parts =line.trim().split(" +");
-			int count = Integer.parseInt(parts[0]);
-			if (count >= 100) {
-				whitelist.add(parts[1]);
-			}
-		}
+//		whitelist = new HashSet<>();
+//		for (String line : BasicFileIO.openFileLines("resources/train_vocab.txt")) {
+//			String[] parts =line.trim().split(" +");
+//			int count = Integer.parseInt(parts[0]);
+//			if (count >= 100) {
+//				whitelist.add(parts[1]);
+//			}
+//		}
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE
 		for (int tokIdx = 0; tokIdx < n; tokIdx++) {
 			final String postag = _sent.pos()[tokIdx];
 			final String word = _sent.sentence()[tokIdx];
-			final String lemma = whitelist.contains(word) ? morpha.getLemma(word, postag) : "OOV";
+			final String lemma = morpha.getLemma(word, postag);
 			lps[tokIdx] = U.sf("%s_%s", postag, lemma);
 		}
 		return lps;
