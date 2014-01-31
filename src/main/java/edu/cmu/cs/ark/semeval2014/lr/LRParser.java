@@ -414,6 +414,13 @@ public class LRParser {
             }
     		int[][] edgeMatrix = graphMatrixes.get(snum);
             ll += updateExampleLogreg(ns, edgeMatrix);
+            
+            if (firstIter && snum>0 && snum % 1000 == 0) {
+            	U.pf("%d sents, %.3fm percepts, %.3fm finefeats allocated, %.1f MB mem used\n", 
+            			snum+1, perceptVocab.size()/1e6, coefs.length/1e6, 
+            			Runtime.getRuntime().totalMemory()/1e6
+            			);
+            }
         }
         //  logprior  =  - (1/2) lambda || beta ||^2
         //  gradient =  - lambda beta
