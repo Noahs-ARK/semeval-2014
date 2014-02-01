@@ -12,16 +12,14 @@ public class NumberizedSentence {
 	int[] iIndexes;
 	int[] jIndexes;
 	int[] perceptnums;
-	int[] labels;
 	float[] values;
 	int nnz;
 	
-	void add(int i, int j, int perceptnum, int label, double value) {
+	void add(int i, int j, int perceptnum, double value) {
 		growIfNecessary();
 		iIndexes[nnz] = i;
 		jIndexes[nnz] = j;
 		perceptnums[nnz] = perceptnum;
-		labels[nnz] = label;
 		values[nnz] = (float) value;
 		nnz++;
 		totalNNZ++;
@@ -29,7 +27,6 @@ public class NumberizedSentence {
 	int i(int kk) { return iIndexes[kk]; }
 	int j(int kk) { return jIndexes[kk]; }
 	int perceptnum(int kk) { return perceptnums[kk]; }
-	int label(int kk) { return labels[kk]; }
 	float value(int kk) { return values[kk]; }
 	
 	static long totalNNZ = 0;  // only for diagnosis
@@ -47,7 +44,6 @@ public class NumberizedSentence {
 		iIndexes = new int[INIT_SIZE];
 		jIndexes = new int[INIT_SIZE];
 		perceptnums = new int[INIT_SIZE];
-		labels = new int[INIT_SIZE];
 		values = new float[INIT_SIZE];
 	}
 	
@@ -85,7 +81,6 @@ public class NumberizedSentence {
 			iIndexes = grow(iIndexes);
 			jIndexes = grow(jIndexes);
 			perceptnums = grow(perceptnums);
-			labels = grow(labels);
 			values = grow(values);
 		}
 	}
