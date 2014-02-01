@@ -1,4 +1,3 @@
 #!/bin/bash
 test -f ~/.sbtconfig && . ~/.sbtconfig
-exec java -Xmx1g ${SBT_OPTS} -jar $(dirname $0)/sbt-launch.jar "$@"
-
+exec java -Xmx1g -XX:MaxPermSize=256m ${SBT_OPTS} -jar $(dirname $0)/sbt-launch.jar "$@"
