@@ -53,7 +53,7 @@ public class LRParser {
 	
 	// 3. Model parameter-ish options
 	static int maxEdgeDistance = 10;
-	static double l2reg = .01;
+	static double l2reg = 1;
 	static double noedgeWeight = 0.3;
 	
 	// 4. Runtime options
@@ -159,7 +159,7 @@ public class LRParser {
 	static long totalPairs = 0;  // only for diagnosis
 	
 	static class TokenFeatAdder extends FE.FeatureAdder {
-		int i=-1, labelID=-1;
+		int i=-1;
 		NumberizedSentence ns;
 		InputAnnotatedSentence is; // only for debugging
 		
@@ -171,29 +171,27 @@ public class LRParser {
 
 			// this is kinda a hack, put it in both directions for every edge. we could use smarter data structures rather than the full matrix of edge featvecs to represent this more compactly.
 
-			for (int labelID=0; labelID < labelVocab.size(); labelID++) {
-				String ff;
-				int featnum;
-				
-				ff = U.sf("%s::ashead", featname);
-				featnum = perceptVocab.num(ff);
-				if (featnum!=-1) {
-					for (int j=0; j<ns.T; j++) {
-						if (badDistance(i,j)) continue;
-						ns.add(i,j, featnum, labelID, value);
-					}
+			String ff;
+			int featnum;
+			
+			ff = U.sf("%s::ashead", featname);
+			featnum = perceptVocab.num(ff);
+			if (featnum!=-1) {
+				for (int j=0; j<ns.T; j++) {
+					if (badDistance(i,j)) continue;
+					ns.add(i,j, featnum, value);
 				}
-				
-				ff = U.sf("%s::aschild", featname);
-				featnum = perceptVocab.num(ff);
-				if (featnum!=-1) {
-					for (int j=0; j<ns.T; j++) {
-						if (badDistance(j,i)) continue;
-						ns.add(j,i, featnum, labelID, value);
-					}
-				}
-				
 			}
+			
+			ff = U.sf("%s::aschild", featname);
+			featnum = perceptVocab.num(ff);
+			if (featnum!=-1) {
+				for (int j=0; j<ns.T; j++) {
+					if (badDistance(j,i)) continue;
+					ns.add(j,i, featnum, value);
+				}
+			}
+				
 		}
 	}
 	
@@ -214,9 +212,8 @@ public class LRParser {
 		public void add(String featname, double value) {
 			int perceptnum = perceptVocab.num(featname);
 			if (perceptnum==-1) return;
-			for (int label=0; label<labelVocab.size(); label++) {
-				ns.add(i,j, perceptnum, label, value);
-			}
+			
+			ns.add(i,j, perceptnum, value);
 			
 			if (verboseFeatures) {
 				U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", is.sentence()[i], i, is.sentence()[j], j, 
@@ -258,9 +255,8 @@ public class LRParser {
 				if (badDistance(adder2.i,adder2.j)) continue;
 				
 				// bias term
-				for (int k=0; k<labelVocab.size(); k++) {
-					ns.add(adder2.i, adder2.j, 0, k, 1.0);
-				}
+				ns.add(adder2.i, adder2.j, 0, 1.0);
+				
 				// edge features
 				for (FE.FeatureExtractor fe : allFE) {
 					if (fe instanceof FE.EdgeFE) {
@@ -438,15 +434,17 @@ public class LRParser {
 		double[][][] probs = inferEdgeProbs(ns);
 		
 		for (int kk=0; kk<ns.nnz; kk++) {
-		    int i=ns.i(kk), j=ns.j(kk);
+		    int i=ns.i(kk), j=ns.j(kk), pnum = ns.perceptnum(kk);
 		    double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
-		    int observed = edgeMatrix[i][j] == ns.label(kk) ? 1 : 0;
-		    double resid = observed - probs[i][j][ns.label(kk)];
-		    double g = w * resid * ns.value(kk);
-		    
-		    double rate = adagradStoreRate(ns.perceptnum(kk), g);
 
-		    coefs[finefeatnum(ns.perceptnum(kk),ns.label(kk))] += learningRate * rate * g;
+		    for (int label=0; label<labelVocab.size(); label++) {
+			    int ffnum = finefeatnum(pnum,label);
+			    int observed = edgeMatrix[i][j] == label ? 1 : 0;
+			    double resid = observed - probs[i][j][label];
+			    double g = w * resid * ns.value(kk);
+			    double rate = adagradStoreRate(ffnum, g);
+			    coefs[ffnum] += learningRate * rate * g;
+		    }
 		}
 		
 		// loglik is completely unnecessary for optimization, just nice for diagnosis.
@@ -479,7 +477,9 @@ public class LRParser {
 	static double[][][] inferEdgeScores(NumberizedSentence ns) {
 		double[][][] scores = new double[ns.T][ns.T][labelVocab.size()];
 		for (int kk=0; kk<ns.nnz; kk++) {
-			scores[ns.i(kk)][ns.j(kk)][ns.label(kk)] += coefs[finefeatnum(ns.perceptnum(kk),ns.label(kk))] * ns.value(kk);
+			for (int label=0; label<labelVocab.size(); label++) {
+				scores[ns.i(kk)][ns.j(kk)][label] += coefs[finefeatnum(ns.perceptnum(kk),label)] * ns.value(kk);
+			}
 		}
 		return scores;
 	}
