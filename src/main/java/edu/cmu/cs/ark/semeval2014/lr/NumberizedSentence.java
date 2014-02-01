@@ -72,6 +72,12 @@ public class NumberizedSentence {
 		System.arraycopy(x,0, y,0, x.length);
 		return y;
 	}
+	static float[] growToLength(float[] x, int newlength) {
+		assert newlength >= x.length;
+		float[] y = new float[newlength];
+		System.arraycopy(x,0, y,0, x.length);
+		return y;
+	}
 
 	void growIfNecessary() {
 		int curCapacity = iIndexes.length;

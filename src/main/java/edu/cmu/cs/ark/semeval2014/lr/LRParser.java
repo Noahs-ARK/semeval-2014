@@ -45,8 +45,8 @@ public class LRParser {
 	static List<FE.FeatureExtractor> allFE = new ArrayList<>();
 	static Vocabulary labelVocab = new Vocabulary();
 	static Vocabulary perceptVocab;
-	static double[] coefs; // flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
-	static double[] ssGrad;  // adagrad history info. parallel to coefs[].
+	static float[] coefs; // flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
+	static float[] ssGrad;  // adagrad history info. parallel to coefs[].
 	static double learningRate = .1;
 	
 
@@ -289,7 +289,7 @@ public class LRParser {
 		perceptVocab.lock();
 		labelVocab.lock();
 		assert perceptVocab.name(0).equals("***BIAS***");
-		coefs = new double[perceptVocab.size() * labelVocab.size()];
+		coefs = new float[perceptVocab.size() * labelVocab.size()];
 	}
 	
 	static void saveModel(String modelFile) throws IOException {
@@ -318,7 +318,7 @@ public class LRParser {
 		BufferedReader reader = BasicFileIO.openFileOrResource(modelFile);
 		String line;
 		
-		ArrayList<Triple<Integer,Integer,Double>> coefTuples = new ArrayList<>(); 
+		ArrayList<Triple<Integer,Integer,Float>> coefTuples = new ArrayList<>(); 
 
 		while ( (line = reader.readLine()) != null ) {
 			String[] parts = line.split("\t");
@@ -330,7 +330,7 @@ public class LRParser {
 			else if (parts[0].equals("C")) {
 				int perceptnum = perceptVocab.num(parts[1]);
 				int labelnum = labelVocab.numStrict(parts[2]);
-				double value = Double.parseDouble(parts[3]);
+				float value = Float.parseFloat(parts[3]);
 				coefTuples.add(U.triple(perceptnum, labelnum, value));
 			}
 			else { throw new RuntimeException("bad model line format"); }
@@ -338,7 +338,7 @@ public class LRParser {
 
 		lockdownVocabAndAllocateCoefs();
 		
-		for (Triple<Integer,Integer,Double> x : coefTuples) {
+		for (Triple<Integer,Integer,Float> x : coefTuples) {
 			coefs[finefeatnum(x.first,x.second)] = x.third;
 		}
 		reader.close();
@@ -380,8 +380,8 @@ public class LRParser {
     	assert coefs==null&&ssGrad==null || coefs.length==ssGrad.length;
     	if (coefs==null) {
     		int n = Math.min(10000, perceptVocab.size());
-    		coefs = new double[n*labelVocab.size()];
-    		ssGrad = new double[n*labelVocab.size()];
+    		coefs = new float[n*labelVocab.size()];
+    		ssGrad = new float[n*labelVocab.size()];
     	}
     	else if (labelVocab.size()*perceptVocab.size() > coefs.length) {
     		int newlen = (int) Math.ceil(1.2 * perceptVocab.size()) * labelVocab.size();
