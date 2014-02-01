@@ -301,7 +301,9 @@ public class LRParser {
 		out.append("\n");
 		for (int f=0; f<perceptVocab.size(); f++) {
 			for (int k=0; k<labelVocab.size(); k++) {
-				out.printf("C\t%s\t%s\t%g\n", perceptVocab.name(f), labelVocab.name(k), coefs[finefeatnum(f,k)]);
+				float coef = coefs[finefeatnum(f,k)];
+				if (Math.abs(coef) < 1e-7) continue;
+				out.printf("C\t%s\t%s\t%s\n", perceptVocab.name(f), labelVocab.name(k), coef);
 			}
 		}
 		writer.close();
