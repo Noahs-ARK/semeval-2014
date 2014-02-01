@@ -10,9 +10,9 @@ public class LinearOrderFeatures extends FE.FeatureExtractor implements FE.EdgeF
 	 * Feature for the directed linear distance between a child and its parent.
 	 * Motivation: ARG1 usually on the left, ARG2 on the right, etc.
 	 */
-	public void features(int srcTokenIdx, int destTokenIdx, String label, FeatureAdder fa) {
+	public void features(int srcTokenIdx, int destTokenIdx, FeatureAdder fa) {
 		int dist = srcTokenIdx - destTokenIdx;
-		fa.add(U.sf("lin:%s_%s", dist, label));
-		fa.add(U.sf("left:%s_%s", (srcTokenIdx < destTokenIdx), label));
+		fa.add(U.sf("lin:%s", dist));
+		fa.add(U.sf("left:%s", (srcTokenIdx < destTokenIdx)));
 	}
 }
