@@ -18,13 +18,17 @@ class DependencyPathv1 extends FE.FeatureExtractor with FE.EdgeFE {
     override def features(word1Index: Int, word2Index: Int, fa: FeatureAdder) {
         val dp = "DPv1="
         val path = dependencyPath(word1Index, word2Index)
+        val (word1, word2) = (sent.sentence(word1Index), sent.sentence(word2Index))
         if (path._1.size + path._2.size <= 6) {
-            val (word1, word2) = (sent.sentence(word1Index), sent.sentence(word2Index))
             val pathStr = dependencyPathString(path, sent.pos).mkString("_")
 
             fa.add("W1="+word1+"+"+dp+pathStr)  // path with src word
             fa.add("W2="+word2+"+"+dp+pathStr)  // path with dest word
             fa.add(dp+pathStr)                  // path without words
+        } else {
+            fa.add("W1="+word1+"+"+dp+"NONE")
+            fa.add("W2="+word2+"+"+dp+"NONE")
+            fa.add(dp+"NONE")
         }
     }
 
