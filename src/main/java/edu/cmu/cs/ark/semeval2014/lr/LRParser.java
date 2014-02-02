@@ -1,25 +1,10 @@
 package edu.cmu.cs.ark.semeval2014.lr;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.management.ManagementFactory;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-
 import sdp.graph.Edge;
 import sdp.graph.Graph;
 import sdp.io.GraphReader;
@@ -27,17 +12,22 @@ import util.Arr;
 import util.BasicFileIO;
 import util.U;
 import util.Vocabulary;
-import util.misc.Pair;
 import util.misc.Triple;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
-import edu.cmu.cs.ark.semeval2014.lr.fe.JustPOS;
 import edu.cmu.cs.ark.semeval2014.lr.fe.LinearOrderFeatures;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
 public class LRParser {
-	
+	public static final String NO_EDGE = "NOEDGE";
+
 	// 1. Data structures
 	static Graph[] graphs;
 	static InputAnnotatedSentence[] inputSentences = null; // full dataset
@@ -49,6 +39,7 @@ public class LRParser {
 	static Vocabulary perceptVocab;
 	static float[] coefs; // flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
 	static float[] ssGrad;  // adagrad history info. parallel to coefs[].
+
 	@Parameter(names="-learningRate")
 	static double learningRate = .1;
 	
@@ -77,9 +68,10 @@ public class LRParser {
 	static String sdpFile;
     @Parameter(names="-depInput", required=true)
 	static String depFile;
-	
-	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+
+	public static void main(String[] args) throws IOException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
+
 		assert mode.equals("train") || mode.equals("test");
 
 		// Data loading
@@ -87,7 +79,7 @@ public class LRParser {
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 
 		if (mode.equals("train")) {
-			labelVocab.num("NOEDGE");
+			labelVocab.num(NO_EDGE);
 			
 			U.pf("Reading graphs from %s\n", sdpFile);
 			
@@ -106,7 +98,7 @@ public class LRParser {
 	        reader.close();
 	        
 	        labelVocab.lock();
-	        graphs = graphsAL.toArray(new Graph[0]);
+	        graphs = graphsAL.toArray(new Graph[graphsAL.size()]);
 	        
 	        assert graphs.length == inputSentences.length;
 	        
@@ -118,7 +110,7 @@ public class LRParser {
 	        	int[][] edgeMatrix = new int[size(sent)][size(sent)];
 	        	for (int i=0; i<size(sent); i++) {
 	        		for (int j=0; j<size(sent); j++) {
-	        			edgeMatrix[i][j] = labelVocab.num("NOEDGE");
+	        			edgeMatrix[i][j] = labelVocab.num(NO_EDGE);
 	        		}
 	        	}
 	        	for (Edge e : graphs[snum].getEdges()) {
@@ -238,9 +230,7 @@ public class LRParser {
 	/**
 	 * goldEdgeMatrix is only for feature extractor debugging verbose reports 
 	 */
-	static NumberizedSentence extractFeatures(
-			InputAnnotatedSentence is, int[][] goldEdgeMatrix
-	) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	static NumberizedSentence extractFeatures(InputAnnotatedSentence is, int[][] goldEdgeMatrix) {
 
 		NumberizedSentence ns = new NumberizedSentence( size(is) );
 		EdgeFeatAdder adder2 = new EdgeFeatAdder();
@@ -281,16 +271,7 @@ public class LRParser {
 	}
 	
 	static NumberizedSentence extractFeatures(int snum) {
-		try {
-			
-			return extractFeatures(inputSentences[snum], graphMatrixes!=null ? graphMatrixes.get(snum) : null);
-			
-		} catch (InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return extractFeatures(inputSentences[snum], graphMatrixes!=null ? graphMatrixes.get(snum) : null);
 	}
 	
 	static void lockdownVocabAndAllocateCoefs() {
@@ -500,7 +481,7 @@ public class LRParser {
 
 
 
-	static void makePredictions(String outputFile) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, IOException {
+	static void makePredictions(String outputFile) {
 		BufferedWriter bw = BasicFileIO.openFileToWriteUTF8(outputFile);
 		PrintWriter out = new PrintWriter(bw);
 //		GraphWriter gw = new GraphWriter(out);
@@ -563,7 +544,7 @@ public class LRParser {
 				if (badDistance(i,j)) continue;
 				int predlabel = Arr.argmax(probs[i][j]);
 				Triple<Integer,Integer,String> tt = new Triple(i,j,labelVocab.name(predlabel));
-				if (tt.third.equals("NOEDGE")) continue;
+				if (tt.third.equals(NO_EDGE)) continue;
 				edgelist.add(tt);
 			}
 		}
