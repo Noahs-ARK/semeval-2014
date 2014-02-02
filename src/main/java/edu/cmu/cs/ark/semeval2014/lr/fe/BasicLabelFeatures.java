@@ -13,7 +13,9 @@ public class BasicLabelFeatures {
 	/** Extracts whether the label represents any edge at all (rather than NOEDGE) */
 	public static class IsEdgeFe implements FE.LabelFE {
 		@Override public void features(String label, FE.FeatureAdder fa) {
-			fa.add("IsEdge=" + !label.equals(LRParser.NO_EDGE));
+			if (!label.equals(LRParser.NO_EDGE)) {
+				fa.add("IsEdge");
+			}
 		}
 	}
 
