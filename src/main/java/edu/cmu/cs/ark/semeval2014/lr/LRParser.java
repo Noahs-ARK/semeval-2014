@@ -14,12 +14,10 @@ import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 import sdp.graph.Edge;
 import sdp.graph.Graph;
 import sdp.io.GraphReader;
-import util.Arr;
 import util.BasicFileIO;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
-import util.misc.Triple;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -30,6 +28,7 @@ import static edu.cmu.cs.ark.semeval2014.lr.MiscUtil.unbox;
 
 public class LRParser {
 	public static final String NO_EDGE = "NOEDGE";
+	private static final String BIAS_NAME = "***BIAS***";
 
 	// 1. Data structures
 	static InputAnnotatedSentence[] inputSentences = null; // full dataset
@@ -99,7 +98,7 @@ public class LRParser {
 		}
 	}
 
-	private static void trainModel() throws IOException {
+	private static Model trainModel() throws IOException {
 		double t0;
 		double dur;
 		U.pf("Reading graphs from %s\n", sdpFile);
@@ -130,11 +129,11 @@ public class LRParser {
 			final InputAnnotatedSentence sent = inputSentences[snum];
 			final Graph graph = graphs.get(snum);
 			assert sent.sentenceId().equals(graph.id.replace("#",""));
-			graphMatrices.add(convertGraphToAdjacencyMatrix(graph, size(sent), labelVocab));
+			graphMatrices.add(convertGraphToAdjacencyMatrix(graph, sent.size(), labelVocab));
 		}
 
 		final Vocabulary perceptVocab = new Vocabulary();
-		perceptVocab.num("***BIAS***");
+		perceptVocab.num(BIAS_NAME);
 		model = new Model(labelVocab, labelFeatureVocab, featuresByLabel, perceptVocab);
 
 		t0 = System.currentTimeMillis();
@@ -145,6 +144,7 @@ public class LRParser {
 		model.save(modelFile);
 		if (useFeatureCache)
 			Files.delete(Paths.get(featureCacheFile));
+		return model;
 	}
 
 	private static int[][] convertGraphToAdjacencyMatrix(Graph graph, int n, Vocabulary labelVocab) {
@@ -186,9 +186,6 @@ public class LRParser {
 		return graphs;
 	}
 
-	static int size(InputAnnotatedSentence s) { 
-		return s.sentence().length;
-	}
 	public static boolean badDistance(int i, int j) {
 		return i==j || Math.abs(i-j) > maxEdgeDistance;
 	}
@@ -235,7 +232,6 @@ public class LRParser {
 					ns.add(j,i, featnum, value);
 				}
 			}
-				
 		}
 	}
 
@@ -288,38 +284,39 @@ public class LRParser {
 	 * goldEdgeMatrix is only for feature extractor debugging verbose reports 
 	 */
 	static NumberizedSentence extractFeatures(Model model, InputAnnotatedSentence is, int[][] goldEdgeMatrix) {
+		final int biasIdx = model.perceptVocab.num(BIAS_NAME);
 
-		NumberizedSentence ns = new NumberizedSentence( size(is) );
-		TokenFeatAdder adder1 = new TokenFeatAdder(model.perceptVocab);
-		EdgeFeatAdder adder2 = new EdgeFeatAdder(model.perceptVocab);
-		adder1.ns=adder2.ns=ns;
+		NumberizedSentence ns = new NumberizedSentence( is.size() );
+		TokenFeatAdder tokenAdder = new TokenFeatAdder(model.perceptVocab);
+		EdgeFeatAdder edgeAdder = new EdgeFeatAdder(model.perceptVocab);
+		tokenAdder.ns=edgeAdder.ns=ns;
 		
 		// only for verbose feature extraction reporting
-		adder1.is = adder2.is=is;
-		adder2.goldEdgeMatrix = goldEdgeMatrix;
+		tokenAdder.is = edgeAdder.is=is;
+		edgeAdder.goldEdgeMatrix = goldEdgeMatrix;
 		
 		for (FE.FeatureExtractor fe : allFE) {
 			fe.setupSentence(is);
 		}
 		
-		for (adder2.i=0; adder2.i<ns.T; adder2.i++) {
+		for (edgeAdder.i=0; edgeAdder.i<ns.T; edgeAdder.i++) {
 			
-			adder1.i = adder2.i;
+			tokenAdder.i = edgeAdder.i;
 			for (FE.FeatureExtractor fe : allFE) {
 				if (fe instanceof FE.TokenFE) {
-					((FE.TokenFE) fe).features(adder1.i, adder1);
+					((FE.TokenFE) fe).features(tokenAdder.i, tokenAdder);
 				}
 			}
-			for (adder2.j=0; adder2.j<ns.T; adder2.j++) {
-				if (badDistance(adder2.i,adder2.j)) continue;
+			for (edgeAdder.j=0; edgeAdder.j<ns.T; edgeAdder.j++) {
+				if (badDistance(edgeAdder.i,edgeAdder.j)) continue;
 				
 				// bias term
-				ns.add(adder2.i, adder2.j, 0, 1.0);
+				ns.add(edgeAdder.i, edgeAdder.j, biasIdx, 1.0);
 				
 				// edge features
 				for (FE.FeatureExtractor fe : allFE) {
 					if (fe instanceof FE.EdgeFE) {
-						((FE.EdgeFE) fe).features(adder2.i, adder2.j, adder2);
+						((FE.EdgeFE) fe).features(edgeAdder.i, edgeAdder.j, edgeAdder);
 					}
 				}
 			}
@@ -396,7 +393,7 @@ public class LRParser {
                 growCoefsIfNecessary();
             }
     		int[][] edgeMatrix = graphMatrices.get(snum);
-            ll += updateExampleLogreg(ns, edgeMatrix);
+            ll += updateExampleLogReg(ns, edgeMatrix);
             
             if (firstIter && snum>0 && snum % 1000 == 0) {
             	U.pf("%d sents, %.3fm percepts, %.3fm finefeats allocated, %.1f MB mem used\n", 
@@ -415,11 +412,11 @@ public class LRParser {
         U.pf("ll %.1f  ", ll);
     }
 
-	static double updateExampleLogreg(NumberizedSentence sentence, int[][] edgeMatrix) {
+	static double updateExampleLogReg(NumberizedSentence sentence, int[][] edgeMatrix) {
 		final int noEdgeIdx = model.labelVocab.num(NO_EDGE);
 		double ll = 0;
 
-		double[][][] probs = inferEdgeProbs(sentence);
+		double[][][] probs = model.inferEdgeProbs(sentence);
 		
 		for (int kk = 0; kk < sentence.nnz; kk++) {
 		    int i = sentence.i(kk);
@@ -452,100 +449,19 @@ public class LRParser {
 		return ll;
 	}
 
-	/** returns:  (#tokens x #tokens x #labelvocab)
-	 * for token i and token j, prob dist over the possible edge labels.
-	 */
-	static double[][][] inferEdgeProbs(NumberizedSentence ns) {
-		double[][][] scores = inferEdgeScores(ns);
-		// transform in-place into probs
-		for (int i=0; i<ns.T; i++) {
-			for (int j=0; j<ns.T; j++) {
-				if (badDistance(i,j)) continue;
-				Arr.softmaxInPlace(scores[i][j]);
-			}
-		}
-		return scores;
-	}
-
-	/** returns:  (#tokens x #tokens x #labelvocab)
-	 * for token i and token j, nonneg scores (unnorm probs) per edge label
-	 */
-	static double[][][] inferEdgeScores(NumberizedSentence ns) {
-		double[][][] scores = new double[ns.T][ns.T][model.labelVocab.size()];
-		for (int kk=0; kk<ns.nnz; kk++) {
-			for (int label=0; label<model.labelVocab.size(); label++) {
-				for (int labelFeatureIdx : model.featuresByLabel.get(label)) {
-					final int featureIdx = model.coefIdx(ns.perceptnum(kk), labelFeatureIdx);
-					scores[ns.i(kk)][ns.j(kk)][label] += model.coefs[featureIdx] * ns.value(kk);
-				}
-			}
-		}
-		return scores;
-	}
-
 	static void makePredictions(Model model, String outputFile) {
 		try(PrintWriter out = new PrintWriter(BasicFileIO.openFileToWriteUTF8(outputFile))) {
 			for (InputAnnotatedSentence sent : inputSentences) {
 				NumberizedSentence ns = extractFeatures(model, sent, null);
-				double[][][] probs = inferEdgeProbs(ns);
-				MyGraph g = decodeEdgeProbsToGraph(sent, probs);
-
+				double[][][] probs = model.inferEdgeProbs(ns);
+				MyGraph g = MyGraph.decodeEdgeProbsToGraph(sent, probs, model.labelVocab);
+				g.print(out, sent);
 				U.pf(".");
+			}
+		}
+	}
 
-				out.println("#" + sent.sentenceId());
-				for (int i = 0; i < size(sent); i++) {
-					boolean istop = !g.isChildOfSomething[i] && g.isPred[i];
-					out.printf("%d\t%s\tlemmaz\t%s\t%s\t%s", i + 1, sent.sentence()[i], sent.pos()[i],
-							istop ? "+" : "-", g.isPred[i] ? "+" : "-");
-					for (int head = 0; head < size(sent); head++) {
-						if (!g.isPred[head]) continue;
-						// ok now we're in a predicate column that may be dominating this node
-						String label = g.edgeMatrix[head][i];
-						label = label == null ? "_" : label;
-						out.print("\t" + label);
-					}
-					out.print("\n");
-				}
-				out.print("\n");
-				out.flush();
-			}
-		}
-	}
-	
-	static class MyGraph {
-		boolean[] isChildOfSomething;
-		boolean[] isPred;
-		List< Triple<Integer,Integer,String> > edgelist;
-		String[][] edgeMatrix;
-		MyGraph(int sentenceLength, List<Triple<Integer,Integer,String>>_edgelist) {
-			edgelist = _edgelist;
-			isChildOfSomething = new boolean[sentenceLength];
-			isPred = new boolean[sentenceLength];
-			edgeMatrix = new String[sentenceLength][sentenceLength];
-			for (Triple<Integer,Integer,String> tt : _edgelist) {
-				int i=tt.first, j=tt.second;
-				edgeMatrix[i][j] = tt.third;
-				isPred[i] = true;
-				isChildOfSomething[j] = true;
-			}
-		}
-	}
-	static MyGraph decodeEdgeProbsToGraph(InputAnnotatedSentence sent, double[][][] probs) {
-		final List<Triple<Integer,Integer,String>> edgeList = new ArrayList<>();
-		for (int i=0; i<size(sent); i++) {
-			for (int j=0; j<size(sent); j++) {
-				if (badDistance(i,j)) continue;
-				int predLabel = Arr.argmax(probs[i][j]);
-				Triple<Integer,Integer,String> tt = new Triple<>(i, j, model.labelVocab.name(predLabel));
-				if (tt.third.equals(NO_EDGE)) continue;
-				edgeList.add(tt);
-			}
-		}
-		return new MyGraph(size(sent), edgeList);
-	}
-	////////////////////////////////
-	
-    // START feature cache stuff
+	// START feature cache stuff
     // uses https://github.com/EsotericSoftware/kryo found from http://stackoverflow.com/questions/239280/which-is-the-best-alternative-for-java-serialization
     
     static Kryo kryo;

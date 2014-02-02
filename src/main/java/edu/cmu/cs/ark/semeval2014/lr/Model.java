@@ -1,5 +1,6 @@
 package edu.cmu.cs.ark.semeval2014.lr;
 
+import util.Arr;
 import util.BasicFileIO;
 import util.U;
 import util.Vocabulary;
@@ -52,8 +53,39 @@ public class Model {
 				new float[Math.min(10000, perceptVocab.size()) * perceptVocab.size()]);
 	}
 
+	/** returns:  (#tokens x #tokens x #labelvocab)
+	 * for token i and token j, prob dist over the possible edge labels.
+	 */
+	double[][][] inferEdgeProbs(NumberizedSentence ns) {
+		double[][][] scores = inferEdgeScores(ns);
+		// transform in-place into probs
+		for (int i=0; i<ns.T; i++) {
+			for (int j=0; j<ns.T; j++) {
+				if (LRParser.badDistance(i, j)) continue;
+				Arr.softmaxInPlace(scores[i][j]);
+			}
+		}
+		return scores;
+	}
+
+	/** returns:  (#tokens x #tokens x #labelvocab)
+	 * for token i and token j, nonneg scores (unnorm probs) per edge label
+	 */
+	double[][][] inferEdgeScores(NumberizedSentence ns) {
+		double[][][] scores = new double[ns.T][ns.T][labelVocab.size()];
+		for (int kk=0; kk<ns.nnz; kk++) {
+			for (int label=0; label< labelVocab.size(); label++) {
+				for (int labelFeatureIdx : featuresByLabel.get(label)) {
+					final int featureIdx = coefIdx(ns.perceptnum(kk), labelFeatureIdx);
+					scores[ns.i(kk)][ns.j(kk)][label] += coefs[featureIdx] * ns.value(kk);
+				}
+			}
+		}
+		return scores;
+	}
+
 	/** index into coefs. */
-	protected int coefIdx(int perceptIdx, int labelFeatureIdx) {
+	int coefIdx(int perceptIdx, int labelFeatureIdx) {
 		return coefIdx(labelFeatureVocab, perceptIdx, labelFeatureIdx);
 	}
 
