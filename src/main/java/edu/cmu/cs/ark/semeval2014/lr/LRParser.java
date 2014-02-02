@@ -62,7 +62,7 @@ public class LRParser {
 	// 4. Runtime options
 	@Parameter(names="-verboseFeatures")
 	static boolean verboseFeatures = false;
-	@Parameter(names="-useFeatureCache")
+	@Parameter(names="-useFeatureCache", arity=1)
     static boolean useFeatureCache = true;
     @Parameter(names="-saveEvery")
     static int saveEvery = 10;  // -1 to disable intermediate model saves
@@ -80,9 +80,8 @@ public class LRParser {
 	
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
-		
 		assert mode.equals("train") || mode.equals("test");
-		
+
 		// Data loading
 		
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
@@ -149,7 +148,8 @@ public class LRParser {
 					U.pf("TRAINLOOP TIME %.1f sec\n", dur/1e3);
 
 			saveModel(modelFile);
-			Files.delete(Paths.get(featureCacheFile));
+			if (useFeatureCache)
+				Files.delete(Paths.get(featureCacheFile));
 		}
 		else if (mode.equals("test")) {
 			loadModel(modelFile);
