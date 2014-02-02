@@ -1,54 +1,46 @@
 package edu.cmu.cs.ark.semeval2014.lr;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.management.ManagementFactory;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-
+import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
+import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
+import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures;
+import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
+import edu.cmu.cs.ark.semeval2014.lr.fe.LinearOrderFeatures;
+import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 import sdp.graph.Edge;
 import sdp.graph.Graph;
 import sdp.io.GraphReader;
-import util.Arr;
 import util.BasicFileIO;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
-import util.misc.Triple;
-import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
-import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
-import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
-import edu.cmu.cs.ark.semeval2014.lr.fe.JustPOS;
-import edu.cmu.cs.ark.semeval2014.lr.fe.LinearOrderFeatures;
-import edu.cmu.cs.ark.semeval2014.utils.Corpus;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+
+import static edu.cmu.cs.ark.semeval2014.lr.MiscUtil.unbox;
 
 public class LRParser {
-	
+	public static final String NO_EDGE = "NOEDGE";
+	private static final String BIAS_NAME = "***BIAS***";
+
 	// 1. Data structures
-	static Graph[] graphs;
 	static InputAnnotatedSentence[] inputSentences = null; // full dataset
-	static ArrayList<int[][]> graphMatrixes = null;  // full dataset
+	static List<int[][]> graphMatrices = null;  // full dataset
 	
 	// 2. Feature system and model parameters
 	static List<FE.FeatureExtractor> allFE = new ArrayList<>();
-	static Vocabulary labelVocab = new Vocabulary();
-	static Vocabulary perceptVocab;
-	static float[] coefs; // flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
+	static List<FE.LabelFE> labelFeatureExtractors = new ArrayList<>();
+
+	static Model model;
 	static float[] ssGrad;  // adagrad history info. parallel to coefs[].
+
 	@Parameter(names="-learningRate")
 	static double learningRate = .1;
 	
@@ -77,58 +69,14 @@ public class LRParser {
 	static String sdpFile;
     @Parameter(names="-depInput", required=true)
 	static String depFile;
-	
-	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+
+	public static void main(String[] args) throws IOException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
+
 		assert mode.equals("train") || mode.equals("test");
 
 		// Data loading
-		
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
-
-		if (mode.equals("train")) {
-			labelVocab.num("NOEDGE");
-			
-			U.pf("Reading graphs from %s\n", sdpFile);
-			
-			ArrayList<Graph> graphsAL = new ArrayList<>();
-			graphMatrixes = new ArrayList<>();
-			
-	        GraphReader reader = new GraphReader(sdpFile);
-	        Graph graph;
-	        while ((graph = reader.readGraph()) != null) {
-	        	graphsAL.add(graph);
-	        	// also build up the edge label vocabulary
-	        	for (Edge e : graph.getEdges()) {
-	        		labelVocab.num(e.label);
-	        	}
-	        }
-	        reader.close();
-	        
-	        labelVocab.lock();
-	        graphs = graphsAL.toArray(new Graph[0]);
-	        
-	        assert graphs.length == inputSentences.length;
-	        
-	        for (int snum=0; snum<graphs.length; snum++) {
-	        	InputAnnotatedSentence sent = inputSentences[snum];
-	        	graph = graphs[snum];
-	        	assert sent.sentenceId().equals(graph.id.replace("#",""));
-
-	        	int[][] edgeMatrix = new int[size(sent)][size(sent)];
-	        	for (int i=0; i<size(sent); i++) {
-	        		for (int j=0; j<size(sent); j++) {
-	        			edgeMatrix[i][j] = labelVocab.num("NOEDGE");
-	        		}
-	        	}
-	        	for (Edge e : graphs[snum].getEdges()) {
-	        		edgeMatrix[e.source-1][e.target-1] = labelVocab.num(e.label);
-	        	}
-	        	graphMatrixes.add(edgeMatrix);
-	        }
-	        
-		}
-		
 		U.pf("%d input sentences\n", inputSentences.length);
 
 		initializeFeatureExtractors();
@@ -137,33 +85,107 @@ public class LRParser {
 			fe.initializeAtStartup();
 		}
 
-		double t0,dur;
 		if (mode.equals("train")) {
-			perceptVocab = new Vocabulary();
-			perceptVocab.num("***BIAS***");
-			
-					t0 = System.currentTimeMillis();
-			trainingOuterloopOnline(modelFile);
-					dur = System.currentTimeMillis() - t0;
-					U.pf("TRAINLOOP TIME %.1f sec\n", dur/1e3);
-
-			saveModel(modelFile);
-			if (useFeatureCache)
-				Files.delete(Paths.get(featureCacheFile));
-		}
-		else if (mode.equals("test")) {
-			loadModel(modelFile);
+			trainModel();
+		} else if (mode.equals("test")) {
+			model = Model.load(modelFile);
 			U.pf("Writing predictions to %s\n", sdpFile);
-					t0 = System.currentTimeMillis();
-			makePredictions(sdpFile);
-					dur = System.currentTimeMillis() - t0;
-					U.pf("\nPRED TIME %.1f sec, %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
+			double t0, dur;
+			t0 = System.currentTimeMillis();
+			makePredictions(model, sdpFile);
+			dur = System.currentTimeMillis() - t0;
+			U.pf("\nPRED TIME %.1f sec, %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
 		}
 	}
-	
-	static int size(InputAnnotatedSentence s) { 
-		return s.sentence().length;
+
+	private static Model trainModel() throws IOException {
+		double t0;
+		double dur;
+		U.pf("Reading graphs from %s\n", sdpFile);
+		final List<Graph> graphs = readGraphs(sdpFile);
+
+		// build up the edge label vocabulary
+		Vocabulary labelVocab = new Vocabulary();
+		labelVocab.num(NO_EDGE);
+		for (Graph graph : graphs) {
+			for (Edge e : graph.getEdges()) {
+				labelVocab.num(e.label);
+			}
+		}
+		labelVocab.lock();
+
+		// build up label feature vocab
+		initializeLabelFeatureExtractors();
+		final Pair<Vocabulary, List<int[]>> vocabAndFeatsByLabel =
+				extractAllLabelFeatures(labelVocab, labelFeatureExtractors);
+		final Vocabulary labelFeatureVocab = vocabAndFeatsByLabel.first;
+		final List<int[]> featuresByLabel = vocabAndFeatsByLabel.second;
+
+		assert graphs.size() == inputSentences.length;
+
+		// convert graphs to adjacency matrices
+		graphMatrices = new ArrayList<>();
+		for (int snum=0; snum<graphs.size(); snum++) {
+			final InputAnnotatedSentence sent = inputSentences[snum];
+			final Graph graph = graphs.get(snum);
+			assert sent.sentenceId().equals(graph.id.replace("#",""));
+			graphMatrices.add(convertGraphToAdjacencyMatrix(graph, sent.size(), labelVocab));
+		}
+
+		final Vocabulary perceptVocab = new Vocabulary();
+		perceptVocab.num(BIAS_NAME);
+		model = new Model(labelVocab, labelFeatureVocab, featuresByLabel, perceptVocab);
+
+		t0 = System.currentTimeMillis();
+		trainingOuterLoopOnline(model, modelFile);
+		dur = System.currentTimeMillis() - t0;
+		U.pf("TRAINLOOP TIME %.1f sec\n", dur/1e3);
+
+		model.save(modelFile);
+		if (useFeatureCache)
+			Files.delete(Paths.get(featureCacheFile));
+		return model;
 	}
+
+	private static int[][] convertGraphToAdjacencyMatrix(Graph graph, int n, Vocabulary labelVocab) {
+		int[][] edgeMatrix = new int[n][n];
+		for (int[] row : edgeMatrix) {
+			Arrays.fill(row, labelVocab.num(NO_EDGE));
+		}
+		for (Edge e : graph.getEdges()) {
+			edgeMatrix[e.source-1][e.target-1] = labelVocab.num(e.label);
+		}
+		return edgeMatrix;
+	}
+
+	private static Pair<Vocabulary, List<int[]>> extractAllLabelFeatures(
+			Vocabulary labelVocab,
+			List<FE.LabelFE> labelFeatureExtractors)
+	{
+		final Vocabulary labelFeatVocab = new Vocabulary();
+		final List<int[]> featsByLabel = new ArrayList<>(labelVocab.size());
+		for (int labelIdx = 0; labelIdx < labelVocab.size(); labelIdx++) {
+			final LabelFeatureAdder adder = new LabelFeatureAdder(labelFeatVocab);
+			for (FE.LabelFE fe : labelFeatureExtractors) {
+				fe.features(labelVocab.name(labelIdx), adder);
+			}
+			featsByLabel.add(adder.getFeatures());
+		}
+		labelFeatVocab.lock();
+		return Pair.makePair(labelFeatVocab, featsByLabel);
+	}
+
+	private static List<Graph> readGraphs(String sdpFile) throws IOException {
+		final ArrayList<Graph> graphs = new ArrayList<>();
+		try (GraphReader reader = new GraphReader(sdpFile)) {
+			Graph graph;
+			while ((graph = reader.readGraph()) != null) {
+				graphs.add(graph);
+			}
+		}
+		return graphs;
+	}
+
 	public static boolean badDistance(int i, int j) {
 		return i==j || Math.abs(i-j) > maxEdgeDistance;
 	}
@@ -174,14 +196,21 @@ public class LRParser {
 		int i=-1;
 		NumberizedSentence ns;
 		InputAnnotatedSentence is; // only for debugging
-		
+		final Vocabulary perceptVocab;
+
+		TokenFeatAdder(Vocabulary perceptVocab) {
+			this.perceptVocab = perceptVocab;
+		}
+
 		@Override
 		public void add(String featname, double value) {
 			if (verboseFeatures) {
 				U.pf("NODEFEAT\t%s:%d\t%s\n", is.sentence()[i], i, featname);
 			}
 
-			// this is kinda a hack, put it in both directions for every edge. we could use smarter data structures rather than the full matrix of edge featvecs to represent this more compactly.
+			// this is kinda a hack, put it in both directions for every edge.
+			// we could use smarter data structures rather than the full matrix
+			// of edge featvecs to represent this more compactly.
 
 			String ff;
 			int featnum;
@@ -203,23 +232,21 @@ public class LRParser {
 					ns.add(j,i, featnum, value);
 				}
 			}
-				
 		}
 	}
-	
-	/** "finefeatnum" is a legitimate index into coefs[]. */
-	static int finefeatnum(int perceptnum, int label) {
-		int K = labelVocab.size();
-		return perceptnum*K + label;
-	}
-	
+
 	static class EdgeFeatAdder extends FE.FeatureAdder {
 		int i=-1, j=-1;
 		NumberizedSentence ns;
 		// these are only for debugging
 		InputAnnotatedSentence is;
 		int[][] goldEdgeMatrix;
-		
+		final Vocabulary perceptVocab;
+
+		EdgeFeatAdder(Vocabulary perceptVocab) {
+			this.perceptVocab = perceptVocab;
+		}
+
 		@Override
 		public void add(String featname, double value) {
 			int perceptnum = perceptVocab.num(featname);
@@ -228,51 +255,68 @@ public class LRParser {
 			ns.add(i,j, perceptnum, value);
 			
 			if (verboseFeatures) {
-				U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", is.sentence()[i], i, is.sentence()[j], j, 
-						goldEdgeMatrix!=null ? labelVocab.name(goldEdgeMatrix[i][j]) : null, featname, value);
+				U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", is.sentence()[i], i, is.sentence()[j], j,
+						goldEdgeMatrix!=null ? model.labelVocab.name(goldEdgeMatrix[i][j]) : null, featname, value);
 			}
 
 		}
 	}
-	
+
+	static class LabelFeatureAdder extends FE.FeatureAdder {
+		private final Vocabulary labelFeatureVocab;
+		private final Set<Integer> features = new HashSet<>();
+
+		public LabelFeatureAdder(Vocabulary labelFeatureVocab) {
+			this.labelFeatureVocab = labelFeatureVocab;
+		}
+
+		@Override
+		public void add(String featname, double value) {
+			features.add(labelFeatureVocab.num(featname));
+		}
+
+		public int[] getFeatures() {
+			return unbox(features);
+		}
+	}
+
 	/**
 	 * goldEdgeMatrix is only for feature extractor debugging verbose reports 
 	 */
-	static NumberizedSentence extractFeatures(
-			InputAnnotatedSentence is, int[][] goldEdgeMatrix
-	) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	static NumberizedSentence extractFeatures(Model model, InputAnnotatedSentence is, int[][] goldEdgeMatrix) {
+		final int biasIdx = model.perceptVocab.num(BIAS_NAME);
 
-		NumberizedSentence ns = new NumberizedSentence( size(is) );
-		EdgeFeatAdder adder2 = new EdgeFeatAdder();
-		TokenFeatAdder adder1 = new TokenFeatAdder();
-		adder1.ns=adder2.ns=ns;
+		NumberizedSentence ns = new NumberizedSentence( is.size() );
+		TokenFeatAdder tokenAdder = new TokenFeatAdder(model.perceptVocab);
+		EdgeFeatAdder edgeAdder = new EdgeFeatAdder(model.perceptVocab);
+		tokenAdder.ns=edgeAdder.ns=ns;
 		
 		// only for verbose feature extraction reporting
-		adder1.is = adder2.is=is;
-		adder2.goldEdgeMatrix = goldEdgeMatrix;
+		tokenAdder.is = edgeAdder.is=is;
+		edgeAdder.goldEdgeMatrix = goldEdgeMatrix;
 		
 		for (FE.FeatureExtractor fe : allFE) {
 			fe.setupSentence(is);
 		}
 		
-		for (adder2.i=0; adder2.i<ns.T; adder2.i++) {
+		for (edgeAdder.i=0; edgeAdder.i<ns.T; edgeAdder.i++) {
 			
-			adder1.i = adder2.i;
+			tokenAdder.i = edgeAdder.i;
 			for (FE.FeatureExtractor fe : allFE) {
 				if (fe instanceof FE.TokenFE) {
-					((FE.TokenFE) fe).features(adder1.i, adder1);
+					((FE.TokenFE) fe).features(tokenAdder.i, tokenAdder);
 				}
 			}
-			for (adder2.j=0; adder2.j<ns.T; adder2.j++) {
-				if (badDistance(adder2.i,adder2.j)) continue;
+			for (edgeAdder.j=0; edgeAdder.j<ns.T; edgeAdder.j++) {
+				if (badDistance(edgeAdder.i,edgeAdder.j)) continue;
 				
 				// bias term
-				ns.add(adder2.i, adder2.j, 0, 1.0);
+				ns.add(edgeAdder.i, edgeAdder.j, biasIdx, 1.0);
 				
 				// edge features
 				for (FE.FeatureExtractor fe : allFE) {
 					if (fe instanceof FE.EdgeFE) {
-						((FE.EdgeFE) fe).features(adder2.i, adder2.j, adder2);
+						((FE.EdgeFE) fe).features(edgeAdder.i, edgeAdder.j, edgeAdder);
 					}
 				}
 			}
@@ -280,84 +324,11 @@ public class LRParser {
 		return ns;
 	}
 	
-	static NumberizedSentence extractFeatures(int snum) {
-		try {
-			
-			return extractFeatures(inputSentences[snum], graphMatrixes!=null ? graphMatrixes.get(snum) : null);
-			
-		} catch (InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-		}
-		return null;
+	static NumberizedSentence extractFeatures(Model model, int snum) {
+		return extractFeatures(model, inputSentences[snum], graphMatrices !=null ? graphMatrices.get(snum) : null);
 	}
-	
-	static void lockdownVocabAndAllocateCoefs() {
-		perceptVocab.lock();
-		labelVocab.lock();
-		assert perceptVocab.name(0).equals("***BIAS***");
-		coefs = new float[perceptVocab.size() * labelVocab.size()];
-	}
-	
-	static void saveModel(String modelFile) throws IOException {
-		U.pf("Saving model to %s\n", modelFile);
-		
-		BufferedWriter writer = BasicFileIO.openFileToWriteUTF8(modelFile);
-		PrintWriter out = new PrintWriter(writer);
 
-		out.append("LABELVOCAB\t");
-		for (String x : labelVocab.names()) {
-			out.append(x + " ");
-		}
-		out.append("\n");
-		for (int f=0; f<perceptVocab.size(); f++) {
-			for (int k=0; k<labelVocab.size(); k++) {
-				float coef = coefs[finefeatnum(f,k)];
-				if (Math.abs(coef) < 1e-7) continue;
-				out.printf("C\t%s\t%s\t%s\n", perceptVocab.name(f), labelVocab.name(k), coef);
-			}
-		}
-		writer.close();
-	}
-	static void loadModel(String modelFile) throws IOException {
-		// labelVocab, argfeats
-		labelVocab = new Vocabulary();
-		perceptVocab = new Vocabulary();
-		
-		BufferedReader reader = BasicFileIO.openFileOrResource(modelFile);
-		String line;
-		
-		ArrayList<Triple<Integer,Integer,Float>> coefTuples = new ArrayList<>(); 
-
-		while ( (line = reader.readLine()) != null ) {
-			String[] parts = line.split("\t");
-			if (parts[0].equals("LABELVOCAB")) {
-				String[] labels = parts[1].trim().split(" ");
-				for (String x : labels) labelVocab.num(x);
-				labelVocab.lock();
-			}
-			else if (parts[0].equals("C")) {
-				int perceptnum = perceptVocab.num(parts[1]);
-				int labelnum = labelVocab.numStrict(parts[2]);
-				float value = Float.parseFloat(parts[3]);
-				coefTuples.add(U.triple(perceptnum, labelnum, value));
-			}
-			else { throw new RuntimeException("bad model line format"); }
-		}
-
-		lockdownVocabAndAllocateCoefs();
-		
-		for (Triple<Integer,Integer,Float> x : coefTuples) {
-			coefs[finefeatnum(x.first,x.second)] = x.third;
-		}
-		reader.close();
-		
-		U.pf("Label vocab (size %d): %s\n", labelVocab.size(), labelVocab.names());
-		U.pf("Num features: %d\n", perceptVocab.size());
-	}
-	
-    static void trainingOuterloopOnline(String modelFilePrefix) throws IOException {
+    static void trainingOuterLoopOnline(Model model, String modelFilePrefix) throws IOException {
     	for (int outer=0; outer<numIters; outer++) {
     		U.pf("iter %3d ", outer);  System.out.flush();
     		double t0 = System.currentTimeMillis();
@@ -370,35 +341,33 @@ public class LRParser {
     			resetCacheReader();
     		}
     		
-    		trainOnlineIter(outer==0);
+    		trainOnlineIter(model, outer==0);
     		
         	double dur = System.currentTimeMillis() - t0;
         	U.pf("%.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
     		
         	if (saveEvery >= 0 && outer % saveEvery == 0)
-        		saveModel(U.sf("%s.iter%s",modelFilePrefix, outer));
+        		model.save(U.sf("%s.iter%s", modelFilePrefix, outer));
     		
     		if (outer==0) {
     			closeCacheAfterWriting();
     		}
     		
-    		if (outer==0) U.pf("%d percepts, %d nnz\n", perceptVocab.size(), NumberizedSentence.totalNNZ);
+    		if (outer==0) U.pf("%d percepts, %d nnz\n", model.perceptVocab.size(), NumberizedSentence.totalNNZ);
     	}
     }
 
     static void growCoefsIfNecessary() {
-    	assert coefs==null&&ssGrad==null || coefs.length==ssGrad.length;
-    	if (coefs==null) {
-    		int n = Math.min(10000, perceptVocab.size());
-    		coefs = new float[n*labelVocab.size()];
-    		ssGrad = new float[n*labelVocab.size()];
+    	if (ssGrad==null) {
+    		int n = Math.min(10000, model.perceptVocab.size());
+    		model.coefs = new float[n*model.labelFeatureVocab.size()];
+    		ssGrad = new float[n*model.labelFeatureVocab.size()];
     	}
-    	else if (labelVocab.size()*perceptVocab.size() > coefs.length) {
-    		int newlen = (int) Math.ceil(1.2 * perceptVocab.size()) * labelVocab.size();
-            coefs = NumberizedSentence.growToLength(coefs, newlen);
-            ssGrad = NumberizedSentence.growToLength(ssGrad, newlen);
-            assert coefs.length==ssGrad.length;
-//            U.pf("GROW COEFS TO %d\n", coefs.length);
+    	else if (model.labelFeatureVocab.size()*model.perceptVocab.size() > model.coefs.length) {
+    		int newLen = (int) Math.ceil(1.2 * model.perceptVocab.size()) * model.labelFeatureVocab.size();
+			model.coefs = NumberizedSentence.growToLength(model.coefs, newLen);
+            ssGrad = NumberizedSentence.growToLength(ssGrad, newLen);
+            assert model.coefs.length==ssGrad.length;
         }
     }
 	
@@ -411,10 +380,11 @@ public class LRParser {
     
     
     /** adagrad: http://www.ark.cs.cmu.edu/cdyer/adagrad.pdf */ 
-    static void trainOnlineIter(boolean firstIter) throws FileNotFoundException {
-    	assert labelVocab.isLocked() : "since we have autolabelconj, can't tolerate label vocab expanding during a training pass.";
+    static void trainOnlineIter(Model model, boolean firstIter) throws FileNotFoundException {
+		assert model.labelVocab.isLocked() : "since we have autolabelconj, can't tolerate label vocab expanding during a training pass.";
+		assert model.labelFeatureVocab.isLocked() : "since we have autolabelconj, can't tolerate label vocab expanding during a training pass.";
 
-        double ll = 0;
+		double ll = 0;
         for (int snum=0; snum<inputSentences.length; snum++) {
         	U.pf(".");
             
@@ -422,48 +392,55 @@ public class LRParser {
             if (firstIter) {
                 growCoefsIfNecessary();
             }
-    		int[][] edgeMatrix = graphMatrixes.get(snum);
-            ll += updateExampleLogreg(ns, edgeMatrix);
+    		int[][] edgeMatrix = graphMatrices.get(snum);
+            ll += updateExampleLogReg(ns, edgeMatrix);
             
             if (firstIter && snum>0 && snum % 1000 == 0) {
             	U.pf("%d sents, %.3fm percepts, %.3fm finefeats allocated, %.1f MB mem used\n", 
-            			snum+1, perceptVocab.size()/1e6, coefs.length/1e6, 
+            			snum+1, model.perceptVocab.size()/1e6, model.coefs.length/1e6,
             			Runtime.getRuntime().totalMemory()/1e6
             			);
             }
         }
         //  logprior  =  - (1/2) lambda || beta ||^2
         //  gradient =  - lambda beta
-        for (int f=0; f<coefs.length; f++) {
-            ll -= 0.5 * l2reg * coefs[f]*coefs[f];
-            double g = l2reg * coefs[f];
-            coefs[f] -= adagradStoreRate(f,g) * learningRate * g;
+        for (int f=0; f< model.coefs.length; f++) {
+            ll -= 0.5 * l2reg * model.coefs[f]*model.coefs[f];
+            double g = l2reg * model.coefs[f];
+			model.coefs[f] -= adagradStoreRate(f,g) * learningRate * g;
         }
         U.pf("ll %.1f  ", ll);
     }
 
-	static double updateExampleLogreg(NumberizedSentence ns, int[][] edgeMatrix) {
+	static double updateExampleLogReg(NumberizedSentence sentence, int[][] edgeMatrix) {
+		final int noEdgeIdx = model.labelVocab.num(NO_EDGE);
 		double ll = 0;
-		
-		double[][][] probs = inferEdgeProbs(ns);
-		
-		for (int kk=0; kk<ns.nnz; kk++) {
-		    int i=ns.i(kk), j=ns.j(kk), pnum = ns.perceptnum(kk);
-		    double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
 
-		    for (int label=0; label<labelVocab.size(); label++) {
-			    int ffnum = finefeatnum(pnum,label);
-			    int observed = edgeMatrix[i][j] == label ? 1 : 0;
-			    double resid = observed - probs[i][j][label];
-			    double g = w * resid * ns.value(kk);
-			    double rate = adagradStoreRate(ffnum, g);
-			    coefs[ffnum] += learningRate * rate * g;
+		double[][][] probs = model.inferEdgeProbs(sentence);
+		
+		for (int kk = 0; kk < sentence.nnz; kk++) {
+		    int i = sentence.i(kk);
+			int j = sentence.j(kk);
+			int perceptNum = sentence.perceptnum(kk);
+			final int goldLabelIdx = edgeMatrix[i][j];
+			// manually downweight the NO_EDGE label
+			final double w = goldLabelIdx == noEdgeIdx ? noedgeWeight : 1.0;
+
+		    for (int label = 0; label < model.labelVocab.size(); label++) {
+				int isObserved = goldLabelIdx == label ? 1 : 0;
+				double resid = isObserved - probs[i][j][label];
+				double g = w * resid * sentence.value(kk);
+				for (int labelFeatureIdx : model.featuresByLabel.get(label)) {
+					int ffnum = model.coefIdx(perceptNum, labelFeatureIdx);
+					double rate = adagradStoreRate(ffnum, g);
+					model.coefs[ffnum] += learningRate * rate * g;
+				}
 		    }
 		}
 		
 		// loglik is completely unnecessary for optimization, just nice for diagnosis.
-		for (int i=0;i<ns.T;i++) {
-		    for (int j=0; j<ns.T;j++) {
+		for (int i=0;i<sentence.T;i++) {
+		    for (int j=0; j<sentence.T;j++) {
 		        if (badDistance(i,j)) continue;
 		        double w = edgeMatrix[i][j]==0 ? noedgeWeight : 1.0;
 		        ll += w * Math.log(probs[i][j][edgeMatrix[i][j]]);
@@ -471,107 +448,20 @@ public class LRParser {
 		}
 		return ll;
 	}
-	/** returns:  (#tokens x #tokens x #labelvocab)
-	 * for token i and token j, prob dist over the possible edge labels.
-	 */
-	static double[][][] inferEdgeProbs(NumberizedSentence ns) {
-		double[][][] scores = inferEdgeScores(ns);
-		// transform in-place into probs
-		for (int i=0; i<ns.T; i++) {
-			for (int j=0; j<ns.T; j++) {
-				if (badDistance(i,j)) continue;
-				Arr.softmaxInPlace(scores[i][j]);
-			}
-		}
-		return scores;
-	}
-	/** returns:  (#tokens x #tokens x #labelvocab)
-	 * for token i and token j, nonneg scores (unnorm probs) per edge label
-	 */
-	static double[][][] inferEdgeScores(NumberizedSentence ns) {
-		double[][][] scores = new double[ns.T][ns.T][labelVocab.size()];
-		for (int kk=0; kk<ns.nnz; kk++) {
-			for (int label=0; label<labelVocab.size(); label++) {
-				scores[ns.i(kk)][ns.j(kk)][label] += coefs[finefeatnum(ns.perceptnum(kk),label)] * ns.value(kk);
-			}
-		}
-		return scores;
-	}
 
-
-
-	static void makePredictions(String outputFile) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, IOException {
-		BufferedWriter bw = BasicFileIO.openFileToWriteUTF8(outputFile);
-		PrintWriter out = new PrintWriter(bw);
-//		GraphWriter gw = new GraphWriter(out);
-
-		for (int snum=0; snum<inputSentences.length; snum++) {
-			InputAnnotatedSentence sent = inputSentences[snum];
-			NumberizedSentence ns = extractFeatures(sent, null);
-			double[][][] probs = inferEdgeProbs(ns);
-			MyGraph g = decodeEdgeprobsToGraph(sent, probs);
-
-			U.pf(".");
-//			U.pf("\nSENT %d\n", snum);
-//			for (Triple<Integer,Integer,String> tt : g.edgelist) {
-//				U.pf("%s[%s:%d -> %s:%d]\n", tt.third, sent.sentence()[tt.first], tt.first, sent.sentence()[tt.second], tt.second);
-//			}
-			
-			out.println("#" + sent.sentenceId());
-			for (int i=0; i<size(sent); i++) {
-				boolean istop = !g.isChildOfSomething[i] && g.isPred[i];
-				out.printf("%d\t%s\tlemmaz\t%s\t%s\t%s", i+1, sent.sentence()[i], sent.pos()[i], 
-						 istop ? "+" : "-", g.isPred[i] ? "+" : "-");
-				for (int head=0; head<size(sent); head++) {
-					if (!g.isPred[head]) continue;
-					// ok now we're in a predicate column that may be dominating this node
-					String label = g.edgeMatrix[head][i];
-					label = label==null ? "_" : label;
-					out.print("\t" + label);
-				}
-				out.print("\n");
-			}
-			out.print("\n");
-			out.flush();
-		}
-		out.close();
-	}
-	
-	static class MyGraph {
-		boolean[] isChildOfSomething;
-		boolean[] isPred;
-		List< Triple<Integer,Integer,String> > edgelist;
-		String[][] edgeMatrix;
-		MyGraph(int sentenceLength, List<Triple<Integer,Integer,String>>_edgelist) {
-			edgelist = _edgelist;
-			isChildOfSomething = new boolean[sentenceLength];
-			isPred = new boolean[sentenceLength];
-			edgeMatrix = new String[sentenceLength][sentenceLength];
-			for (Triple<Integer,Integer,String> tt : _edgelist) {
-				int i=tt.first, j=tt.second;
-				edgeMatrix[i][j] = tt.third;
-				isPred[i] = true;
-				isChildOfSomething[j] = true;
+	static void makePredictions(Model model, String outputFile) {
+		try(PrintWriter out = new PrintWriter(BasicFileIO.openFileToWriteUTF8(outputFile))) {
+			for (InputAnnotatedSentence sent : inputSentences) {
+				NumberizedSentence ns = extractFeatures(model, sent, null);
+				double[][][] probs = model.inferEdgeProbs(ns);
+				MyGraph g = MyGraph.decodeEdgeProbsToGraph(sent, probs, model.labelVocab);
+				g.print(out, sent);
+				U.pf(".");
 			}
 		}
 	}
-	static MyGraph decodeEdgeprobsToGraph(InputAnnotatedSentence sent, double[][][] probs) {
-//		Graph g = new Graph("#"+sent.sentenceId());
-		List<Triple<Integer,Integer,String>> edgelist = new ArrayList<>();
-		for (int i=0; i<size(sent); i++) {
-			for (int j=0; j<size(sent); j++) {
-				if (badDistance(i,j)) continue;
-				int predlabel = Arr.argmax(probs[i][j]);
-				Triple<Integer,Integer,String> tt = new Triple(i,j,labelVocab.name(predlabel));
-				if (tt.third.equals("NOEDGE")) continue;
-				edgelist.add(tt);
-			}
-		}
-		return new MyGraph(size(sent), edgelist);
-	}
-	////////////////////////////////
-	
-    // START feature cache stuff
+
+	// START feature cache stuff
     // uses https://github.com/EsotericSoftware/kryo found from http://stackoverflow.com/questions/239280/which-is-the-best-alternative-for-java-serialization
     
     static Kryo kryo;
@@ -589,7 +479,7 @@ public class LRParser {
     	if (useFeatureCache && cacheReadMode) {
     		return kryo.readObject(kryoInput, NumberizedSentence.class);
     	} else {
-    		NumberizedSentence ns = extractFeatures(snum);
+    		NumberizedSentence ns = extractFeatures(model, snum);
     		if (useFeatureCache) { 
     			kryo.writeObject(kryoOutput, ns);
     		}
@@ -621,9 +511,13 @@ public class LRParser {
 	///////////////////////////////////////////////////////////
 	
 	static void initializeFeatureExtractors() {
-//		allFE.add(new JustPOS());
 		allFE.add(new BasicFeatures());
 		allFE.add(new LinearOrderFeatures());
 	}
 
+	static void initializeLabelFeatureExtractors() {
+		labelFeatureExtractors.add(new BasicLabelFeatures.PassThroughFe());
+//		labelFeatureExtractors.add(new BasicLabelFeatures.IsEdgeFe());
+//		labelFeatureExtractors.add(new BasicLabelFeatures.DmFe());
+	}
 }

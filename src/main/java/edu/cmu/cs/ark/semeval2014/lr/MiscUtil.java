@@ -1,6 +1,8 @@
 package edu.cmu.cs.ark.semeval2014.lr;
 
 import java.lang.management.ManagementFactory;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class MiscUtil {
 	/** http://stackoverflow.com/questions/35842/how-can-a-java-program-get-its-own-process-id */
@@ -25,6 +27,12 @@ public class MiscUtil {
 	    return fallback;
 	}
 
-	
-
+	public static int[] unbox(Collection<Integer> integers) {
+		final int[] ints = new int[integers.size()];
+		final Iterator<Integer> iterator = integers.iterator();
+		for (int i = 0; i < integers.size(); i++) {
+			ints[i] = iterator.next();
+		}
+		return ints;
+	}
 }

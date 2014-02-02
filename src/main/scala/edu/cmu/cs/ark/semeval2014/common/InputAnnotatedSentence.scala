@@ -14,7 +14,9 @@ import scala.collection.mutable.Map
 case class InputAnnotatedSentence(sentenceId: String,
                                   sentence: Array[String],
                                   syntaticDependencies: Array[SyntacticDependency],
-                                  pos: Array[String])
+                                  pos: Array[String]) {
+  def size = sentence.length
+}
 
 object InputAnnotatedSentence {
 
