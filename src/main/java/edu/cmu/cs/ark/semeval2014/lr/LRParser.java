@@ -7,7 +7,6 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
-import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
 import edu.cmu.cs.ark.semeval2014.lr.fe.LinearOrderFeatures;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
@@ -25,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static edu.cmu.cs.ark.semeval2014.lr.MiscUtil.unbox;
+import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
 
 public class LRParser {
 	public static final String NO_EDGE = "NOEDGE";
@@ -60,8 +60,18 @@ public class LRParser {
     static int saveEvery = 10;  // -1 to disable intermediate model saves
     @Parameter(names="-numIters")
 	static int numIters = 30;
-	
-    @Parameter(names="-mode", required=true)
+
+	// label feature flags
+	@Parameter(names="-useIsEdgeFeature")
+	static boolean useIsEdgeFeature = false;
+	@Parameter(names = "-useDmLabelFeatures")
+	static boolean useDmLabelFeatures = false;
+	@Parameter(names = "-usePasLabelFeatures")
+	static boolean usePasLabelFeatures = false;
+	@Parameter(names = "-usePcedtLabelFeatures")
+	static boolean usePcedtLabelFeatures = false;
+
+	@Parameter(names="-mode", required=true)
 	static String mode;
     @Parameter(names="-model",required=true)
 	static String modelFile;
@@ -516,8 +526,19 @@ public class LRParser {
 	}
 
 	static void initializeLabelFeatureExtractors() {
-		labelFeatureExtractors.add(new BasicLabelFeatures.PassThroughFe());
-//		labelFeatureExtractors.add(new BasicLabelFeatures.IsEdgeFe());
-//		labelFeatureExtractors.add(new BasicLabelFeatures.DmFe());
+		// always use the name of the label itself
+		labelFeatureExtractors.add(new PassThroughFe());
+		if (useIsEdgeFeature) {
+			labelFeatureExtractors.add(new IsEdgeFe());
+		}
+		if (useDmLabelFeatures) {
+			labelFeatureExtractors.add(new DmFe());
+		}
+		if (usePasLabelFeatures) {
+			labelFeatureExtractors.add(new PasFe());
+		}
+		if (usePcedtLabelFeatures) {
+			labelFeatureExtractors.add(new PcedtFE());
+		}
 	}
 }

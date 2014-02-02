@@ -31,9 +31,11 @@ public class BasicLabelFeatures {
 	public static class PasFe implements FE.LabelFE {
 		@Override public void features(String label, FE.FeatureAdder fa) {
 			final String[] postagAndRole = label.split("_", 2);
-			fa.add("Pos=" + postagAndRole[0]);
-			fa.add("Role=" + postagAndRole[1]);
-			fa.add("IsCore=" + postagAndRole[1].startsWith("ARG"));
+			if (postagAndRole.length > 1) {
+				fa.add("Pos=" + postagAndRole[0]);
+				fa.add("Role=" + postagAndRole[1]);
+				fa.add("IsCore=" + postagAndRole[1].startsWith("ARG"));
+			}
 		}
 	}
 
