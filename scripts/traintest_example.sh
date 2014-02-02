@@ -10,7 +10,8 @@ testfile=lildata/lildev.dm.sdp
 testdeps=lildata/lildev.dm.sdp.dependencies
 
 set -x
-./java.sh lr.LRParser train $modelfile $trainfile $traindeps
-./java.sh lr.LRParser test $modelfile $predfile $testdeps
-echo "evalling"
+./java.sh lr.LRParser -mode train \
+  -model $modelfile -sdpInput $trainfile -depInput $traindeps
+./java.sh lr.LRParser -mode test \
+  -model $modelfile -sdpOutput $predfile -depInput $testdeps
 scripts/eval.sh $testfile $predfile

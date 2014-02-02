@@ -14,6 +14,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -47,27 +49,37 @@ public class LRParser {
 	static Vocabulary perceptVocab;
 	static float[] coefs; // flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
 	static float[] ssGrad;  // adagrad history info. parallel to coefs[].
+	@Parameter(names="-learningRate")
 	static double learningRate = .1;
-	
-
 	
 	// 3. Model parameter-ish options
 	static int maxEdgeDistance = 10;
+	@Parameter(names="-l2reg")
 	static double l2reg = 1;
+	@Parameter(names="-noedgeWeight")
 	static double noedgeWeight = 0.3;
 	
 	// 4. Runtime options
+	@Parameter(names="-verboseFeatures")
 	static boolean verboseFeatures = false;
+	@Parameter(names="-useFeatureCache")
     static boolean useFeatureCache = true;
-    static int saveModelAtEvery = 10;  // -1 to disable intermediate model saves
-	static int numOnlineIters = 30;
+    @Parameter(names="-saveEvery")
+    static int saveEvery = 10;  // -1 to disable intermediate model saves
+    @Parameter(names="-numIters")
+	static int numIters = 30;
 	
+    @Parameter(names="-mode", required=true)
+	static String mode;
+    @Parameter(names="-model",required=true)
+	static String modelFile;
+    @Parameter(names={"-sdpInput","-sdpOutput"}, required=true)
+	static String sdpFile;
+    @Parameter(names="-depInput", required=true)
+	static String depFile;
 	
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		String mode = args[0];
-		String modelFile = args[1];
-		String sdpFile = args[2];
-		String depFile = args[3];
+		new JCommander(new LRParser(), args);  // seems to write to the static members.
 		
 		assert mode.equals("train") || mode.equals("test");
 		
@@ -166,7 +178,7 @@ public class LRParser {
 		@Override
 		public void add(String featname, double value) {
 			if (verboseFeatures) {
-				U.pf("NODEFEAT\t%s:%d\t%s\n", is.sentence()[i], featname);
+				U.pf("NODEFEAT\t%s:%d\t%s\n", is.sentence()[i], i, featname);
 			}
 
 			// this is kinda a hack, put it in both directions for every edge. we could use smarter data structures rather than the full matrix of edge featvecs to represent this more compactly.
@@ -346,7 +358,7 @@ public class LRParser {
 	}
 	
     static void trainingOuterloopOnline(String modelFilePrefix) throws IOException {
-    	for (int outer=0; outer<numOnlineIters; outer++) {
+    	for (int outer=0; outer<numIters; outer++) {
     		U.pf("iter %3d ", outer);  System.out.flush();
     		double t0 = System.currentTimeMillis();
     		
@@ -363,7 +375,7 @@ public class LRParser {
         	double dur = System.currentTimeMillis() - t0;
         	U.pf("%.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
     		
-        	if (saveModelAtEvery >= 0 && outer % saveModelAtEvery == 0)
+        	if (saveEvery >= 0 && outer % saveEvery == 0)
         		saveModel(U.sf("%s.iter%s",modelFilePrefix, outer));
     		
     		if (outer==0) {

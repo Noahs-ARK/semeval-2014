@@ -12,7 +12,8 @@ scalaVersion := "2.10.2"
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "1.9.2",
-  "edu.washington.cs.knowitall" % "morpha-stemmer" % "1.0.4"
+  "edu.washington.cs.knowitall" % "morpha-stemmer" % "1.0.4",
+  "com.beust" % "jcommander" % "1.30"
 )
 
 mainClass := Some("edu.cmu.cs.ark.semeval2014.lr.LRParser")
