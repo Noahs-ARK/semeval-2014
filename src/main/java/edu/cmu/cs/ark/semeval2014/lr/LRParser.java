@@ -50,7 +50,7 @@ public class LRParser {
 	@Parameter(names="-l2reg")
 	static double l2reg = 1;
 	@Parameter(names="-noedgeWeight")
-	static double noedgeWeight = 0.3;
+	static double noedgeWeight = 0.2;
 	
 	// 4. Runtime options
 	@Parameter(names="-verboseFeatures")
