@@ -13,7 +13,7 @@ import scala.collection.mutable.Map
 
 case class InputAnnotatedSentence(sentenceId: String,
                                   sentence: Array[String],
-                                  syntaticDependencies: Array[SyntacticDependency],
+                                  syntacticDependencies: Array[SyntacticDependency],
                                   pos: Array[String]) {
   def size = sentence.length
 }
@@ -48,7 +48,7 @@ object InputAnnotatedSentence {
             annotations.sentence(i) = field("SDP")(1)
             annotations.pos(i) = field("SDP")(3)
             if (field.contains("DEPS")) {
-                annotations.syntaticDependencies(i) = SyntacticDependency.fromSemEval8(field("DEPS").mkString("\t"))
+                annotations.syntacticDependencies(i) = SyntacticDependency.fromSemEval8(field("DEPS").mkString("\t"))
             }
             } catch {
                 case _ : Throwable => throw new RuntimeException("Error processing line:\n"+line)
