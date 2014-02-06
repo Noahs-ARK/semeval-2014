@@ -95,7 +95,7 @@ public class LRParser {
 			assert (fe instanceof FE.TokenFE) || (fe instanceof FE.EdgeFE) : "all feature extractors need to implement one of the interfaces!";
 			fe.initializeAtStartup();
 		}
-
+		
 		if (mode.equals("train")) {
 			trainModel();
 		} else if (mode.equals("test")) {
