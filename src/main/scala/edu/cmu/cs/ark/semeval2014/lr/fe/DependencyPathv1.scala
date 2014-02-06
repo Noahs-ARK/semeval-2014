@@ -45,6 +45,7 @@ class DependencyPathv1 extends FE.FeatureExtractor with FE.EdgeFE {
 
     private def rootDependencyPath(word: Int, path: List[Int] = List()) : List[Int] = {
         // Returns path to root (integers) as a list in reverse order (including the word we started at)
+        assert(word >= -1, "Seriously, somebody needs to fix the dependency tree.  There is a token with head = "+(word+1).toString+".  There should be no words with heads < 0.")
         if (word == -1) {
             path
         } else {
