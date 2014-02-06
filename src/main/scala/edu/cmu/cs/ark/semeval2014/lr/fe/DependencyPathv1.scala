@@ -1,35 +1,38 @@
 package edu.cmu.cs.ark.semeval2014.lr.fe
 
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence
-import edu.cmu.cs.ark.semeval2014.common.SyntacticDependency
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder
 import java.lang.Math.min
+import DependencyPathv1._
+
+object DependencyPathv1 {
+    val MAX_LENGTH = 6
+    val VERSION = "DPv1="
+}
 
 class DependencyPathv1 extends FE.FeatureExtractor with FE.EdgeFE {
-    private var dependencies : Array[SyntacticDependency] = _
-    private var rootDependencyPaths : Array[List[Int]] = _
+    private var rootDependencyPaths: Seq[List[Int]] = _
+    private var heads: Map[Int, Int] = _
+    private var relations: Map[(Int, Int), String] = _
 
     override def setupSentence(s: InputAnnotatedSentence) {
         sent = s
-        dependencies = sent.syntaticDependencies
-        rootDependencyPaths = dependencies.indices.map(i => rootDependencyPath(i)).toArray
+        heads = Map() ++ sent.syntacticDependencies.map(dep => dep.dependent -> dep.head)
+        relations = Map() ++ sent.syntacticDependencies.map(dep => (dep.head, dep.dependent) -> dep.relation)
+        rootDependencyPaths = sent.syntacticDependencies.indices.map(rootDependencyPath(_))
     }
 
     override def features(word1Index: Int, word2Index: Int, fa: FeatureAdder) {
-        val dp = "DPv1="
         val path = dependencyPath(word1Index, word2Index)
         val (word1, word2) = (sent.sentence(word1Index), sent.sentence(word2Index))
-        if (path._1.size + path._2.size <= 6) {
-            val pathStr = dependencyPathString(path, sent.pos).mkString("_")
-
-            fa.add("W1="+word1+"+"+dp+pathStr)  // path with src word
-            fa.add("W2="+word2+"+"+dp+pathStr)  // path with dest word
-            fa.add(dp+pathStr)                  // path without words
+        val pathStr = if (path._1.size + path._2.size <= MAX_LENGTH) {
+          dependencyPathString(path, sent.pos).mkString("_")
         } else {
-            fa.add("W1="+word1+"+"+dp+"NONE")
-            fa.add("W2="+word2+"+"+dp+"NONE")
-            fa.add(dp+"NONE")
+          "NONE"
         }
+        fa.add("W1=" + word1 + "+" + VERSION + pathStr) // path with src word
+        fa.add("W2=" + word2 + "+" + VERSION + pathStr) // path with dest word
+        fa.add(VERSION + pathStr) // path without words
     }
 
     private def dependencyPath(word1: Int, word2: Int) : (List[Int], List[Int]) = {
@@ -46,19 +49,19 @@ class DependencyPathv1 extends FE.FeatureExtractor with FE.EdgeFE {
         if (word == -1) {
             path
         } else {
-            val dep = dependencies.find(_.dependent == word)
+            val dep = heads.get(word)
             assert(dep != None, "The dependency tree seems broken.  I can't find the head of "+sent.sentence(word)+" in position "+word)
-            rootDependencyPath(dep.get.head, word :: path)
+            rootDependencyPath(dep.get, word :: path)
         }
     }
 
     private def dependencyPathString(path: (List[Int], List[Int]), labels: Array[String]) : List[String] = {
         var pathList : List[String] = List()
         for (List(word1, word2) <- path._1.sliding(2)) {
-            pathList = labels(word1) + "_" + dependencies.find(x => (x.dependent == word1 && x.head == word2)).get.relation + ">_" + labels(word2) :: pathList
+            pathList = labels(word1) + "_" + relations(word2, word1) + ">_" + labels(word2) :: pathList
         }
         for (List(word1, word2) <- path._2.sliding(2)) {
-            pathList = labels(word1) + "_" + dependencies.find(x => (x.head == word1 && x.dependent == word2)).get.relation + "<_" + labels(word2) :: pathList
+            pathList = labels(word1) + "_" + relations(word1, word2) + "<_" + labels(word2) :: pathList
         }
         return pathList.reverse
     }
