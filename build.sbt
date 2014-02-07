@@ -11,7 +11,7 @@ organization := "edu.cmu.cs.ark"
 scalaVersion := "2.10.2"
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "1.9.2",
+  "org.scalatest" %% "scalatest" % "2.0" % "test",
   "edu.washington.cs.knowitall" % "morpha-stemmer" % "1.0.4",
   "com.beust" % "jcommander" % "1.30",
   "com.jsuereth" %% "scala-arm" % "1.3"
