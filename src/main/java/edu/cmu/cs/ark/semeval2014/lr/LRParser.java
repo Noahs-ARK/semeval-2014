@@ -19,9 +19,10 @@ import util.misc.Pair;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import static edu.cmu.cs.ark.semeval2014.lr.MiscUtil.unbox;
 import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
 
 public class LRParser {
@@ -163,11 +164,11 @@ public class LRParser {
 		final Vocabulary labelFeatVocab = new Vocabulary();
 		final List<int[]> featsByLabel = new ArrayList<>(labelVocab.size());
 		for (int labelIdx = 0; labelIdx < labelVocab.size(); labelIdx++) {
-			final LabelFeatureAdder adder = new LabelFeatureAdder(labelFeatVocab);
+			final InMemoryNumberizedFeatureAdder adder = new InMemoryNumberizedFeatureAdder(labelFeatVocab);
 			for (FE.LabelFE fe : labelFeatureExtractors) {
 				fe.features(labelVocab.name(labelIdx), adder);
 			}
-			featsByLabel.add(adder.getFeatures());
+			featsByLabel.add(adder.features());
 		}
 		labelFeatVocab.lock();
 		return Pair.makePair(labelFeatVocab, featsByLabel);
@@ -257,24 +258,6 @@ public class LRParser {
 						goldEdgeMatrix!=null ? model.labelVocab.name(goldEdgeMatrix[i][j]) : null, featname, value);
 			}
 
-		}
-	}
-
-	static class LabelFeatureAdder extends FE.FeatureAdder {
-		private final Vocabulary labelFeatureVocab;
-		private final Set<Integer> features = new HashSet<>();
-
-		public LabelFeatureAdder(Vocabulary labelFeatureVocab) {
-			this.labelFeatureVocab = labelFeatureVocab;
-		}
-
-		@Override
-		public void add(String featname, double value) {
-			features.add(labelFeatureVocab.num(featname));
-		}
-
-		public int[] getFeatures() {
-			return unbox(features);
 		}
 	}
 
@@ -503,7 +486,8 @@ public class LRParser {
 		final List<FE.FeatureExtractor> allFE = new ArrayList<>();
 		allFE.add(new BasicFeatures());
 		allFE.add(new LinearOrderFeatures());
-        allFE.add(new DependencyPathv1());
+		allFE.add(new DependencyPathv1());
+		allFE.add(new SubcatSequenceFE());
 		return allFE;
 	}
 

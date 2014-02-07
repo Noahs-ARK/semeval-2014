@@ -12,8 +12,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.cmu.cs.ark.semeval2014.lr.MiscUtil.unbox;
-
 public class Model {
 	private static final String LABEL_VOCAB_HEADER = "LABELVOCAB";
 	private static final String LABEL_FEATURE_VOCAB_HEADER = "LABEL_FEATURE_VOCAB";
@@ -118,9 +116,11 @@ public class Model {
 						break;
 					case FEATURES_BY_LABEL_HEADER:
 						final String[] featureStrs = parts[1].trim().split(" ");
-						final List<Integer> features = new ArrayList<>(featureStrs.length);
-						for (String x : featureStrs) features.add(Integer.parseInt(x));
-						featuresByLabel.add(unbox(features));
+						final int[] features = new int[featureStrs.length];
+						for (int i = 0; i < featureStrs.length; i++) {
+							features[i] = Integer.parseInt(featureStrs[i]);
+						}
+						featuresByLabel.add(features);
 						break;
 					case COEFFICIENTS_HEADER:
 						int perceptIdx = perceptVocab.num(parts[1]);
