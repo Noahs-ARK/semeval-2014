@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-class MyGraph {
+public class MyGraph {
 	boolean[] isChildOfSomething;
 	boolean[] isPred;
 	List< Triple<Integer,Integer,String> > edgelist;
@@ -27,7 +27,7 @@ class MyGraph {
 		}
 	}
 
-	static MyGraph decodeEdgeProbsToGraph(InputAnnotatedSentence sent, double[][][] probs, Vocabulary labelVocab) {
+	public static MyGraph decodeEdgeProbsToGraph(InputAnnotatedSentence sent, double[][][] probs, Vocabulary labelVocab) {
 		final List<Triple<Integer,Integer,String>> edgeList = new ArrayList<>();
 		for (int i = 0; i < sent.size(); i++) {
 			for (int j = 0; j < sent.size(); j++) {
@@ -41,7 +41,7 @@ class MyGraph {
 		return new MyGraph(sent.size(), edgeList);
 	}
 
-	void print(PrintWriter out, InputAnnotatedSentence sent) {
+	public void print(PrintWriter out, InputAnnotatedSentence sent) {
 		out.println("#" + sent.sentenceId());
 		for (int i = 0; i < sent.size(); i++) {
 			boolean isTop = !isChildOfSomething[i] && isPred[i];

@@ -21,7 +21,7 @@ public class Model {
 	private static final String COEFFICIENTS_HEADER = "C";
 	private static final double MINIMUM_WEIGHT_THRESHOLD = 1e-7;
 
-	final Vocabulary labelVocab;
+	public final Vocabulary labelVocab;
 	final Vocabulary labelFeatureVocab;
 	final List<int[]> featuresByLabel;
 	final Vocabulary perceptVocab;
@@ -56,7 +56,7 @@ public class Model {
 	/** returns:  (#tokens x #tokens x #labelvocab)
 	 * for token i and token j, prob dist over the possible edge labels.
 	 */
-	double[][][] inferEdgeProbs(NumberizedSentence ns) {
+	public double[][][] inferEdgeProbs(NumberizedSentence ns) {
 		double[][][] scores = inferEdgeScores(ns);
 		// transform in-place into probs
 		for (int i=0; i<ns.T; i++) {

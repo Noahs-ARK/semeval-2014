@@ -1,21 +1,10 @@
 package edu.cmu.cs.ark.semeval2014.lr.fe;
 
-import edu.cmu.cs.ark.semeval2014.lr.LRParser;
-
 public class BasicLabelFeatures {
 	/** Extracts the name of the label */
 	public static class PassThroughFe implements FE.LabelFE {
 		@Override public void features(String label, FE.FeatureAdder fa) {
 			fa.add(label);
-		}
-	}
-
-	/** Extracts whether the label represents any edge at all (rather than NOEDGE) */
-	public static class IsEdgeFe implements FE.LabelFE {
-		@Override public void features(String label, FE.FeatureAdder fa) {
-			if (!label.equals(LRParser.NO_EDGE)) {
-				fa.add("IsEdge");
-			}
 		}
 	}
 
