@@ -18,6 +18,7 @@ import util.BasicFileIO;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
+import edu.cmu.cs.ark.semeval2014.prune.*;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -114,6 +115,9 @@ public class LRParser {
 		double dur;
 		U.pf("Reading graphs from %s\n", sdpFile);
 		final List<Graph> graphs = readGraphs(sdpFile);
+		
+		PruneModel pm = new PruneModel(graphs, inputSentences);
+		pm.trainModel();
 
 		// build up the edge label vocabulary
 		Vocabulary labelVocab = new Vocabulary();
