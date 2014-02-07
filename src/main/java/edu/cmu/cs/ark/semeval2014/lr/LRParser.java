@@ -5,16 +5,13 @@ import com.beust.jcommander.Parameter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
-import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
-import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
-import edu.cmu.cs.ark.semeval2014.lr.fe.LinearOrderFeatures;
-import edu.cmu.cs.ark.semeval2014.lr.fe.DependencyPathv1;
+import edu.cmu.cs.ark.semeval2014.lr.fe.*;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 import sdp.graph.Edge;
 import sdp.graph.Graph;
 import sdp.io.GraphReader;
-import util.BasicFileIO;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
@@ -34,9 +31,7 @@ public class LRParser {
 	// 1. Data structures
 	static InputAnnotatedSentence[] inputSentences = null; // full dataset
 	static List<int[][]> graphMatrices = null;  // full dataset
-	
-	// 2. Feature system and model parameters
-	static List<FE.FeatureExtractor> allFE = new ArrayList<>();
+
 	static List<FE.LabelFE> labelFeatureExtractors = new ArrayList<>();
 
 	static Model model;
@@ -63,8 +58,6 @@ public class LRParser {
 	static int numIters = 30;
 
 	// label feature flags
-	@Parameter(names="-useIsEdgeFeature")
-	static boolean useIsEdgeFeature = false;
 	@Parameter(names = "-useDmLabelFeatures")
 	static boolean useDmLabelFeatures = false;
 	@Parameter(names = "-usePasLabelFeatures")
@@ -90,12 +83,6 @@ public class LRParser {
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
 
-		initializeFeatureExtractors();
-		for (FE.FeatureExtractor fe : allFE) {
-			assert (fe instanceof FE.TokenFE) || (fe instanceof FE.EdgeFE) : "all feature extractors need to implement one of the interfaces!";
-			fe.initializeAtStartup();
-		}
-
 		if (mode.equals("train")) {
 			trainModel();
 		} else if (mode.equals("test")) {
@@ -103,7 +90,7 @@ public class LRParser {
 			U.pf("Writing predictions to %s\n", sdpFile);
 			double t0, dur;
 			t0 = System.currentTimeMillis();
-			makePredictions(model, sdpFile);
+			ParallelParser.makePredictions(model, inputSentences, sdpFile);
 			dur = System.currentTimeMillis() - t0;
 			U.pf("\nPRED TIME %.1f sec, %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
 		}
@@ -294,7 +281,7 @@ public class LRParser {
 	/**
 	 * goldEdgeMatrix is only for feature extractor debugging verbose reports 
 	 */
-	static NumberizedSentence extractFeatures(Model model, InputAnnotatedSentence is, int[][] goldEdgeMatrix) {
+	public static NumberizedSentence extractFeatures(Model model, InputAnnotatedSentence is, int[][] goldEdgeMatrix) {
 		final int biasIdx = model.perceptVocab.num(BIAS_NAME);
 
 		NumberizedSentence ns = new NumberizedSentence( is.size() );
@@ -305,15 +292,18 @@ public class LRParser {
 		// only for verbose feature extraction reporting
 		tokenAdder.is = edgeAdder.is=is;
 		edgeAdder.goldEdgeMatrix = goldEdgeMatrix;
-		
-		for (FE.FeatureExtractor fe : allFE) {
+
+		final List<FE.FeatureExtractor> featureExtractors = initializeFeatureExtractors();
+		for (FE.FeatureExtractor fe : featureExtractors) {
+			assert (fe instanceof FE.TokenFE) || (fe instanceof FE.EdgeFE) : "all feature extractors need to implement one of the interfaces!";
+			fe.initializeAtStartup();
 			fe.setupSentence(is);
 		}
 		
 		for (edgeAdder.i=0; edgeAdder.i<ns.T; edgeAdder.i++) {
 			
 			tokenAdder.i = edgeAdder.i;
-			for (FE.FeatureExtractor fe : allFE) {
+			for (FE.FeatureExtractor fe : featureExtractors) {
 				if (fe instanceof FE.TokenFE) {
 					((FE.TokenFE) fe).features(tokenAdder.i, tokenAdder);
 				}
@@ -325,7 +315,7 @@ public class LRParser {
 				ns.add(edgeAdder.i, edgeAdder.j, biasIdx, 1.0);
 				
 				// edge features
-				for (FE.FeatureExtractor fe : allFE) {
+				for (FE.FeatureExtractor fe : featureExtractors) {
 					if (fe instanceof FE.EdgeFE) {
 						((FE.EdgeFE) fe).features(edgeAdder.i, edgeAdder.j, edgeAdder);
 					}
@@ -460,18 +450,6 @@ public class LRParser {
 		return ll;
 	}
 
-	static void makePredictions(Model model, String outputFile) {
-		try(PrintWriter out = new PrintWriter(BasicFileIO.openFileToWriteUTF8(outputFile))) {
-			for (InputAnnotatedSentence sent : inputSentences) {
-				NumberizedSentence ns = extractFeatures(model, sent, null);
-				double[][][] probs = model.inferEdgeProbs(ns);
-				MyGraph g = MyGraph.decodeEdgeProbsToGraph(sent, probs, model.labelVocab);
-				g.print(out, sent);
-				U.pf(".");
-			}
-		}
-	}
-
 	// START feature cache stuff
     // uses https://github.com/EsotericSoftware/kryo found from http://stackoverflow.com/questions/239280/which-is-the-best-alternative-for-java-serialization
     
@@ -521,18 +499,17 @@ public class LRParser {
 
 	///////////////////////////////////////////////////////////
 	
-	static void initializeFeatureExtractors() {
+	static List<FE.FeatureExtractor> initializeFeatureExtractors() {
+		final List<FE.FeatureExtractor> allFE = new ArrayList<>();
 		allFE.add(new BasicFeatures());
 		allFE.add(new LinearOrderFeatures());
         allFE.add(new DependencyPathv1());
+		return allFE;
 	}
 
 	static void initializeLabelFeatureExtractors() {
 		// always use the name of the label itself
 		labelFeatureExtractors.add(new PassThroughFe());
-		if (useIsEdgeFeature) {
-			labelFeatureExtractors.add(new IsEdgeFe());
-		}
 		if (useDmLabelFeatures) {
 			labelFeatureExtractors.add(new DmFe());
 		}

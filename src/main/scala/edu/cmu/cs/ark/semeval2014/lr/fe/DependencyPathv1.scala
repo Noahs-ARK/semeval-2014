@@ -11,7 +11,7 @@ object DependencyPathv1 {
 }
 
 class DependencyPathv1 extends FE.FeatureExtractor with FE.EdgeFE {
-    private var rootDependencyPaths: Seq[List[Int]] = _
+    private var rootDependencyPaths: Seq[Option[List[Int]]] = _
     private var heads: Map[Int, Int] = _
     private var relations: Map[(Int, Int), String] = _
 
@@ -24,34 +24,41 @@ class DependencyPathv1 extends FE.FeatureExtractor with FE.EdgeFE {
 
     override def features(word1Index: Int, word2Index: Int, fa: FeatureAdder) {
         val path = dependencyPath(word1Index, word2Index)
-        val (word1, word2) = (sent.sentence(word1Index), sent.sentence(word2Index))
-        val pathStr = if (path._1.size + path._2.size <= MAX_LENGTH) {
-          dependencyPathString(path, sent.pos).mkString("_")
+        val pathStr = if (path.isDefined && path.get._1.size + path.get._2.size <= MAX_LENGTH) {
+          dependencyPathString(path.get, sent.pos).mkString("_")
         } else {
           "NONE"
         }
+        val (word1, word2) = (sent.sentence(word1Index), sent.sentence(word2Index))
         fa.add("W1=" + word1 + "+" + VERSION + pathStr) // path with src word
         fa.add("W2=" + word2 + "+" + VERSION + pathStr) // path with dest word
         fa.add(VERSION + pathStr) // path without words
     }
 
-    private def dependencyPath(word1: Int, word2: Int) : (List[Int], List[Int]) = {
+    def dependencyPath(word1: Int, word2: Int) : Option[(List[Int], List[Int])] = {
+        if (rootDependencyPaths(word1) == None || rootDependencyPaths(word2) == None) return None
         // Return type list one is path from word1 to common head
         // Return type list two is path from common head to word2
         // Includes the common head in both lists
-        val prefix = longestCommonPrefixLength(rootDependencyPaths(word1), rootDependencyPaths(word2))
-        return (rootDependencyPaths(word1).drop(prefix-1).reverse, rootDependencyPaths(word2).drop(prefix-1))
+        val prefix = longestCommonPrefixLength(rootDependencyPaths(word1).get, rootDependencyPaths(word2).get)
+        Some((rootDependencyPaths(word1).get.drop(prefix-1).reverse, rootDependencyPaths(word2).get.drop(prefix-1)))
     }
 
-    private def rootDependencyPath(word: Int, path: List[Int] = List()) : List[Int] = {
+    private def rootDependencyPath(word: Int, path: List[Int] = List()): Option[List[Int]] = {
         // Returns path to root (integers) as a list in reverse order (including the word we started at)
-        assert(word >= -1, "Seriously, somebody needs to fix the dependency tree.  There is a token with head = "+(word+1).toString+".  There should be no words with heads < 0.")
         if (word == -1) {
-            path
+            Some(path)
         } else {
             val dep = heads.get(word)
-            assert(dep != None, "The dependency tree seems broken.  I can't find the head of "+sent.sentence(word)+" in position "+word)
-            rootDependencyPath(dep.get, word :: path)
+            if (dep == None) {
+                System.err.println("Invalid dependency tree. token %d has no head in sentence %s".format(word, sent.sentence.mkString(" ")))
+                None
+            } else if (dep.get < -1) {
+              System.err.println("Invalid dependency tree. token %d has head %d in sentence %s. There should be no words with heads < 0.".format(word + 1, dep.get + 1, sent.sentence.mkString(" ")))
+              None
+            } else {
+              rootDependencyPath(dep.get, word :: path)
+            }
         }
     }
 
