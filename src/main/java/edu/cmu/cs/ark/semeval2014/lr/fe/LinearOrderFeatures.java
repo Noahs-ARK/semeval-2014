@@ -5,7 +5,7 @@ import util.U;
 import java.lang.Math.abs;
 import java.lang.Math.log;
 import java.lang.Math.floor;
-import java.lang.Math.sign;
+import java.lang.Math.signum;
 
 public class LinearOrderFeatures extends FE.FeatureExtractor implements FE.EdgeFE {
 
@@ -18,6 +18,6 @@ public class LinearOrderFeatures extends FE.FeatureExtractor implements FE.EdgeF
 		int dist = srcTokenIdx - destTokenIdx;
 		fa.add(U.sf("lin:%s", dist));
 		fa.add(U.sf("left:%s", (srcTokenIdx < destTokenIdx)));
-        fa.add(U.sf("logD:%s", sign(dist)*floor(log(abs(dist)+1)/log(1.39))));
+        fa.add(U.sf("logD:%s", signum(dist)*floor(log(abs(dist)+1)/log(1.39))));
 	}
 }
