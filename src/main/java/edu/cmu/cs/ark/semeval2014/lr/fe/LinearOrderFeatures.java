@@ -2,10 +2,10 @@ package edu.cmu.cs.ark.semeval2014.lr.fe;
 
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
 import util.U;
-import java.lang.Math.abs
-import java.lang.Math.log
-import java.lang.Math.floor
-import java.lang.Math.sign
+import java.lang.Math.abs;
+import java.lang.Math.log;
+import java.lang.Math.floor;
+import java.lang.Math.sign;
 
 public class LinearOrderFeatures extends FE.FeatureExtractor implements FE.EdgeFE {
 
