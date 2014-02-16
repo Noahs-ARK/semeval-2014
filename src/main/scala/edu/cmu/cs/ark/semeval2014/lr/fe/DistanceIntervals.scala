@@ -11,7 +11,7 @@ import java.lang.Math.floor
 class DistanceIntervals extends FE.FeatureExtractor with FE.EdgeFE {
     override def features(word1Index: Int, word2Index: Int, fa: FeatureAdder) {
         val distance = abs(word1Index - word2Index).toInt
-        val direction = signum(dist).toInt
+        val direction = signum(distance).toInt
         // distance intervals
         for (i <- Range(1, distance-1)) {
             fa.add("Di="+(direction*i).toString)
