@@ -5,7 +5,7 @@ DATADIR="/cab1/corpora/LDC2013E167/"
 
 for f in dm pcedt pas; do
  for ext in sdp sdp.dependencies; do
-   cat ${DATADIR}splits/{train,dev,test}.$f.$ext | 
+   cat ${DATADIR}/${f}.${ext} |
       awk -v dir=${DATADIR}splits -v myext=${f}.${ext} '
         BEGIN { print "outputting to dir=" dir " and extension=" myext }
         /^#2[0-1]/ {out="sec0019"} 
