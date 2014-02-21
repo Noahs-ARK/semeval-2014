@@ -51,10 +51,10 @@ class DependencyPathv1 extends FE.FeatureExtractor with FE.EdgeFE {
         } else {
             val dep = heads.get(word)
             if (dep == None) {
-                System.err.println("Invalid dependency tree. token %d has no head in sentence %s".format(word, sent.sentence.mkString(" ")))
+                //System.err.println("Invalid dependency tree. token %d has no head in sentence %s".format(word, sent.sentence.mkString(" ")))
                 None
             } else if (dep.get < -1) {
-              System.err.println("Invalid dependency tree. token %d has head %d in sentence %s. There should be no words with heads < 0.".format(word + 1, dep.get + 1, sent.sentence.mkString(" ")))
+              //System.err.println("Invalid dependency tree. token %d has head %d in sentence %s. There should be no words with heads < 0.".format(word + 1, dep.get + 1, sent.sentence.mkString(" ")))
               None
             } else {
               rootDependencyPath(dep.get, word :: path)
