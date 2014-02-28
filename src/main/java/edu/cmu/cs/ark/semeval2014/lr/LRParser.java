@@ -8,6 +8,8 @@ import com.esotericsoftware.kryo.io.Output;
 import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.*;
+import edu.cmu.cs.ark.semeval2014.topness.DetermTopness;
+import edu.cmu.cs.ark.semeval2014.topness.TopnessScorer;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 import sdp.graph.Edge;
 import sdp.graph.Graph;
@@ -37,6 +39,8 @@ public class LRParser {
 
 	static Model model;
 	static float[] ssGrad;  // adagrad history info. parallel to coefs[].
+	
+	static TopnessScorer topnessScorer = new DetermTopness();
 
 	@Parameter(names="-learningRate")
 	static double learningRate = .1;
@@ -357,7 +361,7 @@ public class LRParser {
     static void featureExtractionPass() {
         for (int snum=0; snum<inputSentences.length; snum++) {
         	U.pf(".");
-        	getNextExample(snum);
+        	extractFeaturesForExampleAndWriteToCache(snum);
             if (snum>0 && snum % 1000 == 0) {
             	U.pf("%d sents, %.3fm percepts, %.1f MB mem used\n", 
             			snum+1, model.perceptVocab.size()/1e6,
@@ -426,6 +430,14 @@ public class LRParser {
 		}
 		return ll;
 	}
+	
+	public static MyGraph decodeToGraph(InputAnnotatedSentence sent, NumberizedSentence ns) {
+	    MyGraph g = MyGraph.decodeEdgeProbsToGraph(sent, model.inferEdgeProbs(ns), model.labelVocab);
+	    MyGraph.decideTops(g, sent);
+//	    MyGraph.decideTopsStupid(g, sent);
+	    return g;
+	}
+
 
 	// START feature cache stuff
     // uses https://github.com/EsotericSoftware/kryo found from http://stackoverflow.com/questions/239280/which-is-the-best-alternative-for-java-serialization
@@ -446,15 +458,16 @@ public class LRParser {
     		return kryo.readObject(kryoInput, NumberizedSentence.class);
     	} else {
     		NumberizedSentence ns = extractFeatures(model, snum);
-    		if (useFeatureCache) { 
-    			kryo.writeObject(kryoOutput, ns);
-    		}
     		return ns;
     	}
     }
     static void openCacheForWriting() throws FileNotFoundException {
     	if (!useFeatureCache) return;
         kryoOutput = new Output(new FileOutputStream(featureCacheFile));
+    }
+    static void extractFeaturesForExampleAndWriteToCache(int snum) {
+		NumberizedSentence ns = extractFeatures(model, snum);
+		kryo.writeObject(kryoOutput, ns);
     }
     static void closeCacheAfterWriting() {
     	if (!useFeatureCache) return;

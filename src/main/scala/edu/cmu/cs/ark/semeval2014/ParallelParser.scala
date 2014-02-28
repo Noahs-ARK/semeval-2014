@@ -6,6 +6,7 @@ import edu.cmu.cs.ark.semeval2014.lr.{Model, MyGraph}
 import edu.cmu.cs.ark.semeval2014.lr.LRParser.extractFeatures
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence
 import util.{U, BasicFileIO}
+import edu.cmu.cs.ark.semeval2014.lr.LRParser
 import resource.managed
 
 object ParallelParser {
@@ -32,6 +33,6 @@ object ParallelParser {
 
   def predict(model: Model, sent: InputAnnotatedSentence): MyGraph = {
     val ns = extractFeatures(model, sent, null)
-    MyGraph.decodeEdgeProbsToGraph(sent, model.inferEdgeProbs(ns), model.labelVocab)
+    LRParser.decodeToGraph(sent, ns)
   }
 }
