@@ -23,7 +23,7 @@ public class Model {
 	final Vocabulary labelFeatureVocab;
 	final List<int[]> featuresByLabel;
 	final Vocabulary perceptVocab;
-	float[] coefs; // flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
+	float[] coefs; // flattened form: #percepts * #labelFeatures
 
 	public Model(
 			Vocabulary labelVocab,
@@ -48,7 +48,7 @@ public class Model {
 				labelFeatureVocab,
 				featuresByLabel,
 				perceptVocab,
-				new float[Math.min(10000, perceptVocab.size()) * perceptVocab.size()]);
+				null);
 	}
 
 	/** returns:  (#tokens x #tokens x #labelvocab)

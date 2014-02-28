@@ -136,7 +136,7 @@ public class LRParser {
 		model = new Model(labelVocab, labelFeatureVocab, featuresByLabel, perceptVocab);
 
 		t0 = System.currentTimeMillis();
-		trainingOuterLoopOnline(model, modelFile);
+		trainingOuterLoopOnline();
 		dur = System.currentTimeMillis() - t0;
 		U.pf("TRAINLOOP TIME %.1f sec\n", dur/1e3);
 
@@ -312,48 +312,53 @@ public class LRParser {
 		return extractFeatures(model, inputSentences[snum], graphMatrices !=null ? graphMatrices.get(snum) : null);
 	}
 
-    static void trainingOuterLoopOnline(Model model, String modelFilePrefix) throws IOException {
+    static void trainingOuterLoopOnline() throws IOException {
+    	
+    	U.pf("First pass: extracting features, no model updates.\n");
+		cacheReadMode = false;
+		openCacheForWriting();
+    	featureExtractionPass();
+		closeCacheAfterWriting();
+    	allocateCoefs();
+		U.pf("FE done: %d percepts, %d nnz\n", model.perceptVocab.size(), NumberizedSentence.totalNNZ);
+		cacheReadMode = true;
+		
     	for (int outer=0; outer<numIters; outer++) {
     		U.pf("iter %3d ", outer);  System.out.flush();
     		double t0 = System.currentTimeMillis();
     		
-    		if (outer==0) {
-    			cacheReadMode = false;
-    			openCacheForWriting();
-    		} else {
-    			cacheReadMode = true;
-    			resetCacheReader();
-    		}
-    		
-    		trainOnlineIter(model, outer==0);
+			resetCacheReader();
+    		trainOnlineIter();
     		
         	double dur = System.currentTimeMillis() - t0;
         	U.pf("%.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
     		
         	if (saveEvery >= 0 && outer % saveEvery == 0)
-        		model.save(U.sf("%s.iter%s", modelFilePrefix, outer));
+        		model.save(U.sf("%s.iter%s", modelFile, outer));
     		
-    		if (outer==0) {
-    			closeCacheAfterWriting();
-    		}
-    		
-    		if (outer==0) U.pf("%d percepts, %d nnz\n", model.perceptVocab.size(), NumberizedSentence.totalNNZ);
     	}
     }
 
-    static void growCoefsIfNecessary() {
-    	if (ssGrad==null) {
-    		int n = Math.min(10000, model.perceptVocab.size());
-    		model.coefs = new float[n*model.labelFeatureVocab.size()];
-    		ssGrad = new float[n*model.labelFeatureVocab.size()];
-    	}
-    	else if (model.labelFeatureVocab.size()*model.perceptVocab.size() > model.coefs.length) {
-    		int newLen = (int) Math.ceil(1.2 * model.perceptVocab.size()) * model.labelFeatureVocab.size();
-			model.coefs = NumberizedSentence.growToLength(model.coefs, newLen);
-            ssGrad = NumberizedSentence.growToLength(ssGrad, newLen);
-            assert model.coefs.length==ssGrad.length;
-        }
+    static void allocateCoefs() {
+    	int len = model.perceptVocab.size() * model.labelFeatureVocab.size();
+    	model.coefs = new float[len];
+    	ssGrad = new float[len];
+    	model.perceptVocab.lock();
+    	model.labelFeatureVocab.lock();
     }
+//    static void growCoefsIfNecessary() {
+//    	if (ssGrad==null) {
+//    		int n = Math.min(10000, model.perceptVocab.size());
+//    		model.coefs = new float[n*model.labelFeatureVocab.size()];
+//    		ssGrad = new float[n*model.labelFeatureVocab.size()];
+//    	}
+//    	else if (model.labelFeatureVocab.size()*model.perceptVocab.size() > model.coefs.length) {
+//    		int newLen = (int) Math.ceil(1.2 * model.perceptVocab.size()) * model.labelFeatureVocab.size();
+//			model.coefs = NumberizedSentence.growToLength(model.coefs, newLen);
+//            ssGrad = NumberizedSentence.growToLength(ssGrad, newLen);
+//            assert model.coefs.length==ssGrad.length;
+//        }
+//    }
 	
     /** From the new gradient value, update this feature's learning rate and return it. */
     static double adagradStoreRate(int featnum, double g) {
@@ -362,9 +367,21 @@ public class LRParser {
         return 1.0 / Math.sqrt(ssGrad[featnum]);
     }
     
+    static void featureExtractionPass() {
+        for (int snum=0; snum<inputSentences.length; snum++) {
+        	U.pf(".");
+        	getNextExample(snum);
+            if (snum>0 && snum % 1000 == 0) {
+            	U.pf("%d sents, %.3fm percepts, %.1f MB mem used\n", 
+            			snum+1, model.perceptVocab.size()/1e6,
+            			Runtime.getRuntime().totalMemory()/1e6
+            			);
+            }
+        }
+    }
     
     /** adagrad: http://www.ark.cs.cmu.edu/cdyer/adagrad.pdf */ 
-    static void trainOnlineIter(Model model, boolean firstIter) throws FileNotFoundException {
+    static void trainOnlineIter() throws FileNotFoundException {
 		assert model.labelVocab.isLocked() : "since we have autolabelconj, can't tolerate label vocab expanding during a training pass.";
 		assert model.labelFeatureVocab.isLocked() : "since we have autolabelconj, can't tolerate label vocab expanding during a training pass.";
 
@@ -373,18 +390,8 @@ public class LRParser {
         	U.pf(".");
             
             NumberizedSentence ns = getNextExample(snum);
-            if (firstIter) {
-                growCoefsIfNecessary();
-            }
     		int[][] edgeMatrix = graphMatrices.get(snum);
             ll += updateExampleLogReg(ns, edgeMatrix);
-            
-            if (firstIter && snum>0 && snum % 1000 == 0) {
-            	U.pf("%d sents, %.3fm percepts, %.3fm finefeats allocated, %.1f MB mem used\n", 
-            			snum+1, model.perceptVocab.size()/1e6, model.coefs.length/1e6,
-            			Runtime.getRuntime().totalMemory()/1e6
-            			);
-            }
         }
         //  logprior  =  - (1/2) lambda || beta ||^2
         //  gradient =  - lambda beta
