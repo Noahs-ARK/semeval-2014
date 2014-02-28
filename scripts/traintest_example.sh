@@ -1,29 +1,21 @@
 #!/bin/sh
 set -eu
 
-
 model_name="mymodel"
 feature_opts=""
-#feature_opts="-useIsEdgeFeature"
-#feature_opts="-usePasLabelFeatures"
-#feature_opts="-useIsEdgeFeature -usePasLabelFeatures"
-data_dir="lildata/lil"
-#data_dir="../data/splits/"
-#data_dir="../data/medium_splits/"
-experiments_dir="experiments"
-#model_dir="${experiments_dir}/label_feats_medium"
-model_dir="${experiments_dir}/label_feats_lil"
+model_dir="bladir"
 mkdir -p "${model_dir}"
 model_file="${model_dir}/${model_name}"
 
 formalism="pas"
-train_file="${data_dir}train.${formalism}.sdp"
-train_deps="${data_dir}train.${formalism}.sdp.dependencies"
+train_file="lildata/liltrain.${formalism}.sdp"
+train_deps="lildata/liltrain.${formalism}.sdp.dependencies"
 
-test_file="${data_dir}dev.${formalism}.sdp"
-test_deps="${data_dir}dev.${formalism}.sdp.dependencies"
+# sec20 files are from: /cab1/corpora/LDC2013E167/splits
+test_file="data/splits/sec20.${formalism}.sdp"
+test_deps="data/splits/sec20.${formalism}.sdp.dependencies"
 
-pred_file="${model_file}.pred.dev.${formalism}.sdp"
+pred_file="${model_file}.pred.${formalism}.sdp"
 
 set -x
 ./java.sh lr.LRParser -mode train \

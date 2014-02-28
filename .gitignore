@@ -4,3 +4,12 @@
 target
 .classpath
 .project
+
+# More stuff
+data
+ex
+experiments
+.RData
+.Rhistory
+.DS_Store
+.cache
