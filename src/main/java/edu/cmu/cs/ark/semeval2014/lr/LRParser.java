@@ -346,19 +346,6 @@ public class LRParser {
     	model.perceptVocab.lock();
     	model.labelFeatureVocab.lock();
     }
-//    static void growCoefsIfNecessary() {
-//    	if (ssGrad==null) {
-//    		int n = Math.min(10000, model.perceptVocab.size());
-//    		model.coefs = new float[n*model.labelFeatureVocab.size()];
-//    		ssGrad = new float[n*model.labelFeatureVocab.size()];
-//    	}
-//    	else if (model.labelFeatureVocab.size()*model.perceptVocab.size() > model.coefs.length) {
-//    		int newLen = (int) Math.ceil(1.2 * model.perceptVocab.size()) * model.labelFeatureVocab.size();
-//			model.coefs = NumberizedSentence.growToLength(model.coefs, newLen);
-//            ssGrad = NumberizedSentence.growToLength(ssGrad, newLen);
-//            assert model.coefs.length==ssGrad.length;
-//        }
-//    }
 	
     /** From the new gradient value, update this feature's learning rate and return it. */
     static double adagradStoreRate(int featnum, double g) {
