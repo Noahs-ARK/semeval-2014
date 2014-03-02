@@ -9,16 +9,9 @@ import util.misc.Pair;
 
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.LRParser;
-import edu.cmu.cs.ark.semeval2014.lr.Model;
 import edu.cmu.cs.ark.semeval2014.lr.NumberizedSentence;
-import edu.cmu.cs.ark.semeval2014.lr.LRParser.LabelFeatureAdder;
-import edu.cmu.cs.ark.semeval2014.lr.LRParser.TokenFeatAdder;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
-import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.DmFe;
-import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.IsEdgeFe;
-import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PasFe;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PassThroughFe;
-import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PcedtFE;
 
 public class Prune {
 	private int numIter = 1;
@@ -139,6 +132,7 @@ public class Prune {
 		labelFeatureExtractors.add(new PassThroughFe());
 	}
 	
+	/*
 	private Pair<Vocabulary, List<int[]>> extractAllLabelFeatures(
 			Vocabulary labelVocab,
 			List<FE.LabelFE> labelFeatureExtractors)
@@ -155,6 +149,7 @@ public class Prune {
 		labelFeatVocab.lock();
 		return Pair.makePair(labelFeatVocab, featsByLabel);
 	}
+	*/
 	
 	// to learn the weight vectors 
 	public void trainModels(Vocabulary lv, List<int[][]> graphMatrices){
@@ -164,31 +159,34 @@ public class Prune {
 		singletonWeights = new HashMap<String, Double>();
 		initializeWeights(singletonWeights);
 		trainingOuterLoopOnline(singletonWeights, singletons);
+		saveModel(singletonWeights, "singletonWeights");
 		
 		// to learn the weights for the predicates
 		predicateWeights = new HashMap<String, Double>();
 		initializeWeights(predicateWeights);
 		trainingOuterLoopOnline(predicateWeights, predicates);
+		saveModel(singletonWeights, "singletonWeights");
 		
-		System.out.println("Singleton weights:" );
-		printUniqueWeights(singletonWeights);
+		//System.out.println("Singleton weights:");
+		//printUniqueWeights(singletonWeights);
 		//System.out.println("Predicate weights:");
 		//printUniqueWeights(predicateWeights);
 
-		System.out.println("Train error for singletons:");
-		trainError(singletonWeights, singletons);
+		//System.out.println("Train error for singletons:");
+		//trainError(singletonWeights, singletons);
 
-		System.out.println("Train error for predicates:");
-		trainError(predicateWeights, predicates);
+		//System.out.println("Train error for predicates:");
+		//trainError(predicateWeights, predicates);
 		
 
 	}
-	
+
+
 	private void trainError(Map<String, Double> weights,
 			List<int[]> test) {
 		int correct = 0;
 		int incorrect = 0;
-        for (int snum=inputSentences.length-200; snum<inputSentences.length; snum++) {
+        for (int snum=0; snum<inputSentences.length; snum++) {
         	U.pf(".");
         	List<Map<String, Set<String>>> feats = ghettoFeats(snum);
     		int[] sequenceOfLabels = test.get(snum);
@@ -252,7 +250,7 @@ public class Prune {
 
 	// the inner training loop. Within the dataset, loops over each example.
 	private void trainOnlineIter(Map<String, Double> weights, List<int[]> train ) {
-        for (int snum=0; snum<inputSentences.length - 200; snum++) {
+        for (int snum=0; snum<inputSentences.length; snum++) {
         	U.pf(".");
         	List<Map<String, Set<String>>> feats = ghettoFeats(snum);
     		int[] sequenceOfLabels = train.get(snum);
@@ -393,13 +391,14 @@ public class Prune {
 	}
 
 
+    /*
 	NumberizedSentence getNextExample(int snum, PruneModel pm) {
     	//return new NumberizedSentence();
     	/*
     	if (useFeatureCache && cacheReadMode) {
     		return kryo.readObject(kryoInput, NumberizedSentence.class);
     	} else {
-    	*/
+    	
     		NumberizedSentence ns = 
     				extractFeatures(pm, inputSentences[snum]);
     		return ns;
@@ -409,9 +408,11 @@ public class Prune {
     		}
     		
     	}
-    	*/
+    	
     }
+    */
     
+	/*
 	NumberizedSentence extractFeatures(PruneModel pm, InputAnnotatedSentence is) {
 		//final int biasIdx = model.perceptVocab.num(BIAS_NAME);
 		
@@ -438,6 +439,7 @@ public class Prune {
 		}
 		return ns;
 	}
+	*/
 	
 	private void printSentenceAndGraph(InputAnnotatedSentence inputSentences, int[][] g){
 		for (int i = 0; i < inputSentences.sentence().length; i++){
@@ -467,5 +469,12 @@ public class Prune {
 			System.out.println();
 		}
 		System.out.println();
+	}
+	
+	
+	private void saveModel(Map<String, Double> singletonWeights2, String string) {
+		String saveLoc = "./";
+		
+		
 	}
 }
