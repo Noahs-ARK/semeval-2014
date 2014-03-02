@@ -8,6 +8,7 @@ import com.esotericsoftware.kryo.io.Output;
 import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.*;
+import edu.cmu.cs.ark.semeval2014.prune.Prune;
 import edu.cmu.cs.ark.semeval2014.topness.DetermTopness;
 import edu.cmu.cs.ark.semeval2014.topness.TopnessScorer;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
@@ -78,6 +79,7 @@ public class LRParser {
 	static String sdpFile;
     @Parameter(names="-depInput", required=true)
 	static String depFile;
+    static Prune p;
 
 	public static void main(String[] args) throws IOException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
@@ -88,6 +90,8 @@ public class LRParser {
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
 
+		p = new Prune(inputSentences);
+		
 		if (mode.equals("train")) {
 			trainModel();
 		} else if (mode.equals("test")) {
@@ -134,6 +138,9 @@ public class LRParser {
 			assert sent.sentenceId().equals(graph.id.replace("#",""));
 			graphMatrices.add(convertGraphToAdjacencyMatrix(graph, sent.size(), labelVocab));
 		}
+		
+		p.trainModels(labelVocab, graphMatrices);
+		System.exit(1);
 
 		final Vocabulary perceptVocab = new Vocabulary();
 		perceptVocab.num(BIAS_NAME);
