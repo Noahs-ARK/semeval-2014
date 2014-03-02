@@ -1,50 +1,52 @@
 package edu.cmu.cs.ark.semeval2014.prune;
 
+import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import sdp.graph.Edge;
-import sdp.graph.Graph;
-import util.Vocabulary;
-import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
-import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
+import java.util.Map;
 
 public class PruneModel {
+	public Map<String, Double> weights;
 
-	final Vocabulary labelVocab;
-	final Vocabulary labelFeatureVocab;
-	final List<int[]> featuresByLabel;
-	final Vocabulary perceptVocab;
-	float[] coefs; // flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
-
-	public PruneModel(
-			Vocabulary labelVocab,
-			Vocabulary labelFeatureVocab,
-			List<int[]> featuresByLabel,
-			Vocabulary perceptVocab,
-			float[] coefs) {
-		this.labelVocab = labelVocab;
-		this.labelFeatureVocab = labelFeatureVocab;
-		this.featuresByLabel = featuresByLabel;
-		this.perceptVocab = perceptVocab;
-		this.coefs = coefs;
+	public PruneModel(){
+		weights = new HashMap<String, Double>();
 	}
 
-	public PruneModel(
-			Vocabulary labelVocab,
-			Vocabulary labelFeatureVocab,
-			List<int[]> featuresByLabel,
-			Vocabulary perceptVocab) {
-		this(
-				labelVocab,
-				labelFeatureVocab,
-				featuresByLabel,
-				perceptVocab,
-				new float[Math.min(10000, perceptVocab.size()) * perceptVocab.size()]);
-	}
-	
-	public PruneModel(Vocabulary labelVocab, Vocabulary featVocab){
-		this(labelVocab, new Vocabulary(), new ArrayList<int[]>(), featVocab, new float[Math.min(10000, featVocab.size()) * featVocab.size()]);
+	public void save(String fileName) {
+		try
+		{
+			FileOutputStream fileOut =
+					new FileOutputStream(fileName);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(weights);
+			out.close();
+			fileOut.close();
+			System.out.printf("Serialized preprocessing model is saved in " + fileName);
+		}catch(IOException i)
+		{
+			i.printStackTrace();
+		}
 	}
 
+	public void load(String fileName){
+		try
+		{
+			FileInputStream fileIn = new FileInputStream(fileName);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			weights = (Map<String, Double>) in.readObject();
+			in.close();
+			fileIn.close();
+		}catch(IOException i)
+		{
+			i.printStackTrace();
+			return;
+		}catch(ClassNotFoundException c)
+		{
+			System.out.println("Employee class not found");
+			c.printStackTrace();
+			return;
+		}
+		System.out.println("Successuflly loaded in weights file from " + fileName);
+	}
 }

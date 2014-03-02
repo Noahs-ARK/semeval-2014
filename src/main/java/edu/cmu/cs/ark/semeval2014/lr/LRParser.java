@@ -61,7 +61,7 @@ public class LRParser {
     @Parameter(names="-saveEvery")
     static int saveEvery = 10;  // -1 to disable intermediate model saves
     @Parameter(names="-numIters")
-	static int numIters = 30;
+	static int numIters = 3;// CHANGED TO MAKE IT RUN FASTER
 
 	// label feature flags
 	@Parameter(names = "-useDmLabelFeatures")
@@ -96,6 +96,7 @@ public class LRParser {
 			trainModel();
 		} else if (mode.equals("test")) {
 			model = Model.load(modelFile);
+			preprocessInputSentences();
 			U.pf("Writing predictions to %s\n", sdpFile);
 			double t0, dur;
 			t0 = System.currentTimeMillis();
@@ -103,6 +104,14 @@ public class LRParser {
 			dur = System.currentTimeMillis() - t0;
 			U.pf("\nPRED TIME %.1f sec, %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
 		}
+	}
+	
+	// this loads in the learned weights for the preprocessing models
+	// then predicts the 'predicates' and 'singelton' classes within the
+	// inputSentences that are already stored in p.
+	private static void preprocessInputSentences(){
+		p.loadModels();
+		p.predict();
 	}
 
 	private static Model trainModel() throws IOException {
@@ -140,7 +149,8 @@ public class LRParser {
 		}
 		
 		p.trainModels(labelVocab, graphMatrices);
-		System.exit(1);
+		p.predict();
+		//System.exit(1);
 
 		final Vocabulary perceptVocab = new Vocabulary();
 		perceptVocab.num(BIAS_NAME);

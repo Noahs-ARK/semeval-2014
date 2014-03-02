@@ -4,22 +4,21 @@ import java.util.*;
 
 import util.U;
 import util.Vocabulary;
-import util.misc.Pair;
 
 
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.LRParser;
-import edu.cmu.cs.ark.semeval2014.lr.NumberizedSentence;
+//import edu.cmu.cs.ark.semeval2014.lr.NumberizedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PassThroughFe;
 
 public class Prune {
 	private int numIter = 1;
 	private List<int[]> singletons;
-	private Map<String, Double> singletonWeights;
 	private List<int[]> predicates;
-	private Map<String, Double> predicateWeights;
 	private List<int[]> tops;
+	private PruneModel sModel;
+	private PruneModel pModel;
 	private InputAnnotatedSentence[] inputSentences;
 	private List<FE.FeatureExtractor> allFE = new ArrayList<>();
 	
@@ -29,6 +28,8 @@ public class Prune {
 	private List<FE.LabelFE> labelFeatureExtractors = new ArrayList<>();
 	private final String TRUE = "t";
 	private final String FALSE = "f";
+	private final String singletonFileName = "singeltonModel.ser";
+	private final String predicateFileName = "predicateModel.ser";
 	//private final Vocabulary labelVocab;
 		
 	// featuresByLabel: map from the labels to the features computed from the labels
@@ -85,15 +86,7 @@ public class Prune {
 					}
 				}
 			}
-			
-			// for testing, to print the singleton array, the graph, and the sentence:
-			/*
-			printSentenceAndGraph(inputSentences[0], g);
-			System.out.print("   ");
-			for (int i = 0; i < singles.length; i++){
-				System.out.print(singles[i] + "  ");
-			}
-			*/
+
 			singletons.add(singles);
 			//System.exit(0);
 		}
@@ -132,53 +125,26 @@ public class Prune {
 		labelFeatureExtractors.add(new PassThroughFe());
 	}
 	
-	/*
-	private Pair<Vocabulary, List<int[]>> extractAllLabelFeatures(
-			Vocabulary labelVocab,
-			List<FE.LabelFE> labelFeatureExtractors)
-	{
-		final Vocabulary labelFeatVocab = new Vocabulary();
-		final List<int[]> featsByLabel = new ArrayList<>(labelVocab.size());
-		for (int labelIdx = 0; labelIdx < labelVocab.size(); labelIdx++) {
-			final LRParser.LabelFeatureAdder adder = new LRParser.LabelFeatureAdder(labelFeatVocab);
-			for (FE.LabelFE fe : labelFeatureExtractors) {
-				fe.features(labelVocab.name(labelIdx), adder);
-			}
-			featsByLabel.add(adder.getFeatures());
-		}
-		labelFeatVocab.lock();
-		return Pair.makePair(labelFeatVocab, featsByLabel);
-	}
-	*/
-	
 	// to learn the weight vectors 
 	public void trainModels(Vocabulary lv, List<int[][]> graphMatrices){
 		initialize(graphMatrices, lv);
 		
 		// to learn the weights for the singletons
-		singletonWeights = new HashMap<String, Double>();
-		initializeWeights(singletonWeights);
-		trainingOuterLoopOnline(singletonWeights, singletons);
-		saveModel(singletonWeights, "singletonWeights");
+		sModel = new PruneModel();
+		initializeWeights(sModel);
+		trainingOuterLoopOnline(sModel, singletons);
+		sModel.save(singletonFileName);
+		
+		trainError(sModel.weights, singletons);
 		
 		// to learn the weights for the predicates
-		predicateWeights = new HashMap<String, Double>();
-		initializeWeights(predicateWeights);
-		trainingOuterLoopOnline(predicateWeights, predicates);
-		saveModel(singletonWeights, "singletonWeights");
+		pModel = new PruneModel();
+		initializeWeights(pModel);
+		trainingOuterLoopOnline(pModel, predicates);
+		pModel.save(predicateFileName);
 		
-		//System.out.println("Singleton weights:");
-		//printUniqueWeights(singletonWeights);
-		//System.out.println("Predicate weights:");
-		//printUniqueWeights(predicateWeights);
-
-		//System.out.println("Train error for singletons:");
-		//trainError(singletonWeights, singletons);
-
-		//System.out.println("Train error for predicates:");
-		//trainError(predicateWeights, predicates);
+		trainError(pModel.weights, predicates);
 		
-
 	}
 
 
@@ -220,13 +186,13 @@ public class Prune {
         }
 	}
 	
-	private void initializeWeights(Map<String, Double> weights){
+	private void initializeWeights(PruneModel model){
 		for (int i = 0; i < inputSentences.length; i++){
 			List<Map<String, Set<String>>> feats = ghettoFeats(i);
 			for (int j = 0; j < feats.size(); j++){
 				for (String l : feats.get(j).keySet()){
 					for (String w : feats.get(j).get(l)){
-						weights.put(w, 0.0);						
+						model.weights.put(w, 0.0);						
 						//weights.put(w + "_" + l, 0.0);
 						
 					}
@@ -236,45 +202,45 @@ public class Prune {
 		// to initialize the transitions
 		for (String prev : labelVocab.names()){
 			for (String cur : labelVocab.names()){
-				weights.put(labelVocab.num(prev) + "_" + labelVocab.num(cur), 0.0);
+				model.weights.put(labelVocab.num(prev) + "_" + labelVocab.num(cur), 0.0);
 			}
 		}
 	}
 
 	// the outer training loop. loops over the data numIter times.
-	private void trainingOuterLoopOnline(Map<String, Double> weights, List<int[]> train) {
+	private void trainingOuterLoopOnline(PruneModel singletonModel, List<int[]> train) {
 		for (int i = 0; i < numIter; i++){
-			trainOnlineIter(weights, train);
+			trainOnlineIter(singletonModel, train);
 		}
 	}
 
 	// the inner training loop. Within the dataset, loops over each example.
-	private void trainOnlineIter(Map<String, Double> weights, List<int[]> train ) {
+	private void trainOnlineIter(PruneModel singletonModel, List<int[]> train ) {
         for (int snum=0; snum<inputSentences.length; snum++) {
         	U.pf(".");
         	List<Map<String, Set<String>>> feats = ghettoFeats(snum);
     		int[] sequenceOfLabels = train.get(snum);
-    		ghettoPerceptronUpdate(sequenceOfLabels, feats, weights);
+    		ghettoPerceptronUpdate(sequenceOfLabels, feats, singletonModel);
         }
 	}
 	
-	private void ghettoPerceptronUpdate(int[] sequenceOfLabels, List<Map<String, Set<String>>> feats, Map<String, Double> weights ){
-		runViterbi(feats, weights, sequenceOfLabels);
+	private void ghettoPerceptronUpdate(int[] sequenceOfLabels, List<Map<String, Set<String>>> feats, PruneModel singletonModel ){
+		runViterbi(feats, singletonModel, sequenceOfLabels);
 	}
 	
-	private void runViterbi(List<Map<String, Set<String>>> feats, Map<String, Double> weights, int[] gold ) {
-		Viterbi v = new Viterbi(weights);
+	private void runViterbi(List<Map<String, Set<String>>> feats, PruneModel model, int[] gold ) {
+		Viterbi v = new Viterbi(model.weights);
 		String[] labels = v.decode(feats);
 
 		// downweighting the predicted transition weights
 		for (int i = 1; i < labels.length - 1; i++){
-			weights.put(labels[i] + "_" + labels[i+1], weights.get(labels[i] + "_" + labels[i+1]) -1 );
+			model.weights.put(labels[i] + "_" + labels[i+1], model.weights.get(labels[i] + "_" + labels[i+1]) -1 );
 		}
 		
 		// downweighting the predicted emission weights
 		for (int i = 1; i < feats.size() - 1; i++){
 			for (String f : feats.get(i).get(labels[i])){
-				weights.put(f, weights.get(f) - 1);
+				model.weights.put(f, model.weights.get(f) - 1);
 			}
 		}
 		
@@ -282,14 +248,14 @@ public class Prune {
 		for (int i = 0; i < gold.length-1; i++){
 			String ith = Integer.toString(gold[i]);
 			String ithPlusOne = Integer.toString(gold[i+1]);
-			weights.put(ith + "_" + ithPlusOne, weights.get(ith + "_" + ithPlusOne) +1 );
+			model.weights.put(ith + "_" + ithPlusOne, model.weights.get(ith + "_" + ithPlusOne) +1 );
 		}
 		
 		// upweighting the gold emission weights
 		for (int i = 1; i < feats.size() - 1; i++){
 			String g = Integer.toString(gold[i - 1]);
 			for (String f : feats.get(i).get(g)){
-				weights.put(f, weights.get(f) + 1);
+				model.weights.put(f, model.weights.get(f) + 1);
 			}
 		}
 	}
@@ -341,106 +307,6 @@ public class Prune {
 		}
 	}
 	
-    private void updateExamplePerceptron(NumberizedSentence ns,
-			int[] sequenceOfLabels) {
-    	System.out.println();
-    	System.out.println("printing NumberizedSentence! nnz is " + ns.nnz + " long. Format:");
-    	System.out.println("iIndex, jIndex, perceptnum, values");
-    	int counter = 0;
-    	int maxinnz = 0;
-    	int maxi = 0;
-    	int maxjnnz = 0;
-    	int maxj = 0;
-    	int countNumValueIsOne = 0;
-    	int same = 0;
-		for (int i = 0; i < ns.nnz; i++){
-			/*
-			System.out.print(ns.iIndexes[i] + ", ");
-			System.out.print(ns.jIndexes[i] + ", ");
-			System.out.print(ns.perceptnums[i] + ", ");
-			System.out.print(ns.values[i]);
-			//System.out.print(labelVocab.name(ns.perceptnums[i]));
-			System.out.println();
-			counter ++;
-			if (counter > 20) 
-				break;
-				*/
-			if (ns.values[i] == 1.0){
-				countNumValueIsOne++;
-			}
-			if (ns.iIndexes[i] > maxi){
-				maxi = ns.iIndexes[i];
-				maxinnz = i;
-			}
-			if (ns.jIndexes[i] > maxj){
-				maxj = ns.jIndexes[i];
-				maxjnnz = i;
-			}
-			if (ns.iIndexes[i] == ns.jIndexes[i]){
-				same++;
-			}
-		}
-		System.out.println("maxi: " + maxi);
-		System.out.println("maxinnz: " + maxinnz);
-		System.out.println("maxj: " + maxj);
-		System.out.println("maxjnnz: " + maxjnnz);
-		System.out.println("Number of timse value = 1: " + countNumValueIsOne);
-		System.out.println("Nmuber of times i==j: " + same);
-		
-		System.exit(0);
-	}
-
-
-    /*
-	NumberizedSentence getNextExample(int snum, PruneModel pm) {
-    	//return new NumberizedSentence();
-    	/*
-    	if (useFeatureCache && cacheReadMode) {
-    		return kryo.readObject(kryoInput, NumberizedSentence.class);
-    	} else {
-    	
-    		NumberizedSentence ns = 
-    				extractFeatures(pm, inputSentences[snum]);
-    		return ns;
-    		/*
-    		if (useFeatureCache) { 
-    			kryo.writeObject(kryoOutput, ns);
-    		}
-    		
-    	}
-    	
-    }
-    */
-    
-	/*
-	NumberizedSentence extractFeatures(PruneModel pm, InputAnnotatedSentence is) {
-		//final int biasIdx = model.perceptVocab.num(BIAS_NAME);
-		
-		NumberizedSentence ns = new NumberizedSentence( is.size() );
-		
-		TokenFeatAdder tokenAdder = new TokenFeatAdder(pm.perceptVocab);
-		tokenAdder.ns=ns;
-		
-		// only for verbose feature extraction reporting
-		tokenAdder.is =is;
-		
-		for (FE.FeatureExtractor fe : allFE) {
-			fe.setupSentence(is);
-		}
-		
-		for (tokenAdder.i=0; tokenAdder.i<ns.T; tokenAdder.i++) {
-			
-			//tokenAdder.i = edgeAdder.i;
-			for (FE.FeatureExtractor fe : allFE) {
-				if (fe instanceof FE.TokenFE) {
-					((FE.TokenFE) fe).features(tokenAdder.i, tokenAdder);
-				}
-			}
-		}
-		return ns;
-	}
-	*/
-	
 	private void printSentenceAndGraph(InputAnnotatedSentence inputSentences, int[][] g){
 		for (int i = 0; i < inputSentences.sentence().length; i++){
 			System.out.print(i + ":" + inputSentences.sentence()[i] + " ");
@@ -470,11 +336,47 @@ public class Prune {
 		}
 		System.out.println();
 	}
-	
-	
-	private void saveModel(Map<String, Double> singletonWeights2, String string) {
-		String saveLoc = "./";
+
+	public void loadModels() {
+		sModel = new PruneModel();
+		sModel.load(singletonFileName);
 		
-		
+		pModel = new PruneModel();
+		pModel.load(predicateFileName);
 	}
+	
+	public void predict(){
+		predictForInputSentences(sModel, pModel);
+	}
+
+	private void predictForInputSentences(PruneModel singletonModel, PruneModel predicateModel) {
+		for (int i = 0; i < inputSentences.length; i++){
+			int[] singles = predict(singletonModel, i);
+			int[] preds = predict(predicateModel, i);
+			addInPredicted(singles, inputSentences[i].singletons());
+			addInPredicted(preds, inputSentences[i].predicates());
+		}
+	}
+
+	private void addInPredicted(int[] predicted, Integer[] stored) {
+		for (int i = 0; i < predicted.length; i++){
+			stored[i] = predicted[i];
+		}
+	}
+
+	private int[] predict(PruneModel model,
+			int snum) {
+        	List<Map<String, Set<String>>> feats = ghettoFeats(snum);
+        	// run viterbi
+    		Viterbi v = new Viterbi(model.weights);
+    		String[] labelsAsStrings = v.decode(feats);
+    		int[] predLabels = new int[labelsAsStrings.length-1];
+    		for (int i = 1; i < labelsAsStrings.length; i++){
+    			predLabels[i-1] = Integer.parseInt(labelsAsStrings[i]);
+    		}
+    		return predLabels;
+	}
+	
+	
+
 }
