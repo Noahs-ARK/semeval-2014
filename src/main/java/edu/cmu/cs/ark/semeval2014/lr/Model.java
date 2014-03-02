@@ -12,8 +12,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.cmu.cs.ark.semeval2014.lr.MiscUtil.unbox;
-
 public class Model {
 	private static final String LABEL_VOCAB_HEADER = "LABELVOCAB";
 	private static final String LABEL_FEATURE_VOCAB_HEADER = "LABEL_FEATURE_VOCAB";
@@ -21,11 +19,11 @@ public class Model {
 	private static final String COEFFICIENTS_HEADER = "C";
 	private static final double MINIMUM_WEIGHT_THRESHOLD = 1e-7;
 
-	final Vocabulary labelVocab;
+	public final Vocabulary labelVocab;
 	final Vocabulary labelFeatureVocab;
 	final List<int[]> featuresByLabel;
 	final Vocabulary perceptVocab;
-	float[] coefs; // flattened form. DO NOT USE coefs.length IT IS CAPACITY NOT FEATURE CARDINALITY
+	float[] coefs; // flattened form: #percepts * #labelFeatures
 
 	public Model(
 			Vocabulary labelVocab,
@@ -50,13 +48,13 @@ public class Model {
 				labelFeatureVocab,
 				featuresByLabel,
 				perceptVocab,
-				new float[Math.min(10000, perceptVocab.size()) * perceptVocab.size()]);
+				null);
 	}
 
 	/** returns:  (#tokens x #tokens x #labelvocab)
 	 * for token i and token j, prob dist over the possible edge labels.
 	 */
-	double[][][] inferEdgeProbs(NumberizedSentence ns) {
+	public double[][][] inferEdgeProbs(NumberizedSentence ns) {
 		double[][][] scores = inferEdgeScores(ns);
 		// transform in-place into probs
 		for (int i=0; i<ns.T; i++) {
@@ -118,9 +116,11 @@ public class Model {
 						break;
 					case FEATURES_BY_LABEL_HEADER:
 						final String[] featureStrs = parts[1].trim().split(" ");
-						final List<Integer> features = new ArrayList<>(featureStrs.length);
-						for (String x : featureStrs) features.add(Integer.parseInt(x));
-						featuresByLabel.add(unbox(features));
+						final int[] features = new int[featureStrs.length];
+						for (int i = 0; i < featureStrs.length; i++) {
+							features[i] = Integer.parseInt(featureStrs[i]);
+						}
+						featuresByLabel.add(features);
 						break;
 					case COEFFICIENTS_HEADER:
 						int perceptIdx = perceptVocab.num(parts[1]);
