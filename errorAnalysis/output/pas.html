@@ -1,0 +1,344 @@
+<html><style>td
+{
+padding:3px;
+} tr:nth-child(even) {
+    background-color: #EEEEEE;
+    }</style>
+<h1>feb7_recsplit.pas.pred confusion matrix</h1><hr />
+<h3>Tops</h3>
+Gold n = 1614; predicted n = 18029
+
+<table>
+<tr><td>P</td><td>R</td><td>F</td></tr>
+<tr><td>0.017</td><td>0.191</td><td>0.031</td></tr>
+</table>
+
+<hr />
+<h3>Labels</h3>
+Gold = rows, Predicted = columns. Sorted by count of the number of gold tags in the test data (the most important quadrant is the upper left).  Calculated from the correct vs. predicted label for each pair of tokens in the sentence. High values for ['_', LABEL] and [LABEL, '_'] probably implies that we're getting the label right but the head wrong.
+
+<p /><table>
+<tr><td bgcolor="#FA58AC" width=30px></td><td>BAD +50% of correct label misattributed to this one predicted category</td></tr>
+<tr><td bgcolor="#FFFF00" width=30px></td><td>BAD +30%</td></tr>
+<tr><td bgcolor="#01DF01" width=30px></td><td>BAD +10%</td></tr>
+<tr><td bgcolor="#A9BCF5" width=30px></td><td>GOOD +80% right!</td></tr>
+</table>
+<body><p /><table border=1>
+<tr><td><em>cumulative%</em></td><td><em>count</em><td>P</td><td>R</td><td>F</td></td><td></td><td>_</td><td>adj_ARG1</td><td>noun_ARG1</td><td>prep_ARG2</td><td>prep_ARG1</td><td>verb_ARG2</td><td>det_ARG1</td><td>verb_ARG1</td><td>punct_ARG1</td><td>aux_ARG2</td><td>aux_ARG1</td><td>coord_ARG1</td><td>coord_ARG2</td><td>comp_ARG1</td><td>conj_ARG1</td><td>poss_ARG2</td><td>poss_ARG1</td><td>conj_ARG2</td><td>verb_ARG3</td><td>app_ARG1</td><td>app_ARG2</td><td>relative_ARG1</td><td>comp_MOD</td><td>lgs_ARG2</td><td>verb_MOD</td><td>lparen_ARG2</td><td>lparen_ARG3</td><td>adj_ARG2</td><td>lparen_ARG1</td><td>noun_ARG2</td><td>it_ARG1</td><td>dtv_ARG2</td><td>prep_ARG3</td><td>comp_ARG2</td><td>aux_MOD</td><td>verb_ARG4</td><td>conj_ARG3</td><td>quote_ARG2</td><td>relative_ARG2</td><td>quote_ARG3</td></tr>
+<tr>
+<td></td><td></td><td></td><td></td><td></td>
+<td>_</td>
+<td bgcolor="">885479</td> <td bgcolor="">599</td> <td bgcolor="">333</td> <td bgcolor="">565</td> <td bgcolor="">1036</td> <td bgcolor="">573</td> <td bgcolor="">186</td> <td bgcolor="">527</td> <td bgcolor="">683</td> <td bgcolor="">72</td> <td bgcolor="">137</td> <td bgcolor="">389</td> <td bgcolor="">256</td> <td bgcolor="">53</td> <td bgcolor="">97</td> <td bgcolor="">7</td> <td bgcolor="">30</td> <td bgcolor="">54</td> <td bgcolor="">53</td> <td bgcolor="">61</td> <td bgcolor="">69</td> <td bgcolor="">68</td> <td bgcolor="">54</td> <td bgcolor="">23</td> <td bgcolor="">7</td> <td bgcolor="">12</td> <td bgcolor="">2</td> <td bgcolor="">6</td> <td bgcolor="">20</td> <td bgcolor="">3</td> <td bgcolor="">5</td> <td bgcolor=""></td> <td bgcolor="">3</td> <td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor="">1</td> <td bgcolor="">2</td> <td bgcolor="">2</td> <td>_</td></tr>
+<tr>
+<td>0.136</td>
+<td>4624</td>
+<td>0.866</td>
+<td>0.880</td>
+<td>0.873</td>
+<td>adj_ARG1</td>
+<td bgcolor="">495</td> <td bgcolor="#A9BCF5">4068</td> <td bgcolor="">3</td> <td bgcolor="">13</td> <td bgcolor="">16</td> <td bgcolor="">10</td> <td bgcolor="">5</td> <td bgcolor="">6</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">4</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>adj_ARG1</td></tr>
+<tr>
+<td>0.242</td>
+<td>3607</td>
+<td>0.907</td>
+<td>0.927</td>
+<td>0.917</td>
+<td>noun_ARG1</td>
+<td bgcolor="">257</td> <td bgcolor="">6</td> <td bgcolor="#A9BCF5">3343</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>noun_ARG1</td></tr>
+<tr>
+<td>0.345</td>
+<td>3500</td>
+<td>0.841</td>
+<td>0.924</td>
+<td>0.881</td>
+<td>prep_ARG2</td>
+<td bgcolor="">199</td> <td bgcolor="">9</td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">3235</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor="">9</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">5</td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">39</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>prep_ARG2</td></tr>
+<tr>
+<td>0.447</td>
+<td>3438</td>
+<td>0.724</td>
+<td>0.816</td>
+<td>0.767</td>
+<td>prep_ARG1</td>
+<td bgcolor="">621</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">3</td> <td bgcolor="#A9BCF5">2804</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">3</td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor="">4</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>prep_ARG1</td></tr>
+<tr>
+<td>0.543</td>
+<td>3262</td>
+<td>0.786</td>
+<td>0.788</td>
+<td>0.787</td>
+<td>verb_ARG2</td>
+<td bgcolor="">597</td> <td bgcolor="">5</td> <td bgcolor="">5</td> <td bgcolor="">3</td> <td bgcolor="">1</td> <td bgcolor="">2572</td> <td bgcolor=""></td> <td bgcolor="">49</td> <td bgcolor=""></td> <td bgcolor="">19</td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor="">9</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>verb_ARG2</td></tr>
+<tr>
+<td>0.636</td>
+<td>3174</td>
+<td>0.942</td>
+<td>0.974</td>
+<td>0.958</td>
+<td>det_ARG1</td>
+<td bgcolor="">81</td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">3092</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>det_ARG1</td></tr>
+<tr>
+<td>0.728</td>
+<td>3101</td>
+<td>0.805</td>
+<td>0.809</td>
+<td>0.807</td>
+<td>verb_ARG1</td>
+<td bgcolor="">519</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor="">54</td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">2508</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">16</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">3</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>verb_ARG1</td></tr>
+<tr>
+<td>0.782</td>
+<td>1862</td>
+<td>0.620</td>
+<td>0.651</td>
+<td>0.635</td>
+<td>punct_ARG1</td>
+<td bgcolor="#FFFF00">581</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1213</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">16</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor="">47</td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td>punct_ARG1</td></tr>
+<tr>
+<td>0.813</td>
+<td>1052</td>
+<td>0.918</td>
+<td>0.969</td>
+<td>0.943</td>
+<td>aux_ARG2</td>
+<td bgcolor="">15</td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">15</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">1019</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>aux_ARG2</td></tr>
+<tr>
+<td>0.844</td>
+<td>1047</td>
+<td>0.849</td>
+<td>0.827</td>
+<td>0.838</td>
+<td>aux_ARG1</td>
+<td bgcolor="">156</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">25</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">866</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>aux_ARG1</td></tr>
+<tr>
+<td>0.869</td>
+<td>847</td>
+<td>0.569</td>
+<td>0.660</td>
+<td>0.611</td>
+<td>coord_ARG1</td>
+<td bgcolor="#01DF01">237</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">25</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">559</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">24</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>coord_ARG1</td></tr>
+<tr>
+<td>0.894</td>
+<td>847</td>
+<td>0.710</td>
+<td>0.802</td>
+<td>0.753</td>
+<td>coord_ARG2</td>
+<td bgcolor="">141</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">8</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">679</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">3</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">14</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>coord_ARG2</td></tr>
+<tr>
+<td>0.913</td>
+<td>650</td>
+<td>0.903</td>
+<td>0.905</td>
+<td>0.904</td>
+<td>comp_ARG1</td>
+<td bgcolor="">54</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">5</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">588</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">3</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>comp_ARG1</td></tr>
+<tr>
+<td>0.926</td>
+<td>427</td>
+<td>0.649</td>
+<td>0.459</td>
+<td>0.538</td>
+<td>conj_ARG1</td>
+<td bgcolor="#FFFF00">197</td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">11</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">6</td> <td bgcolor="">14</td> <td bgcolor=""></td> <td bgcolor="">196</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>conj_ARG1</td></tr>
+<tr>
+<td>0.935</td>
+<td>313</td>
+<td>0.978</td>
+<td>0.997</td>
+<td>0.987</td>
+<td>poss_ARG2</td>
+<td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">312</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>poss_ARG2</td></tr>
+<tr>
+<td>0.944</td>
+<td>311</td>
+<td>0.906</td>
+<td>0.961</td>
+<td>0.933</td>
+<td>poss_ARG1</td>
+<td bgcolor="">12</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">299</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>poss_ARG1</td></tr>
+<tr>
+<td>0.952</td>
+<td>270</td>
+<td>0.763</td>
+<td>0.848</td>
+<td>0.804</td>
+<td>conj_ARG2</td>
+<td bgcolor="">36</td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">229</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>conj_ARG2</td></tr>
+<tr>
+<td>0.960</td>
+<td>265</td>
+<td>0.600</td>
+<td>0.408</td>
+<td>0.485</td>
+<td>verb_ARG3</td>
+<td bgcolor="#FFFF00">111</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">46</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">108</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>verb_ARG3</td></tr>
+<tr>
+<td>0.968</td>
+<td>260</td>
+<td>0.575</td>
+<td>0.692</td>
+<td>0.628</td>
+<td>app_ARG1</td>
+<td bgcolor="">46</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">24</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">9</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">180</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>app_ARG1</td></tr>
+<tr>
+<td>0.975</td>
+<td>260</td>
+<td>0.710</td>
+<td>0.812</td>
+<td>0.758</td>
+<td>app_ARG2</td>
+<td bgcolor="">42</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">5</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">211</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>app_ARG2</td></tr>
+<tr>
+<td>0.981</td>
+<td>211</td>
+<td>0.719</td>
+<td>0.825</td>
+<td>0.768</td>
+<td>relative_ARG1</td>
+<td bgcolor="">37</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">174</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>relative_ARG1</td></tr>
+<tr>
+<td>0.986</td>
+<td>144</td>
+<td>0.636</td>
+<td>0.681</td>
+<td>0.658</td>
+<td>comp_MOD</td>
+<td bgcolor="#FFFF00">44</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">98</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>comp_MOD</td></tr>
+<tr>
+<td>0.989</td>
+<td>101</td>
+<td>0.575</td>
+<td>0.832</td>
+<td>0.680</td>
+<td>lgs_ARG2</td>
+<td bgcolor="">10</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">7</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">84</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>lgs_ARG2</td></tr>
+<tr>
+<td>0.990</td>
+<td>62</td>
+<td>0.667</td>
+<td>0.226</td>
+<td>0.337</td>
+<td>verb_MOD</td>
+<td bgcolor="#FA58AC">48</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">14</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>verb_MOD</td></tr>
+<tr>
+<td>0.992</td>
+<td>54</td>
+<td>0.735</td>
+<td>0.667</td>
+<td>0.699</td>
+<td>lparen_ARG2</td>
+<td bgcolor="#01DF01">16</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">36</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>lparen_ARG2</td></tr>
+<tr>
+<td>0.994</td>
+<td>54</td>
+<td>0.943</td>
+<td>0.926</td>
+<td>0.935</td>
+<td>lparen_ARG3</td>
+<td bgcolor="">4</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">50</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>lparen_ARG3</td></tr>
+<tr>
+<td>0.995</td>
+<td>54</td>
+<td>0.744</td>
+<td>0.537</td>
+<td>0.624</td>
+<td>adj_ARG2</td>
+<td bgcolor="#01DF01">14</td> <td bgcolor="">6</td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">4</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">29</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>adj_ARG2</td></tr>
+<tr>
+<td>0.997</td>
+<td>54</td>
+<td>0.580</td>
+<td>0.537</td>
+<td>0.558</td>
+<td>lparen_ARG1</td>
+<td bgcolor="#FFFF00">21</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">29</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>lparen_ARG1</td></tr>
+<tr>
+<td>0.998</td>
+<td>32</td>
+<td>0.769</td>
+<td>0.312</td>
+<td>0.444</td>
+<td>noun_ARG2</td>
+<td bgcolor="#FA58AC">22</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">10</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>noun_ARG2</td></tr>
+<tr>
+<td>0.998</td>
+<td>21</td>
+<td>0.444</td>
+<td>0.190</td>
+<td>0.267</td>
+<td>it_ARG1</td>
+<td bgcolor="#FA58AC">17</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">4</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>it_ARG1</td></tr>
+<tr>
+<td>0.999</td>
+<td>13</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>dtv_ARG2</td>
+<td bgcolor="">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#FA58AC">11</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>dtv_ARG2</td></tr>
+<tr>
+<td>0.999</td>
+<td>12</td>
+<td>0.500</td>
+<td>0.250</td>
+<td>0.333</td>
+<td>prep_ARG3</td>
+<td bgcolor="#FA58AC">9</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">3</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>prep_ARG3</td></tr>
+<tr>
+<td>0.999</td>
+<td>9</td>
+<td>0.600</td>
+<td>0.333</td>
+<td>0.429</td>
+<td>comp_ARG2</td>
+<td bgcolor="#FFFF00">4</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="">3</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#01DF01">2</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>comp_ARG2</td></tr>
+<tr>
+<td>1.000</td>
+<td>6</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>aux_MOD</td>
+<td bgcolor="#FA58AC">6</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>aux_MOD</td></tr>
+<tr>
+<td>1.000</td>
+<td>4</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>verb_ARG4</td>
+<td bgcolor="#FA58AC">4</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>verb_ARG4</td></tr>
+<tr>
+<td>1.000</td>
+<td>4</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>conj_ARG3</td>
+<td bgcolor="#FA58AC">4</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>conj_ARG3</td></tr>
+<tr>
+<td>1.000</td>
+<td>3</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>quote_ARG2</td>
+<td bgcolor="#FA58AC">3</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>quote_ARG2</td></tr>
+<tr>
+<td>1.000</td>
+<td>2</td>
+<td>0.500</td>
+<td>1.000</td>
+<td>0.667</td>
+<td>relative_ARG2</td>
+<td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#A9BCF5">2</td> <td bgcolor=""></td> <td>relative_ARG2</td></tr>
+<tr>
+<td>1.000</td>
+<td>2</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>quote_ARG3</td>
+<td bgcolor="#FFFF00">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor="#FFFF00">1</td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td bgcolor=""></td> <td>quote_ARG3</td></tr>
+<table></body></html>
