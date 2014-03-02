@@ -81,6 +81,8 @@ public class LRParser {
 	static String sdpFile;
     @Parameter(names="-depInput", required=true)
 	static String depFile;
+    
+    static Prune p;
 
 	public static void main(String[] args) throws IOException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
@@ -96,6 +98,9 @@ public class LRParser {
 			assert (fe instanceof FE.TokenFE) || (fe instanceof FE.EdgeFE) : "all feature extractors need to implement one of the interfaces!";
 			fe.initializeAtStartup();
 		}
+		p = new Prune(inputSentences);
+		
+
 		
 		if (mode.equals("train")) {
 			trainModel();
@@ -115,9 +120,6 @@ public class LRParser {
 		double dur;
 		U.pf("Reading graphs from %s\n", sdpFile);
 		final List<Graph> graphs = readGraphs(sdpFile);
-		
-		PruneModel pm = new PruneModel(graphs, inputSentences);
-		pm.trainModel();
 
 		// build up the edge label vocabulary
 		Vocabulary labelVocab = new Vocabulary();
@@ -146,6 +148,10 @@ public class LRParser {
 			assert sent.sentenceId().equals(graph.id.replace("#",""));
 			graphMatrices.add(convertGraphToAdjacencyMatrix(graph, sent.size(), labelVocab));
 		}
+		
+		p.trainModels(labelVocab, graphMatrices);
+		System.exit(0);
+
 
 		final Vocabulary perceptVocab = new Vocabulary();
 		perceptVocab.num(BIAS_NAME);
@@ -207,13 +213,13 @@ public class LRParser {
 	
 	static long totalPairs = 0;  // only for diagnosis
 	
-	static class TokenFeatAdder extends FE.FeatureAdder {
-		int i=-1;
-		NumberizedSentence ns;
-		InputAnnotatedSentence is; // only for debugging
-		final Vocabulary perceptVocab;
+	public static class TokenFeatAdder extends FE.FeatureAdder {
+		public int i=-1;
+		public NumberizedSentence ns;
+		public InputAnnotatedSentence is; // only for debugging
+		public final Vocabulary perceptVocab;
 
-		TokenFeatAdder(Vocabulary perceptVocab) {
+		public TokenFeatAdder(Vocabulary perceptVocab) {
 			this.perceptVocab = perceptVocab;
 		}
 
@@ -277,7 +283,7 @@ public class LRParser {
 		}
 	}
 
-	static class LabelFeatureAdder extends FE.FeatureAdder {
+	public static class LabelFeatureAdder extends FE.FeatureAdder {
 		private final Vocabulary labelFeatureVocab;
 		private final Set<Integer> features = new HashSet<>();
 
@@ -467,6 +473,7 @@ public class LRParser {
 	static void makePredictions(Model model, String outputFile) {
 		try(PrintWriter out = new PrintWriter(BasicFileIO.openFileToWriteUTF8(outputFile))) {
 			for (InputAnnotatedSentence sent : inputSentences) {
+				//int[] singletons = p.predictSingletons(sent);
 				NumberizedSentence ns = extractFeatures(model, sent, null);
 				double[][][] probs = model.inferEdgeProbs(ns);
 				MyGraph g = MyGraph.decodeEdgeProbsToGraph(sent, probs, model.labelVocab);
