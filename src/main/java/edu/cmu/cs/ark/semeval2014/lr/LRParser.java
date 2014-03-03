@@ -2,6 +2,7 @@ package edu.cmu.cs.ark.semeval2014.lr;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.internal.Lists;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -9,6 +10,7 @@ import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.*;
 import edu.cmu.cs.ark.semeval2014.topness.DetermTopness;
+import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
 import edu.cmu.cs.ark.semeval2014.topness.TopnessScorer;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 import sdp.graph.Edge;
@@ -40,7 +42,8 @@ public class LRParser {
 	static Model model;
 	static float[] ssGrad;  // adagrad history info. parallel to coefs[].
 	
-	static TopnessScorer topnessScorer = new DetermTopness();
+//	static TopnessScorer topnessScorer = new DetermTopness();
+	static TopClassifier topnessScorer = new TopClassifier();
 
 	@Parameter(names="-learningRate")
 	static double learningRate = .1;
@@ -89,8 +92,11 @@ public class LRParser {
 		U.pf("%d input sentences\n", inputSentences.length);
 
 		if (mode.equals("train")) {
+			topnessScorer.train(depFile, modelFile + ".topmodel");
 			trainModel();
-		} else if (mode.equals("test")) {
+		}
+		else if (mode.equals("test")) {
+			topnessScorer.loadModel(modelFile + ".topmodel");
 			model = Model.load(modelFile);
 			U.pf("Writing predictions to %s\n", sdpFile);
 			double t0, dur;

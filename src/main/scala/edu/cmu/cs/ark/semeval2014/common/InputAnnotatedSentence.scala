@@ -14,6 +14,7 @@ import scala.collection.mutable.Map
 case class InputAnnotatedSentence(sentenceId: String,
                                   sentence: Array[String],
                                   syntacticDependencies: Array[SyntacticDependency],
+                                  isTop: Array[Boolean],
                                   pos: Array[String]) {
   def size = sentence.length
 }
@@ -40,6 +41,7 @@ object InputAnnotatedSentence {
         val annotations = InputAnnotatedSentence(
                             if (allLines.size > 0 && allLines(0).matches("#.*")) { allLines(0).split("\t")(0).tail } else { "" },
                             new Array(lines.size),
+                            new Array(lines.size),
                             if (lines.size > 0 && lines(0).matches("""^DEPS\t.*|.*\t###\tDEPS\t.*""")) { new Array(lines.size) } else { new Array(0) },
                             new Array(lines.size))
         for ((line, i) <- lines.zipWithIndex) {
@@ -47,6 +49,7 @@ object InputAnnotatedSentence {
             val field = splitLine(line)
             annotations.sentence(i) = field("SDP")(1)
             annotations.pos(i) = field("SDP")(3)
+            annotations.isTop(i) = field("SDP")(4)=="+"
             if (field.contains("DEPS")) {
                 annotations.syntacticDependencies(i) = SyntacticDependency.fromSemEval8(field("DEPS").mkString("\t"))
             }
