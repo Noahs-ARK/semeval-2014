@@ -2,6 +2,7 @@ package edu.cmu.cs.ark.semeval2014.lr.fe;
 
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
 import util.U;
+import java.lang.Math;
 
 public class LinearOrderFeatures extends FE.FeatureExtractor implements FE.EdgeFE {
 
@@ -14,5 +15,6 @@ public class LinearOrderFeatures extends FE.FeatureExtractor implements FE.EdgeF
 		int dist = srcTokenIdx - destTokenIdx;
 		fa.add(U.sf("lin:%s", dist));
 		fa.add(U.sf("left:%s", (srcTokenIdx < destTokenIdx)));
+        fa.add(U.sf("logD:%s", Math.signum(dist)*Math.floor(Math.log(Math.abs(dist)+1)/Math.log(1.39))));
 	}
 }

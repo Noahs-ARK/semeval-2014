@@ -499,6 +499,7 @@ public class LRParser {
 		final List<FE.FeatureExtractor> allFE = new ArrayList<>();
 		allFE.add(new BasicFeatures());
 		allFE.add(new LinearOrderFeatures());
+		allFE.add(new DistanceIntervals());
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
 		return allFE;
