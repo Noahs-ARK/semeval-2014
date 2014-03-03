@@ -10,6 +10,7 @@ timestamp=$(date '+%Y-%m-%dT%H:%M:%S%z')
 gitid=$(git log -1 --format="%ci_%ce_%h" | perl -pe 's/ /T/; s/ //; s/ /_/g')
 reports_dir="target/reports_run=${timestamp}_commit=${gitid}"
 mkdir -p "${reports_dir}"
+(cd $(dirname $reports_dir) && ln -sf $(basename $reports_dir) reports)
 echo "REPORTS DIR: ${reports_dir}"
 
 archive_dir=/cab0/brendano/www/semeval/reports
