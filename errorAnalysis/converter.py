@@ -10,27 +10,8 @@ python ../converter.py < feb7_recsplit.dm.pred > pred.dm.beast
 
 """
 
-# annotation iterator from brendan's view.py
-def iter_sents():
-	cur = []
-	sentid = None
-	for line in sys.stdin:
-		line=line.strip()
-		if not line:
-			yield sentid,cur
-			sentid=None
-			cur=[]
-		if len(line.split())==1 and line.startswith("#"):
-			sentid = line.lstrip("#")
-			cur=[]
-			continue
-		row = line.split('\t')
-		cur.append(row)
-	if cur:
-		yield sentid,cur
 
-
-for numsent, (sentid,rows) in enumerate(iter_sents()):
+for numsent, (sentid,rows) in enumerate(sdputils.iter_sents()):
 	T = len(rows)
 	K = len(rows[0])
 	if K < 5: continue

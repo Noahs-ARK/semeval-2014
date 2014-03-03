@@ -1,3 +1,4 @@
+import sdputils
 import sys,operator,os
 import numpy as np
 from collections import Counter
@@ -9,30 +10,8 @@ python confusionMatrix.py gold/sec20.pcedt.sdp pred/feb7_recsplit.pcedt.pred > o
 
 '''
 
-# annotation iterator from brendan's view.py
-def iter_sents(filename):
-	file=open(filename)
-	cur = []
-	sentid = None
-	for line in file:
-		line=line.strip()
-		if not line:
-			yield sentid,cur
-			sentid=None
-			cur=[]
-		if len(line.split())==1 and line.startswith("#"):
-			sentid = line.lstrip("#")
-			cur=[]
-			continue
-		row = line.split('\t')
-		cur.append(row)
-	if cur:
-		yield sentid,cur
-
-	file.close()
-
-gold=enumerate(iter_sents(sys.argv[1]))
-pred=enumerate(iter_sents(sys.argv[2]))
+gold=enumerate(sdputils.iter_sents(sys.argv[1]))
+pred=enumerate(sdputils.iter_sents(sys.argv[2]))
 
 zipped=zip(gold,pred)
 
