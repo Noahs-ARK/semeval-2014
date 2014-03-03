@@ -8,12 +8,13 @@ mkdir -p "${model_dir}"
 model_file="${model_dir}/${model_name}"
 
 formalism="pas"
-train_file="lildata/liltrain.${formalism}.sdp"
-train_deps="lildata/liltrain.${formalism}.sdp.dependencies"
+data_dir="lildata/lil"
+train_file="${data_dir}train.${formalism}.sdp"
+train_deps="${train_file}.dependencies"
 
 # sec20 files are from: /cab1/corpora/LDC2013E167/splits
 test_file="data/splits/sec20.${formalism}.sdp"
-test_deps="data/splits/sec20.${formalism}.sdp.dependencies"
+test_deps="${test_file}.dependencies"
 
 pred_file="${model_file}.pred.${formalism}.sdp"
 
