@@ -1,18 +1,8 @@
 package edu.cmu.cs.ark.semeval2014.lr.fe;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import util.U;
-import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
-import edu.cmu.cs.ark.semeval2014.common.SyntacticDependency;
+import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
+import util.U;
 
 public class CoarseDependencyFeatures extends FE.FeatureExtractor implements FE.TokenFE,
 		FE.EdgeFE {
@@ -24,13 +14,13 @@ public class CoarseDependencyFeatures extends FE.FeatureExtractor implements FE.
 
 	public int treeDistance(int src, int dest) {
 		int distance=0;
-		int currentHead=sent.syntacticDependencies()[src].head();
+		int currentHead=sent.syntacticDependencies().deps()[src].head();
 		while(currentHead >= 0) {
 			distance++;
 			if (currentHead == dest) {
 				return distance;
 			}
-			currentHead=sent.syntacticDependencies()[currentHead].head();
+			currentHead=sent.syntacticDependencies().deps()[currentHead].head();
 		}
 		return -1;
 	}
