@@ -11,18 +11,11 @@ object DependencyPathv1 {
 }
 
 class DependencyPathv1 extends FE.FeatureExtractor with FE.EdgeFE {
-//    private var rootDependencyPaths: Map[Int, Option[List[Int]]] = _
-//    private var heads: Map[Int, Int] = _
-//    private var relations: Map[(Int, Int), String] = _
     private var deps: DependencyParse = _
 
     override def setupSentence(s: InputAnnotatedSentence) {
         sent = s
         deps = s.syntacticDependencies
-//        heads = sent.syntacticDependencies.heads
-//        relations = sent.syntacticDependencies.relations // Map() ++ sent.syntacticDependencies.deps.map(dep => (dep.head, dep.dependent) -> dep.relation)
-//        rootDependencyPaths = sent.syntacticDependencies.rootDependencyPaths
-//      sent.syntacticDependencies.deps.indices.map(rootDependencyPath(_))
     }
 
   override def features(word1Index: Int, word2Index: Int, fa: FeatureAdder) {
