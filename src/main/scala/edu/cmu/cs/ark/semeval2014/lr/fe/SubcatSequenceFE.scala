@@ -22,7 +22,7 @@ class SubcatSequenceFE extends FE.FeatureExtractor with FE.EdgeFE {
 
   def getSubcatSequences(s: InputAnnotatedSentence): Map[Int, (Seq[SyntacticDependency], Seq[SyntacticDependency])] = {
     // throw out useless deps, truncate, and group by head
-    val depsByHead = s.syntacticDependencies.toSeq.
+    val depsByHead = s.syntacticDependencies.deps.toSeq.
       filter(d => !IGNORED_DEP_LABELS.contains(d.relation)).
       groupBy(_.head)
     // split left deps from right deps

@@ -1,12 +1,12 @@
 package edu.cmu.cs.ark.semeval2014.topness;
 
-import java.io.IOException;
-
-import util.U;
-
-import mltools.classifier.BinaryLogreg;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
+import mltools.classifier.BinaryLogreg;
+import scala.Option;
+import util.U;
+
+import java.io.IOException;
 
 public class TopClassifier implements TopnessScorer {
 	BinaryLogreg<TokenCtx> logreg;
@@ -20,23 +20,25 @@ public class TopClassifier implements TopnessScorer {
 	}
 	
 	public TopClassifier() {
-		logreg = new BinaryLogreg<TokenCtx>();
+		logreg = new BinaryLogreg<>();
 		logreg.featureExtractors.add(new TopFeats());
 	}
 	
 	static class TopFeats extends mltools.classifier.FeatureExtractor<TokenCtx> {
 		@Override
 		public void computeFeatures(TokenCtx ex, mltools.classifier.FeatureExtractor.FeatureAdder fa) {
-			String pos = ex.sent.pos()[ ex.t ];
+			final int tokenIdx = ex.t;
+			String pos = ex.sent.pos()[tokenIdx];
 			fa.add("pos=" + pos);
 //			fa.add("pos=" + pos + "&lcword=" + ex.sent.sentence()[ex.t].toLowerCase(), 0.2);
-			fa.add("t=" + ex.t);
-			fa.add("pos=" + pos + "&t=" + ex.t);
+			fa.add("t=" + tokenIdx);
+			fa.add("pos=" + pos + "&t=" + tokenIdx);
+			final Option<Object> oDepth = ex.sent.syntacticDependencies().depths().apply(tokenIdx);
+			fa.add("depth=" + (oDepth.isDefined() ? oDepth.get() : "NULL"));
 			
 //			int q5 = (int) Math.floor(ex.t*1.0 / ex.sent.size() * 5);
 //			fa.add("q5=" + ex.t);
 //			fa.add("pos_and_q5=" + pos + "&" + q5);
-			
 		}
 	}
 	
