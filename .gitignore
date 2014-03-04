@@ -13,3 +13,6 @@ experiments
 .Rhistory
 .DS_Store
 .cache
+
+# Python cruft
+*.pyc

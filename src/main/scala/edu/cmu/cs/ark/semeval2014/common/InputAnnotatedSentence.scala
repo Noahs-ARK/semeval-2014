@@ -1,6 +1,7 @@
 package edu.cmu.cs.ark.semeval2014.common
 
 import scala.collection.mutable.Map
+import edu.cmu.cs.ark.semeval2014.nlp.DependencyParse
 
 // In Java, the important members of this class are:
 // public class InputAnnotatedSentence {
@@ -13,10 +14,11 @@ import scala.collection.mutable.Map
 
 case class InputAnnotatedSentence(sentenceId: String,
                                   sentence: Array[String],
-                                  syntacticDependencies: Array[SyntacticDependency],
+                                  syntacticDependencies: DependencyParse,
                                   pos: Array[String],
                                   predicates: Array[Integer],
-                                  singletons: Array[Integer]) {
+                                  singletons: Array[Integer],
+                                  isTop: Array[Boolean]) {
   def size = sentence.length
 }
 
@@ -42,20 +44,18 @@ object InputAnnotatedSentence {
         val annotations = InputAnnotatedSentence(
                             if (allLines.size > 0 && allLines(0).matches("#.*")) { allLines(0).split("\t")(0).tail } else { "" },
                             new Array(lines.size),
+                            DependencyParse(new Array(lines.size)),
                             if (lines.size > 0 && lines(0).matches("""^DEPS\t.*|.*\t###\tDEPS\t.*""")) { new Array(lines.size) } else { new Array(0) },
                             new Array(lines.size),
                             new Array(lines.size),
                             new Array(lines.size))
         for ((line, i) <- lines.zipWithIndex) {
-            try {
             val field = splitLine(line)
             annotations.sentence(i) = field("SDP")(1)
             annotations.pos(i) = field("SDP")(3)
+            annotations.isTop(i) = field("SDP")(4)=="+"
             if (field.contains("DEPS")) {
-                annotations.syntacticDependencies(i) = SyntacticDependency.fromSemEval8(field("DEPS").mkString("\t"))
-            }
-            } catch {
-                case _ : Throwable => throw new RuntimeException("Error processing line:\n"+line)
+                annotations.syntacticDependencies.deps(i) = SyntacticDependency.fromSemEval8(field("DEPS").mkString("\t"))
             }
         }
         return annotations

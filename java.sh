@@ -2,6 +2,10 @@
 
 set -eu
 
+if [ -d /cab0/tools/java7 ]; then
+  export PATH=/cab0/tools/java7/jdk1.7.0_21/bin:$PATH
+fi
+
 # Invokes 'java' using .class files as compiled by SBT and/or Eclipse,
 # plus flags to stop crashes due to idiotic default JVM behaviors
 
