@@ -29,6 +29,23 @@ import java.util.List;
 
 import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
 
+/*
+ * Dimensionality strategies.
+ * 
+ * Without feature hashing:
+ *    percepts  ==>  signed int, \in 0..(#percepttypes - 1)
+ *    labels ==> signed int, \in 0..(#labeltypes - 1)
+ *    coefs ==> dimensino labeltypes*#percepttypes
+ *  
+ *  With feature hashing:
+ *  a coef index is a modulo'd hash of both the percepthash and the labelID.
+ *    percepts  ==>  a hash, that is any signed int.  we never store this in the model file.
+ *    labels ==> signed int \in 0..(#labeltypes - 1)
+ *    coefs ==> dimension #hashbuckets.
+ *  the perceptVocab object still exists, but is not used.
+ */
+
+
 public class LRParser {
 	public static final String NO_EDGE = "NOEDGE";
 	private static final String BIAS_NAME = "***BIAS***";
@@ -64,6 +81,11 @@ public class LRParser {
     static int saveEvery = 10;  // -1 to disable intermediate model saves
     @Parameter(names="-numIters")
 	static int numIters = 30;
+    
+    @Parameter(names="-useHashing", description="only specify this when training. at testtime, whether it's a hash-based model is detected from the model file.")
+    static boolean useHashing = false;
+    @Parameter(names="-numHashBuckets", description="only specify this when training. at testtime, this is read from the model file.  ---  Note mem usage is 4 times higher than this, so maybe use 1e9 on a server?")
+    static double numHashBuckets = 100e6;
 
 	// label feature flags
 	@Parameter(names = "-useDmLabelFeatures")
@@ -81,11 +103,16 @@ public class LRParser {
 	static String sdpFile;
     @Parameter(names="-depInput", required=true)
 	static String depFile;
+    
+    static void validateParameters() {
+    	assert numHashBuckets > 0 : "must have positive number of hashbuckets";
+    	assert numHashBuckets < Integer.MAX_VALUE : "numhashbuckets must be a signed 4byte integer, so less than 2 billion or so";
+		assert mode.equals("train") || mode.equals("test") : "Need to say either train or test mode.";
+    }
 
 	public static void main(String[] args) throws IOException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
-
-		assert mode.equals("train") || mode.equals("test");
+		validateParameters();
 
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
@@ -205,11 +232,6 @@ public class LRParser {
 		int i=-1;
 		NumberizedSentence ns;
 		InputAnnotatedSentence is; // only for debugging
-		final Vocabulary perceptVocab;
-
-		TokenFeatAdder(Vocabulary perceptVocab) {
-			this.perceptVocab = perceptVocab;
-		}
 
 		@Override
 		public void add(String featname, double value) {
@@ -225,8 +247,8 @@ public class LRParser {
 			int featnum;
 			
 			ff = U.sf("%s::ashead", featname);
-			featnum = perceptVocab.num(ff);
-			if (featnum!=-1) {
+			featnum = perceptNum(ff);
+			if (LRParser.useHashing || featnum!=-1) {
 				for (int j=0; j<ns.T; j++) {
 					if (badDistance(i,j)) continue;
 					ns.add(i,j, featnum, value);
@@ -234,13 +256,25 @@ public class LRParser {
 			}
 			
 			ff = U.sf("%s::aschild", featname);
-			featnum = perceptVocab.num(ff);
-			if (featnum!=-1) {
+			featnum = perceptNum(ff);
+			if (LRParser.useHashing || featnum!=-1) {
 				for (int j=0; j<ns.T; j++) {
 					if (badDistance(j,i)) continue;
 					ns.add(j,i, featnum, value);
 				}
 			}
+		}
+	}
+	
+	/** under hashing, this could be a negative number. */
+	static int perceptNum(String perceptName) {
+		if ( ! LRParser.useHashing) {
+			return model.perceptVocab.num(perceptName);
+		}
+		else {
+//			return perceptName.hashCode();
+			byte[] b = perceptName.getBytes();
+			return MurmurHash.hash32(b, b.length);
 		}
 	}
 
@@ -250,15 +284,10 @@ public class LRParser {
 		// these are only for debugging
 		InputAnnotatedSentence is;
 		int[][] goldEdgeMatrix;
-		final Vocabulary perceptVocab;
-
-		EdgeFeatAdder(Vocabulary perceptVocab) {
-			this.perceptVocab = perceptVocab;
-		}
 
 		@Override
 		public void add(String featname, double value) {
-			int perceptnum = perceptVocab.num(featname);
+			int perceptnum = perceptNum(featname);
 			if (perceptnum==-1) return;
 			
 			ns.add(i,j, perceptnum, value);
@@ -278,8 +307,8 @@ public class LRParser {
 		final int biasIdx = model.perceptVocab.num(BIAS_NAME);
 
 		NumberizedSentence ns = new NumberizedSentence( is.size() );
-		TokenFeatAdder tokenAdder = new TokenFeatAdder(model.perceptVocab);
-		EdgeFeatAdder edgeAdder = new EdgeFeatAdder(model.perceptVocab);
+		TokenFeatAdder tokenAdder = new TokenFeatAdder();
+		EdgeFeatAdder edgeAdder = new EdgeFeatAdder();
 		tokenAdder.ns=edgeAdder.ns=ns;
 		
 		// only for verbose feature extraction reporting
@@ -350,11 +379,19 @@ public class LRParser {
     }
 
     static void allocateCoefs() {
-    	int len = model.perceptVocab.size() * model.labelFeatureVocab.size();
+    	int len = -1;
+    	if (useHashing) {
+    		len = (int) numHashBuckets;
+//    		U.p("should be blank, percept vocab = " + model.perceptVocab.toString());
+    	}
+    	else {
+        	len = model.perceptVocab.size() * model.labelFeatureVocab.size();
+    	}
     	model.coefs = new float[len];
     	ssGrad = new float[len];
     	model.perceptVocab.lock();
     	model.labelFeatureVocab.lock();
+		model.calculateLabelHashes();
     }
 	
     /** From the new gradient value, update this feature's learning rate and return it. */
