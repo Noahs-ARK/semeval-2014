@@ -22,7 +22,8 @@ public class PruneModel {
 			out.writeObject(weights);
 			out.close();
 			fileOut.close();
-			System.out.printf("Serialized preprocessing model is saved in " + fileName);
+			System.out.println();
+			System.out.printf("Serialized preprocessing model is saved in " + fileName + "\n");
 		}catch(IOException i)
 		{
 			i.printStackTrace();

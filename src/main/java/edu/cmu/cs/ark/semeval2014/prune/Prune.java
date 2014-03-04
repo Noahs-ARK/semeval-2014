@@ -8,7 +8,6 @@ import util.Vocabulary;
 
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.LRParser;
-//import edu.cmu.cs.ark.semeval2014.lr.NumberizedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PassThroughFe;
 
@@ -28,6 +27,7 @@ public class Prune {
 	private List<FE.LabelFE> labelFeatureExtractors = new ArrayList<>();
 	private final String TRUE = "t";
 	private final String FALSE = "f";
+	private final String modelFileName;
 	private final String singletonFileName = "singeltonModel.ser";
 	private final String predicateFileName = "predicateModel.ser";
 	//private final Vocabulary labelVocab;
@@ -35,8 +35,9 @@ public class Prune {
 	// featuresByLabel: map from the labels to the features computed from the labels
 	// labelFeatureVocab maps from the features computed from the labels to a number representing that feature
 	
-	public Prune(InputAnnotatedSentence[] inputSentences){
+	public Prune(InputAnnotatedSentence[] inputSentences, String modelFileName){
 		this.inputSentences = inputSentences;
+		this.modelFileName = modelFileName;
 
 		labelVocab = new Vocabulary();
 		labelVocab.num(TRUE);
@@ -133,17 +134,17 @@ public class Prune {
 		sModel = new PruneModel();
 		initializeWeights(sModel);
 		trainingOuterLoopOnline(sModel, singletons);
-		sModel.save(singletonFileName);
+		sModel.save(modelFileName + "." + singletonFileName);
 		
-		trainError(sModel.weights, singletons);
+		//trainError(sModel.weights, singletons);
 		
 		// to learn the weights for the predicates
 		pModel = new PruneModel();
 		initializeWeights(pModel);
 		trainingOuterLoopOnline(pModel, predicates);
-		pModel.save(predicateFileName);
+		pModel.save(modelFileName + "." + predicateFileName);
 		
-		trainError(pModel.weights, predicates);
+		//trainError(pModel.weights, predicates);
 		
 	}
 
@@ -339,10 +340,10 @@ public class Prune {
 
 	public void loadModels() {
 		sModel = new PruneModel();
-		sModel.load(singletonFileName);
+		sModel.load(modelFileName + "." + singletonFileName);
 		
 		pModel = new PruneModel();
-		pModel.load(predicateFileName);
+		pModel.load(modelFileName + "." + predicateFileName);
 	}
 	
 	public void predict(){

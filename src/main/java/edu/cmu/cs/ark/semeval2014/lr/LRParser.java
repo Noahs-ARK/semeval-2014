@@ -90,7 +90,7 @@ public class LRParser {
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
 
-		p = new Prune(inputSentences);
+		p = new Prune(inputSentences, modelFile);
 		
 		if (mode.equals("train")) {
 			trainModel();
