@@ -40,8 +40,8 @@ public class Prune {
 		this.modelFileName = modelFileName;
 
 		labelVocab = new Vocabulary();
-		labelVocab.num(TRUE);
 		labelVocab.num(FALSE);
+		labelVocab.num(TRUE);
 	}
 	
 	/*
