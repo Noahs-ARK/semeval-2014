@@ -105,10 +105,13 @@ public class Model {
 		if (LRParser.useHashing){
 			// perceptIdx is a random hashed number.  but labelFeatureIdx is not.
 			// so let's just hash both and we get a new hash
-			int h = hashTwoInts(perceptIdx, labelFeatureIdx);
-			return Math.abs(h) % ( (int) LRParser.numHashBuckets);
+			int h1 = hashTwoInts(perceptIdx, labelFeatureIdx);
+			int h2 = Math.abs(h1 % ( (int) LRParser.numHashBuckets));
+			assert h2 >= 0 : U.sf("%s %s || %s || %s\n", perceptIdx, labelFeatureIdx, h1, h2);
+			return h2;
 		}
 		else {
+			assert perceptIdx >= 0;
 			return coefIdx(labelFeatureVocab, perceptIdx, labelFeatureIdx);
 			
 		}
