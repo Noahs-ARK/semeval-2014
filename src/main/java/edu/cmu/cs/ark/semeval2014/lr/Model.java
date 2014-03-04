@@ -12,22 +12,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Dimensionality strategies.
- * 
- * Without feature hashing:
- *    percepts  ==>  signed int, \in 0..(#percepttypes - 1)
- *    labels ==> signed int, \in 0..(#labeltypes - 1)
- *    coefs ==> dimensino labeltypes*#percepttypes
- *  
- *  With feature hashing:
- *  a coef index is a modulo'd hash of both the percepthash and the labelID.
- *    percepts  ==>  a hash, that is any signed int.  we never store this in the model file.
- *    labels ==> signed int \in 0..(#labeltypes - 1)
- *    coefs ==> dimension #hashbuckets.
- *  
- */
-
 /** note the behavior of this class does depend on globals in LRParser !  */
 public class Model {
 	private static final String LABEL_VOCAB_HEADER = "LABELVOCAB";
@@ -120,7 +104,7 @@ public class Model {
 	int coefIdx(int perceptIdx, int labelFeatureIdx) {
 		if (LRParser.useHashing){
 			// perceptIdx is a random hashed number.  but labelFeatureIdx is not.
-			// so let's just hash both and we get a new hash!
+			// so let's just hash both and we get a new hash
 			int h = hashTwoInts(perceptIdx, labelFeatureIdx);
 			return Math.abs(h) % ( (int) LRParser.numHashBuckets);
 		}
@@ -176,8 +160,8 @@ public class Model {
 						
 					case NUM_HASH_BUCKETS_HEADER:
 						LRParser.useHashing = true;
-						int numHashBuckets = Integer.parseInt(parts[1]);
-						coefs = new float[numHashBuckets];
+						LRParser.numHashBuckets = Integer.parseInt(parts[1]);
+						coefs = new float[(int) LRParser.numHashBuckets];
 						break;
 					case HASH_COEF_HEADER:
 						int featHash = Integer.parseInt(parts[1]);
@@ -227,6 +211,8 @@ public class Model {
 				out.append("\n");
 			}
 			if (LRParser.useHashing) {
+				out.printf("%s\t%d\n", NUM_HASH_BUCKETS_HEADER, (int) LRParser.numHashBuckets);
+				assert LRParser.numHashBuckets == coefs.length;
 				for (int h=0; h < coefs.length; h++) {
 					if (Math.abs(coefs[h]) < MINIMUM_WEIGHT_THRESHOLD) continue;
 					out.printf("%s\t%d\t%s\n", HASH_COEF_HEADER, h, coefs[h]);

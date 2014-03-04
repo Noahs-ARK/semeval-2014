@@ -29,6 +29,23 @@ import java.util.List;
 
 import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
 
+/*
+ * Dimensionality strategies.
+ * 
+ * Without feature hashing:
+ *    percepts  ==>  signed int, \in 0..(#percepttypes - 1)
+ *    labels ==> signed int, \in 0..(#labeltypes - 1)
+ *    coefs ==> dimensino labeltypes*#percepttypes
+ *  
+ *  With feature hashing:
+ *  a coef index is a modulo'd hash of both the percepthash and the labelID.
+ *    percepts  ==>  a hash, that is any signed int.  we never store this in the model file.
+ *    labels ==> signed int \in 0..(#labeltypes - 1)
+ *    coefs ==> dimension #hashbuckets.
+ *  the perceptVocab object still exists, but is not used.
+ */
+
+
 public class LRParser {
 	public static final String NO_EDGE = "NOEDGE";
 	private static final String BIAS_NAME = "***BIAS***";
@@ -230,8 +247,8 @@ public class LRParser {
 			int featnum;
 			
 			ff = U.sf("%s::ashead", featname);
-			featnum = model.perceptVocab.num(ff);
-			if (featnum!=-1) {
+			featnum = perceptNum(ff);
+			if (LRParser.useHashing || featnum!=-1) {
 				for (int j=0; j<ns.T; j++) {
 					if (badDistance(i,j)) continue;
 					ns.add(i,j, featnum, value);
@@ -239,13 +256,23 @@ public class LRParser {
 			}
 			
 			ff = U.sf("%s::aschild", featname);
-			featnum = model.perceptVocab.num(ff);
-			if (featnum!=-1) {
+			featnum = perceptNum(ff);
+			if (LRParser.useHashing || featnum!=-1) {
 				for (int j=0; j<ns.T; j++) {
 					if (badDistance(j,i)) continue;
 					ns.add(j,i, featnum, value);
 				}
 			}
+		}
+	}
+	
+	/** under hashing, this could be a negative number. */
+	static int perceptNum(String perceptName) {
+		if ( ! LRParser.useHashing) {
+			return model.perceptVocab.num(perceptName);
+		}
+		else {
+			return perceptName.hashCode();
 		}
 	}
 
@@ -258,7 +285,7 @@ public class LRParser {
 
 		@Override
 		public void add(String featname, double value) {
-			int perceptnum = model.perceptVocab.num(featname);
+			int perceptnum = perceptNum(featname);
 			if (perceptnum==-1) return;
 			
 			ns.add(i,j, perceptnum, value);
@@ -350,7 +377,14 @@ public class LRParser {
     }
 
     static void allocateCoefs() {
-    	int len = model.perceptVocab.size() * model.labelFeatureVocab.size();
+    	int len = -1;
+    	if (useHashing) {
+    		len = (int) numHashBuckets;
+//    		U.p("should be blank, percept vocab = " + model.perceptVocab.toString());
+    	}
+    	else {
+        	len = model.perceptVocab.size() * model.labelFeatureVocab.size();
+    	}
     	model.coefs = new float[len];
     	ssGrad = new float[len];
     	model.perceptVocab.lock();
