@@ -64,7 +64,7 @@ public class LRParser {
     @Parameter(names="-saveEvery")
     static int saveEvery = 10;  // -1 to disable intermediate model saves
     @Parameter(names="-numIters")
-	static int numIters = 3;// CHANGED TO MAKE IT RUN FASTER
+	static int numIters = 30;
 
 	// label feature flags
 	@Parameter(names = "-useDmLabelFeatures")
