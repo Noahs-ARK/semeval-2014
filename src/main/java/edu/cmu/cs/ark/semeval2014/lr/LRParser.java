@@ -64,6 +64,11 @@ public class LRParser {
     static int saveEvery = 10;  // -1 to disable intermediate model saves
     @Parameter(names="-numIters")
 	static int numIters = 30;
+    
+    @Parameter(names="-useHashing", description="only specify this when training. at testtime, whether it's a hash-based model is detected from the model file.")
+    static boolean useHashing = false;
+    @Parameter(names="-numHashBuckets", description="only specify this when training. at testtime, this is read from the model file.  ---  Note mem usage is 4 times higher than this, so maybe use 1e9 on a server?")
+    static double numHashBuckets = 100e6;
 
 	// label feature flags
 	@Parameter(names = "-useDmLabelFeatures")
@@ -81,11 +86,16 @@ public class LRParser {
 	static String sdpFile;
     @Parameter(names="-depInput", required=true)
 	static String depFile;
+    
+    static void validateParameters() {
+    	assert numHashBuckets > 0 : "must have positive number of hashbuckets";
+    	assert numHashBuckets < Integer.MAX_VALUE : "numhashbuckets must be a signed 4byte integer, so less than 2 billion or so";
+		assert mode.equals("train") || mode.equals("test") : "Need to say either train or test mode.";
+    }
 
 	public static void main(String[] args) throws IOException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
-
-		assert mode.equals("train") || mode.equals("test");
+		validateParameters();
 
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);

@@ -12,18 +12,43 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * Dimensionality strategies.
+ * 
+ * Without feature hashing:
+ *    percepts  ==>  signed int, \in 0..(#percepttypes - 1)
+ *    labels ==> signed int, \in 0..(#labeltypes - 1)
+ *    coefs ==> dimensino labeltypes*#percepttypes
+ *  
+ *  With feature hashing:
+ *  a coef index is a modulo'd hash of both the percepthash and the labelID.
+ *    percepts  ==>  a hash, that is any signed int.  we never store this in the model file.
+ *    labels ==> signed int \in 0..(#labeltypes - 1)
+ *    coefs ==> dimension #hashbuckets.
+ *  
+ */
+
+/** note the behavior of this class does depend on globals in LRParser !  */
 public class Model {
 	private static final String LABEL_VOCAB_HEADER = "LABELVOCAB";
+	private static final String NUM_HASH_BUCKETS_HEADER = "NUM_HASH_BUCKETS";
 	private static final String LABEL_FEATURE_VOCAB_HEADER = "LABEL_FEATURE_VOCAB";
 	private static final String FEATURES_BY_LABEL_HEADER = "FEATURES_BY_LABEL";
 	private static final String COEFFICIENTS_HEADER = "C";
+	private static final String HASH_COEF_HEADER = "H";
 	private static final double MINIMUM_WEIGHT_THRESHOLD = 1e-7;
 
+	/** This is for label-side features */
 	public final Vocabulary labelVocab;
+	/** This is for label-side features */
 	final Vocabulary labelFeatureVocab;
+	/** This is for label-side features */
 	final List<int[]> featuresByLabel;
+	
+	/** this is unused under feature hashing */
 	final Vocabulary perceptVocab;
-	float[] coefs; // flattened form: #percepts * #labelFeatures
+	/** flattened form: #percepts * #labelFeatures */
+	float[] coefs; // 
 
 	public Model(
 			Vocabulary labelVocab,
@@ -82,12 +107,30 @@ public class Model {
 		return scores;
 	}
 
+	/** Assume everything is potentially a full-range 4byte int.
+	 * Following Bloch 2nd ed., "Effective Java" item 9 */
+	static int hashTwoInts(int x, int y) {
+	    int hash = 17;
+	    hash = hash * 31 + new Integer(x).hashCode();
+	    hash = hash * 31 + new Integer(y).hashCode();
+	    return hash;
+	}
+	
 	/** index into coefs. */
 	int coefIdx(int perceptIdx, int labelFeatureIdx) {
-		return coefIdx(labelFeatureVocab, perceptIdx, labelFeatureIdx);
+		if (LRParser.useHashing){
+			// perceptIdx is a random hashed number.  but labelFeatureIdx is not.
+			// so let's just hash both and we get a new hash!
+			int h = hashTwoInts(perceptIdx, labelFeatureIdx);
+			return Math.abs(h) % ( (int) LRParser.numHashBuckets);
+		}
+		else {
+			return coefIdx(labelFeatureVocab, perceptIdx, labelFeatureIdx);
+			
+		}
 	}
 
-	protected static int coefIdx(Vocabulary labelFeatureVocab, int perceptIdx, int labelFeatureIdx) {
+	private static int coefIdx(Vocabulary labelFeatureVocab, int perceptIdx, int labelFeatureIdx) {
 		return perceptIdx * labelFeatureVocab.size() + labelFeatureIdx;
 	}
 
@@ -98,7 +141,8 @@ public class Model {
 		final List<int[]> featuresByLabel = new ArrayList<>();
 
 		final ArrayList<Triple<Integer, Integer, Float>> coefTuples = new ArrayList<>();
-
+		float[] coefs = null;
+		
 		try (BufferedReader reader = BasicFileIO.openFileOrResource(modelFile)) {
 			String line;
 			while ((line = reader.readLine()) != null) {
@@ -122,12 +166,25 @@ public class Model {
 						}
 						featuresByLabel.add(features);
 						break;
+						
 					case COEFFICIENTS_HEADER:
 						int perceptIdx = perceptVocab.num(parts[1]);
 						int labelFeatureIdx = labelFeatureVocab.numStrict(parts[2]);
 						float value = Float.parseFloat(parts[3]);
 						coefTuples.add(U.triple(perceptIdx, labelFeatureIdx, value));
 						break;
+						
+					case NUM_HASH_BUCKETS_HEADER:
+						LRParser.useHashing = true;
+						int numHashBuckets = Integer.parseInt(parts[1]);
+						coefs = new float[numHashBuckets];
+						break;
+					case HASH_COEF_HEADER:
+						int featHash = Integer.parseInt(parts[1]);
+						float val = Float.parseFloat(parts[2]);
+						coefs[featHash] = val;
+						break;
+						
 					default:
 						throw new RuntimeException("bad model line format");
 				}
@@ -136,9 +193,12 @@ public class Model {
 		labelVocab.lock();
 		labelFeatureVocab.lock();
 		perceptVocab.lock();
-		final float[] coefs = new float[perceptVocab.size() * labelFeatureVocab.size()];
-		for (Triple<Integer, Integer, Float> x : coefTuples) {
-			coefs[coefIdx(labelFeatureVocab, x.first, x.second)] = x.third;
+		
+		if ( ! LRParser.useHashing) {
+			coefs = new float[perceptVocab.size() * labelFeatureVocab.size()];
+			for (Triple<Integer, Integer, Float> x : coefTuples) {
+				coefs[coefIdx(labelFeatureVocab, x.first, x.second)] = x.third;
+			}
 		}
 		U.pf("Label vocab (size %d): %s\n", labelVocab.size(), labelVocab.names());
 		U.pf("Label feature vocab (size %d): %s\n", labelFeatureVocab.size(), labelVocab.names());
@@ -166,11 +226,19 @@ public class Model {
 				}
 				out.append("\n");
 			}
-			for (int f = 0; f < perceptVocab.size(); f++) {
-				for (int k = 0; k < labelFeatureVocab.size(); k++) {
-					float coef = coefs[coefIdx(f, k)];
-					if (Math.abs(coef) < MINIMUM_WEIGHT_THRESHOLD) continue; // throw out parameters below threshold
-					out.printf("%s\t%s\t%s\t%s\n", COEFFICIENTS_HEADER, perceptVocab.name(f), labelFeatureVocab.name(k), coef);
+			if (LRParser.useHashing) {
+				for (int h=0; h < coefs.length; h++) {
+					if (Math.abs(coefs[h]) < MINIMUM_WEIGHT_THRESHOLD) continue;
+					out.printf("%s\t%d\t%s\n", HASH_COEF_HEADER, h, coefs[h]);
+				}
+			}
+			else {
+				for (int f = 0; f < perceptVocab.size(); f++) {
+					for (int k = 0; k < labelFeatureVocab.size(); k++) {
+						float coef = coefs[coefIdx(f, k)];
+						if (Math.abs(coef) < MINIMUM_WEIGHT_THRESHOLD) continue; // throw out parameters below threshold
+						out.printf("%s\t%s\t%s\t%s\n", COEFFICIENTS_HEADER, perceptVocab.name(f), labelFeatureVocab.name(k), coef);
+					}
 				}
 			}
 		}
