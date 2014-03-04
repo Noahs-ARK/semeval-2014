@@ -215,11 +215,6 @@ public class LRParser {
 		int i=-1;
 		NumberizedSentence ns;
 		InputAnnotatedSentence is; // only for debugging
-		final Vocabulary perceptVocab;
-
-		TokenFeatAdder(Vocabulary perceptVocab) {
-			this.perceptVocab = perceptVocab;
-		}
 
 		@Override
 		public void add(String featname, double value) {
@@ -235,7 +230,7 @@ public class LRParser {
 			int featnum;
 			
 			ff = U.sf("%s::ashead", featname);
-			featnum = perceptVocab.num(ff);
+			featnum = model.perceptVocab.num(ff);
 			if (featnum!=-1) {
 				for (int j=0; j<ns.T; j++) {
 					if (badDistance(i,j)) continue;
@@ -244,7 +239,7 @@ public class LRParser {
 			}
 			
 			ff = U.sf("%s::aschild", featname);
-			featnum = perceptVocab.num(ff);
+			featnum = model.perceptVocab.num(ff);
 			if (featnum!=-1) {
 				for (int j=0; j<ns.T; j++) {
 					if (badDistance(j,i)) continue;
@@ -260,15 +255,10 @@ public class LRParser {
 		// these are only for debugging
 		InputAnnotatedSentence is;
 		int[][] goldEdgeMatrix;
-		final Vocabulary perceptVocab;
-
-		EdgeFeatAdder(Vocabulary perceptVocab) {
-			this.perceptVocab = perceptVocab;
-		}
 
 		@Override
 		public void add(String featname, double value) {
-			int perceptnum = perceptVocab.num(featname);
+			int perceptnum = model.perceptVocab.num(featname);
 			if (perceptnum==-1) return;
 			
 			ns.add(i,j, perceptnum, value);
@@ -288,8 +278,8 @@ public class LRParser {
 		final int biasIdx = model.perceptVocab.num(BIAS_NAME);
 
 		NumberizedSentence ns = new NumberizedSentence( is.size() );
-		TokenFeatAdder tokenAdder = new TokenFeatAdder(model.perceptVocab);
-		EdgeFeatAdder edgeAdder = new EdgeFeatAdder(model.perceptVocab);
+		TokenFeatAdder tokenAdder = new TokenFeatAdder();
+		EdgeFeatAdder edgeAdder = new EdgeFeatAdder();
 		tokenAdder.ns=edgeAdder.ns=ns;
 		
 		// only for verbose feature extraction reporting
