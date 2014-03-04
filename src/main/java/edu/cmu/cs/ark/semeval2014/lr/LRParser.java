@@ -272,7 +272,9 @@ public class LRParser {
 			return model.perceptVocab.num(perceptName);
 		}
 		else {
-			return perceptName.hashCode();
+//			return perceptName.hashCode();
+			byte[] b = perceptName.getBytes();
+			return MurmurHash.hash32(b, b.length);
 		}
 	}
 
@@ -389,6 +391,7 @@ public class LRParser {
     	ssGrad = new float[len];
     	model.perceptVocab.lock();
     	model.labelFeatureVocab.lock();
+		model.calculateLabelHashes();
     }
 	
     /** From the new gradient value, update this feature's learning rate and return it. */

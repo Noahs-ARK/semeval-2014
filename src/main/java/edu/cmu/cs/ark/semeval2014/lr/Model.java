@@ -9,6 +9,7 @@ import util.misc.Triple;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,30 +91,51 @@ public class Model {
 		}
 		return scores;
 	}
+	
+	int[] labelHashes;
+	
+	public void calculateLabelHashes() {
+		assert labelFeatureVocab.isLocked();
+		int K = labelFeatureVocab.size();
+		labelHashes = new int[K];
+		for (int k=0; k<K; k++) {
+			labelHashes[k] = intHash1(k);
+		}
+	}
+	
+	/** dunno why this works well. from http://stackoverflow.com/a/12996028/86684 */
+	static int intHash1(int x) {
+	    x = ((x >> 16) ^ x) * 0x45d9f3b;
+	    x = ((x >> 16) ^ x) * 0x45d9f3b;
+	    x = ((x >> 16) ^ x);
+	    return x;
+	}
 
-	/** Assume everything is potentially a full-range 4byte int.
-	 * Following Bloch 2nd ed., "Effective Java" item 9 */
+	/** Using this MurmurHash here seems to create worse distributions than intHash1() */
+	static int intHash2(int x) {
+		byte[] bytes = ByteBuffer.allocate(4).putInt(x).array();
+		return MurmurHash.hash32(bytes, 4);
+	}
+	
+	/** Bloch 2nd ed., "Effective Java" item 9 */
 	static int hashTwoInts(int x, int y) {
 	    int hash = 17;
-	    hash = hash * 31 + new Integer(x).hashCode();
-	    hash = hash * 31 + new Integer(y).hashCode();
+	    hash = hash * 31 + x;
+	    hash = hash * 31 + y;
 	    return hash;
 	}
 	
 	/** index into coefs. */
 	int coefIdx(int perceptIdx, int labelFeatureIdx) {
 		if (LRParser.useHashing){
-			// perceptIdx is a random hashed number.  but labelFeatureIdx is not.
-			// so let's just hash both and we get a new hash
-			int h1 = hashTwoInts(perceptIdx, labelFeatureIdx);
+			int h1 = hashTwoInts(intHash1(perceptIdx), labelHashes[labelFeatureIdx]);
 			int h2 = Math.abs(h1 % ( (int) LRParser.numHashBuckets));
-			assert h2 >= 0 : U.sf("%s %s || %s || %s\n", perceptIdx, labelFeatureIdx, h1, h2);
+//			assert h2 >= 0 : U.sf("%s %s || %s || %s\n", perceptIdx, labelFeatureIdx, h1, h2);
 			return h2;
 		}
 		else {
 			assert perceptIdx >= 0;
 			return coefIdx(labelFeatureVocab, perceptIdx, labelFeatureIdx);
-			
 		}
 	}
 
@@ -190,7 +212,9 @@ public class Model {
 		U.pf("Label vocab (size %d): %s\n", labelVocab.size(), labelVocab.names());
 		U.pf("Label feature vocab (size %d): %s\n", labelFeatureVocab.size(), labelVocab.names());
 		U.pf("Num features: %d\n", perceptVocab.size());
-		return new Model(labelVocab, labelFeatureVocab, featuresByLabel, perceptVocab, coefs);
+		Model m = new Model(labelVocab, labelFeatureVocab, featuresByLabel, perceptVocab, coefs);
+		m.calculateLabelHashes();
+		return m;
 	}
 
 	void save(String modelFile) throws IOException {
