@@ -9,6 +9,8 @@ import com.esotericsoftware.kryo.io.Output;
 import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.*;
+import edu.cmu.cs.ark.semeval2014.prune.Prune;
+import edu.cmu.cs.ark.semeval2014.prune.PruneFeatsForSemparser;
 import edu.cmu.cs.ark.semeval2014.topness.DetermTopness;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
 import edu.cmu.cs.ark.semeval2014.topness.TopnessScorer;
@@ -81,6 +83,7 @@ public class LRParser {
 	static String sdpFile;
     @Parameter(names="-depInput", required=true)
 	static String depFile;
+    static Prune preprocessor;
 
 	public static void main(String[] args) throws IOException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
@@ -91,6 +94,8 @@ public class LRParser {
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
 
+		preprocessor = new Prune(inputSentences, modelFile);
+		
 		if (mode.equals("train")) {
 			topnessScorer.train(depFile, modelFile + ".topmodel");
 			trainModel();
@@ -98,6 +103,7 @@ public class LRParser {
 		else if (mode.equals("test")) {
 			topnessScorer.loadModel(modelFile + ".topmodel");
 			model = Model.load(modelFile);
+			preprocessInputSentences();
 			U.pf("Writing predictions to %s\n", sdpFile);
 			double t0, dur;
 			t0 = System.currentTimeMillis();
@@ -105,6 +111,14 @@ public class LRParser {
 			dur = System.currentTimeMillis() - t0;
 			U.pf("\nPRED TIME %.1f sec, %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
 		}
+	}
+	
+	// this loads in the learned weights for the preprocessing models
+	// then predicts the 'predicates' and 'singelton' classes within the
+	// inputSentences that are already stored in p.
+	private static void preprocessInputSentences(){
+		preprocessor.loadModels();
+		preprocessor.predict();
 	}
 
 	private static Model trainModel() throws IOException {
@@ -140,7 +154,14 @@ public class LRParser {
 			assert sent.sentenceId().equals(graph.id.replace("#",""));
 			graphMatrices.add(convertGraphToAdjacencyMatrix(graph, sent.size(), labelVocab));
 		}
+		
+		// Preprocessor training & prediction ... its predictions will be used as semparser features.
+		// Note that its predictions are stored in the inputSentences.
+		preprocessor.trainModels(labelVocab, graphMatrices);
+		preprocessor.predict();
+//		preprocessor.dumpDecisions(10);
 
+		// Train the edge-based semparser.
 		final Vocabulary perceptVocab = new Vocabulary();
 		perceptVocab.num(BIAS_NAME);
 		model = new Model(labelVocab, labelFeatureVocab, featuresByLabel, perceptVocab);
@@ -502,6 +523,7 @@ public class LRParser {
 		allFE.add(new CoarseDependencyFeatures());
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
+		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
 	}
 
