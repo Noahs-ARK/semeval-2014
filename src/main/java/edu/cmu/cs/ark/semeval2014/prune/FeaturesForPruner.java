@@ -11,7 +11,7 @@ import edu.cmu.cs.ark.semeval2014.lr.fe.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PruneFeatures extends FE.FeatureExtractor implements FE.TokenFE {
+public class FeaturesForPruner extends FE.FeatureExtractor implements FE.TokenFE {
 	private final MorphaLemmatizer morpha = new MorphaLemmatizer();
 //	Set<String> whitelist;
 	private String[] lemmas;

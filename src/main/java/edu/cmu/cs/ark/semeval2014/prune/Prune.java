@@ -13,11 +13,10 @@ import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PassThroughFe;
 
 public class Prune {
 	private int numIter = 1;
-	private List<int[]> singletons;
-	private List<int[]> predicates;
-	private List<int[]> tops;
-	private PruneModel sModel;
-	private PruneModel pModel;
+	private List<int[]> trainingSingletonIndicators;
+	private List<int[]> trainingPredicateIndicators;
+	private PruneModel singletonModel;
+	private PruneModel predicateModel;
 	private InputAnnotatedSentence[] inputSentences;
 	private List<FE.FeatureExtractor> allFE = new ArrayList<>();
 	
@@ -28,9 +27,8 @@ public class Prune {
 	private final String TRUE = "t";
 	private final String FALSE = "f";
 	private final String modelFileName;
-	private final String singletonFileName = "singeltonModel.ser";
+	private final String singletonFileName = "singletonModel.ser";
 	private final String predicateFileName = "predicateModel.ser";
-	//private final Vocabulary labelVocab;
 		
 	// featuresByLabel: map from the labels to the features computed from the labels
 	// labelFeatureVocab maps from the features computed from the labels to a number representing that feature
@@ -71,7 +69,7 @@ public class Prune {
 	// to find if a token is a singleton, the ith row and ith column should be entirely no-edges
 	// returns: a list of int arrays. Each array correspnds to a sentence, and each element of a given array corresponds to a word. If an 
 	// 		element of the array is 1, the associated token is a singleton.
-	private List<int[]> convertGraphToBinarySingletons(List<int[][]> graphs, Vocabulary graphLabelVocab){
+	private List<int[]> convertGraphsToSingletonIndicators(List<int[][]> graphs, Vocabulary graphLabelVocab){
 		List<int[]> singletons = new ArrayList<>();
 		for (int[][] g : graphs){
 			int[] singles = new int[g.length];
@@ -87,9 +85,7 @@ public class Prune {
 					}
 				}
 			}
-
 			singletons.add(singles);
-			//System.exit(0);
 		}
 		return singletons;
 	}
@@ -99,8 +95,8 @@ public class Prune {
 	// To find if a token is a predicate, the ith row should be entirely no-edges.
 	// returns: a list of int arrays. Each array correspnds to a sentence, and each element of a given array corresponds to a word. If an 
 	// 		element of the array is 1, the associated token is a predicate.
-	// Note: the predicates are those tokens that are either 1) singletons, or 2) leaf-nodes in the graph. 
-	private List<int[]> convertGraphToBinaryPredicates(List<int[][]> graphs, Vocabulary graphLabelVocab){
+	// Note: predicates are tokens that have a child -- they are NOT singletons and NOT leafnodes.
+	private List<int[]> convertGraphsToPredicateIndicators(List<int[][]> graphs, Vocabulary graphLabelVocab){
 		List<int[]> predicates = new ArrayList<>();
 		for (int[][] g : graphs){
 			int[] preds = new int[g.length];
@@ -116,7 +112,6 @@ public class Prune {
 				}
 			}
 			predicates.add(preds);
-			//System.exit(0);
 		}
 		return predicates;
 	}
@@ -131,23 +126,34 @@ public class Prune {
 		initialize(graphMatrices, lv);
 		
 		// to learn the weights for the singletons
-		sModel = new PruneModel();
-		initializeWeights(sModel);
-		trainingOuterLoopOnline(sModel, singletons);
-		sModel.save(modelFileName + "." + singletonFileName);
+		singletonModel = new PruneModel();
+		initializeWeights(singletonModel);
+		trainingOuterLoopOnline(singletonModel, trainingSingletonIndicators);
+		singletonModel.save(modelFileName + "." + singletonFileName);
 		
 		//trainError(sModel.weights, singletons);
 		
 		// to learn the weights for the predicates
-		pModel = new PruneModel();
-		initializeWeights(pModel);
-		trainingOuterLoopOnline(pModel, predicates);
-		pModel.save(modelFileName + "." + predicateFileName);
+		predicateModel = new PruneModel();
+		initializeWeights(predicateModel);
+		trainingOuterLoopOnline(predicateModel, trainingPredicateIndicators);
+		predicateModel.save(modelFileName + "." + predicateFileName);
 		
 		//trainError(pModel.weights, predicates);
+//		dumpDecisions(10);
 		
 	}
-
+	
+	public void dumpDecisions(int snum) {
+		InputAnnotatedSentence sent = inputSentences[snum];
+		U.pf("\nSENTENCE %s\n", sent.sentenceId());
+		for (int t=0; t<inputSentences[snum].size(); t++) {
+			U.pf("issg(g,p) = %d,%d  ispred(g,p) = %d,%d  ||| %s\n", 
+					trainingSingletonIndicators.get(snum)[t], sent.singletons()[t], 
+					trainingPredicateIndicators.get(snum)[t], sent.predicates()[t], 
+					sent.sentence()[t]);
+		}
+	}
 
 	private void trainError(Map<String, Double> weights,
 			List<int[]> test) {
@@ -174,10 +180,8 @@ public class Prune {
 	}
 
 	private void initialize(List<int[][]> graphMatrices, Vocabulary lv) {
-		singletons = convertGraphToBinarySingletons(graphMatrices, lv);
-		predicates = convertGraphToBinaryPredicates(graphMatrices, lv);
-		tops = null; //convertGraphToBinaryTops(graphMatrices, lv);
-		
+		trainingSingletonIndicators = convertGraphsToSingletonIndicators(graphMatrices, lv);
+		trainingPredicateIndicators = convertGraphsToPredicateIndicators(graphMatrices, lv);
 	}
 
 	private void printUniqueWeights(Map<String, Double> weights){
@@ -216,12 +220,12 @@ public class Prune {
 	}
 
 	// the inner training loop. Within the dataset, loops over each example.
-	private void trainOnlineIter(PruneModel singletonModel, List<int[]> train ) {
+	private void trainOnlineIter(PruneModel model, List<int[]> train ) {
         for (int snum=0; snum<inputSentences.length; snum++) {
         	U.pf(".");
         	List<Map<String, Set<String>>> feats = ghettoFeats(snum);
     		int[] sequenceOfLabels = train.get(snum);
-    		ghettoPerceptronUpdate(sequenceOfLabels, feats, singletonModel);
+    		ghettoPerceptronUpdate(sequenceOfLabels, feats, model);
         }
 	}
 	
@@ -339,34 +343,38 @@ public class Prune {
 	}
 
 	public void loadModels() {
-		sModel = new PruneModel();
-		sModel.load(modelFileName + "." + singletonFileName);
+		singletonModel = new PruneModel();
+		singletonModel.load(modelFileName + "." + singletonFileName);
 		
-		pModel = new PruneModel();
-		pModel.load(modelFileName + "." + predicateFileName);
+		predicateModel = new PruneModel();
+		predicateModel.load(modelFileName + "." + predicateFileName);
 	}
 	
+	/** Do predictions and save them in the input sentence objects. */
 	public void predict(){
-		predictForInputSentences(sModel, pModel);
+		predictForInputSentences(singletonModel, predicateModel);
 	}
 
 	private void predictForInputSentences(PruneModel singletonModel, PruneModel predicateModel) {
 		for (int i = 0; i < inputSentences.length; i++){
 			int[] singles = predict(singletonModel, i);
 			int[] preds = predict(predicateModel, i);
-			addInPredicted(singles, inputSentences[i].singletons());
-			addInPredicted(preds, inputSentences[i].predicates());
+			// turns out singletons() and predicates() return the scala object's internal array representation, so you can stuff new values into them.
+			copyValues(singles, inputSentences[i].singletons());
+			copyValues(preds, inputSentences[i].predicates());
 		}
 	}
 
-	private void addInPredicted(int[] predicted, Integer[] stored) {
-		for (int i = 0; i < predicted.length; i++){
-			stored[i] = predicted[i];
+	private static void copyValues(int[] source, Integer[] dest) {
+		assert source.length == dest.length;
+		for (int i = 0; i < source.length; i++){
+			dest[i] = source[i];
 		}
 	}
 
-	private int[] predict(PruneModel model,
-			int snum) {
+	/** return predicted labels, as integers
+	 * todo eventually: clean up messiness with labels vs integers and all that.  why not just use the raw integer numberings? */
+	private int[] predict(PruneModel model, int snum) {
         	List<Map<String, Set<String>>> feats = ghettoFeats(snum);
         	// run viterbi
     		Viterbi v = new Viterbi(model.weights);

@@ -10,6 +10,7 @@ import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.*;
 import edu.cmu.cs.ark.semeval2014.prune.Prune;
+import edu.cmu.cs.ark.semeval2014.prune.PruneFeatsForSemparser;
 import edu.cmu.cs.ark.semeval2014.topness.DetermTopness;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
 import edu.cmu.cs.ark.semeval2014.topness.TopnessScorer;
@@ -154,10 +155,13 @@ public class LRParser {
 			graphMatrices.add(convertGraphToAdjacencyMatrix(graph, sent.size(), labelVocab));
 		}
 		
+		// Preprocessor training & prediction ... its predictions will be used as semparser features.
+		// Note that its predictions are stored in the inputSentences.
 		preprocessor.trainModels(labelVocab, graphMatrices);
 		preprocessor.predict();
-		//System.exit(1);
+//		preprocessor.dumpDecisions(10);
 
+		// Train the edge-based semparser.
 		final Vocabulary perceptVocab = new Vocabulary();
 		perceptVocab.num(BIAS_NAME);
 		model = new Model(labelVocab, labelFeatureVocab, featuresByLabel, perceptVocab);
@@ -519,6 +523,7 @@ public class LRParser {
 		allFE.add(new CoarseDependencyFeatures());
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
+		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
 	}
 
