@@ -36,7 +36,7 @@ do
     ./java.sh lr.LRParser -mode test \
       -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts}
     ./scripts/eval.sh "${test_file}" "${pred_file}" | tee "${reports_dir}/${model_name}.eval.log"
-    ./scripts/eval_to_csv.py < "${reports_dir}/${model_name}.log" > "${reports_dir}/${model_name}.eval.csv"
+    ./scripts/eval_to_csv.py < "${reports_dir}/${model_name}.eval.log" > "${reports_dir}/${model_name}.eval.csv"
     python errorAnalysis/confusionMatrix.py "${test_file}" "${pred_file}" > "${reports_dir}/${model_name}_confusion.html"
     ) 2>&1 | tee -a ${reports_dir}/run.log
 
