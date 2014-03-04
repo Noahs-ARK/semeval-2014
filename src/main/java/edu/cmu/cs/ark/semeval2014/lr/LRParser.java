@@ -82,7 +82,7 @@ public class LRParser {
 	static String sdpFile;
     @Parameter(names="-depInput", required=true)
 	static String depFile;
-    static Prune p;
+    static Prune preprocessing;
 
 	public static void main(String[] args) throws IOException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
@@ -93,7 +93,7 @@ public class LRParser {
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
 
-		p = new Prune(inputSentences, modelFile);
+		preprocessing = new Prune(inputSentences, modelFile);
 		
 		if (mode.equals("train")) {
 			topnessScorer.train(depFile, modelFile + ".topmodel");
@@ -116,8 +116,8 @@ public class LRParser {
 	// then predicts the 'predicates' and 'singelton' classes within the
 	// inputSentences that are already stored in p.
 	private static void preprocessInputSentences(){
-		p.loadModels();
-		p.predict();
+		preprocessing.loadModels();
+		preprocessing.predict();
 	}
 
 	private static Model trainModel() throws IOException {
@@ -154,8 +154,8 @@ public class LRParser {
 			graphMatrices.add(convertGraphToAdjacencyMatrix(graph, sent.size(), labelVocab));
 		}
 		
-		p.trainModels(labelVocab, graphMatrices);
-		p.predict();
+		preprocessing.trainModels(labelVocab, graphMatrices);
+		preprocessing.predict();
 		//System.exit(1);
 
 		final Vocabulary perceptVocab = new Vocabulary();
