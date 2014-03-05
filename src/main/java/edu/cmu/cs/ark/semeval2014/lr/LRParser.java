@@ -80,12 +80,13 @@ public class LRParser {
     @Parameter(names="-model",required=true)
 	static String modelFile;
     @Parameter(names={"-sdpInput","-sdpOutput"}, required=true)
-	static String sdpFile;
+    static String sdpFile;
     @Parameter(names="-depInput", required=true)
-	static String depFile;
+    static String depFile;
+    
     static Prune preprocessor;
 
-	public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
 
 		assert mode.equals("train") || mode.equals("test");
@@ -523,7 +524,7 @@ public class LRParser {
 		allFE.add(new CoarseDependencyFeatures());
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
-		allFE.add(new PruneFeatsForSemparser());
+//		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
 	}
 

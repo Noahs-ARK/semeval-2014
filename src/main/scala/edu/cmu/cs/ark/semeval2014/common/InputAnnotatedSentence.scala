@@ -16,8 +16,8 @@ case class InputAnnotatedSentence(sentenceId: String,
                                   sentence: Array[String],
                                   syntacticDependencies: DependencyParse,
                                   pos: Array[String],
-                                  predicates: Array[Integer],
-                                  singletons: Array[Integer],
+                                  predicatePredictions: Array[Integer],
+                                  singletonPredictions: Array[Integer],
                                   isTop: Array[Boolean]) {
   def size = sentence.length
 }

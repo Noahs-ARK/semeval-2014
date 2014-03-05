@@ -149,8 +149,8 @@ public class Prune {
 		U.pf("\nSENTENCE %s\n", sent.sentenceId());
 		for (int t=0; t<inputSentences[snum].size(); t++) {
 			U.pf("issg(g,p) = %d,%d  ispred(g,p) = %d,%d  ||| %s\n", 
-					trainingSingletonIndicators.get(snum)[t], sent.singletons()[t], 
-					trainingPredicateIndicators.get(snum)[t], sent.predicates()[t], 
+					trainingSingletonIndicators.get(snum)[t], sent.singletonPredictions()[t], 
+					trainingPredicateIndicators.get(snum)[t], sent.predicatePredictions()[t], 
 					sent.sentence()[t]);
 		}
 	}
@@ -360,8 +360,8 @@ public class Prune {
 			int[] singles = predict(singletonModel, i);
 			int[] preds = predict(predicateModel, i);
 			// turns out singletons() and predicates() return the scala object's internal array representation, so you can stuff new values into them.
-			copyValues(singles, inputSentences[i].singletons());
-			copyValues(preds, inputSentences[i].predicates());
+			copyValues(singles, inputSentences[i].singletonPredictions());
+			copyValues(preds, inputSentences[i].predicatePredictions());
 		}
 	}
 
