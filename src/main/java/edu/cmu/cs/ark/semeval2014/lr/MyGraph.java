@@ -81,9 +81,9 @@ public class MyGraph {
 	}
 	
 	public void print(PrintWriter out, InputAnnotatedSentence sent) {
-		out.println("#" + sent.sentenceId());
+		out.println("#" + sent.sentenceId);
 		for (int i = 0; i < sent.size(); i++) {
-			out.printf("%d\t%s\tlemmaz\t%s\t%s\t%s", i + 1, sent.sentence()[i], sent.pos()[i],
+			out.printf("%d\t%s\tlemmaz\t%s\t%s\t%s", i + 1, sent.sentence[i], sent.pos[i],
 					isTop[i] ? "+" : "-", isPred[i] ? "+" : "-");
 			for (int head = 0; head < sent.size(); head++) {
 				if (!isPred[head]) continue;

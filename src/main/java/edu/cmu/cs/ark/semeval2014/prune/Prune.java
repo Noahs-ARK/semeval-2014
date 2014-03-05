@@ -2,6 +2,7 @@ package edu.cmu.cs.ark.semeval2014.prune;
 
 import java.util.*;
 
+import util.Arr;
 import util.U;
 import util.Vocabulary;
 
@@ -146,12 +147,12 @@ public class Prune {
 	
 	public void dumpDecisions(int snum) {
 		InputAnnotatedSentence sent = inputSentences[snum];
-		U.pf("\nSENTENCE %s\n", sent.sentenceId());
+		U.pf("\nSENTENCE %s\n", sent.sentenceId);
 		for (int t=0; t<inputSentences[snum].size(); t++) {
 			U.pf("issg(g,p) = %d,%d  ispred(g,p) = %d,%d  ||| %s\n", 
-					trainingSingletonIndicators.get(snum)[t], sent.singletonPredictions()[t], 
-					trainingPredicateIndicators.get(snum)[t], sent.predicatePredictions()[t], 
-					sent.sentence()[t]);
+					trainingSingletonIndicators.get(snum)[t], sent.singletonPredictions[t], 
+					trainingPredicateIndicators.get(snum)[t], sent.predicatePredictions[t], 
+					sent.sentence[t]);
 		}
 	}
 
@@ -274,13 +275,13 @@ public class Prune {
 		start.put("<START>", new HashSet<String>());
 		feats.add(start);
 
-		for (int i = 0; i < inputSentences[snum].sentence().length; i++){
+		for (int i = 0; i < inputSentences[snum].size(); i++){
 			// adding the token itself as a feature
 			Set<String> wordFeats = new HashSet<String>();
-			wordFeats.add("token=" + inputSentences[snum].sentence()[i]);
+			wordFeats.add("token=" + inputSentences[snum].sentence[i]);
 			
 			Set<String> posFeats = new HashSet<String>();
-			posFeats.add("pos=" + inputSentences[snum].pos()[i]);
+			posFeats.add("pos=" + inputSentences[snum].pos[i]);
 			
 			
 			Map<String, Set<String>> featsByLabel = initializeFeats();
@@ -313,8 +314,8 @@ public class Prune {
 	}
 	
 	private void printSentenceAndGraph(InputAnnotatedSentence inputSentences, int[][] g){
-		for (int i = 0; i < inputSentences.sentence().length; i++){
-			System.out.print(i + ":" + inputSentences.sentence()[i] + " ");
+		for (int i = 0; i < inputSentences.sentence.length; i++){
+			System.out.print(i + ":" + inputSentences.sentence[i] + " ");
 		}
 		System.out.println("\n");
 		System.out.print("   ");
@@ -359,16 +360,8 @@ public class Prune {
 		for (int i = 0; i < inputSentences.length; i++){
 			int[] singles = predict(singletonModel, i);
 			int[] preds = predict(predicateModel, i);
-			// turns out singletons() and predicates() return the scala object's internal array representation, so you can stuff new values into them.
-			copyValues(singles, inputSentences[i].singletonPredictions());
-			copyValues(preds, inputSentences[i].predicatePredictions());
-		}
-	}
-
-	private static void copyValues(int[] source, Integer[] dest) {
-		assert source.length == dest.length;
-		for (int i = 0; i < source.length; i++){
-			dest[i] = source[i];
+			inputSentences[i].singletonPredictions = Arr.copy(singles);
+			inputSentences[i].predicatePredictions = Arr.copy(preds);
 		}
 	}
 

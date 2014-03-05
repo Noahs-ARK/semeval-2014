@@ -177,7 +177,7 @@ public class LRParser {
 		for (int snum=0; snum<graphs.size(); snum++) {
 			final InputAnnotatedSentence sent = inputSentences[snum];
 			final Graph graph = graphs.get(snum);
-			assert sent.sentenceId().equals(graph.id.replace("#",""));
+//			assert sent.sentenceId.equals(graph.id.replace("#",""));
 			graphMatrices.add(convertGraphToAdjacencyMatrix(graph, sent.size(), labelVocab));
 		}
 		
@@ -256,7 +256,7 @@ public class LRParser {
 		@Override
 		public void add(String featname, double value) {
 			if (verboseFeatures) {
-				U.pf("NODEFEAT\t%s:%d\t%s\n", is.sentence()[i], i, featname);
+				U.pf("NODEFEAT\t%s:%d\t%s\n", is.sentence[i], i, featname);
 			}
 
 			// this is kinda a hack, put it in both directions for every edge.
@@ -313,7 +313,7 @@ public class LRParser {
 			ns.add(i,j, perceptnum, value);
 			
 			if (verboseFeatures) {
-				U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", is.sentence()[i], i, is.sentence()[j], j,
+				U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", is.sentence[i], i, is.sentence[j], j,
 						goldEdgeMatrix!=null ? model.labelVocab.name(goldEdgeMatrix[i][j]) : null, featname, value);
 			}
 

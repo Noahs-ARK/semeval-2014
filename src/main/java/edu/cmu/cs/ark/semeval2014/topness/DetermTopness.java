@@ -7,7 +7,7 @@ public class DetermTopness implements TopnessScorer {
 	@Override
 	public double topness(InputAnnotatedSentence sent, int t) {
 		double relpos = 1.0*t / sent.size();
-		String pos = sent.pos()[t];
+		String pos = sent.pos[t];
 		
 		// umm, VB vs MD could be formalism dependent. a modal logician would say MD should be top, right?
 		double prio = 

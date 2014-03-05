@@ -33,11 +33,11 @@ public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE
 	}
 
 	private void setLemmaPostags() {
-		final int n = sent.sentence().length;
+		final int n = sent.sentence.length;
 		lemmas = new String[n];
 		for (int tokIdx = 0; tokIdx < n; tokIdx++) {
-			final String postag = sent.pos()[tokIdx];
-			final String word = sent.sentence()[tokIdx];
+			final String postag = sent.pos[tokIdx];
+			final String word = sent.sentence[tokIdx];
 			final String lemma = morpha.getLemma(word, postag);
 			lemmas[tokIdx] = lemma;
 		}
@@ -45,8 +45,8 @@ public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE
 
 	@Override
 	public void features(int srcTokenIdx, int destTokenIdx, FeatureAdder fa) {
-        final String srcPostag = sent.pos()[srcTokenIdx];
-        final String destPostag = sent.pos()[destTokenIdx];
+        final String srcPostag = sent.pos[srcTokenIdx];
+        final String destPostag = sent.pos[destTokenIdx];
 		final String srcLemma = lemmas[srcTokenIdx];
 		final String destLemma = lemmas[destTokenIdx];
         final String dir = srcTokenIdx > destTokenIdx ? "dir=i>j" : "dir=i<j";
@@ -59,7 +59,7 @@ public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE
 
 	@Override
 	public void features(int tokenIdx, FeatureAdder fa) {
-		final String postag = sent.pos()[tokenIdx];
+		final String postag = sent.pos[tokenIdx];
         final String lemma = lemmas[tokenIdx];
         fa.add(U.sf("pos:%s", postag));
 		fa.add(U.sf("lem:%s", lemma));

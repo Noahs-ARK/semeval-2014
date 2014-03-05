@@ -28,12 +28,12 @@ public class TopClassifier implements TopnessScorer {
 		@Override
 		public void computeFeatures(TokenCtx ex, mltools.classifier.FeatureExtractor.FeatureAdder fa) {
 			final int tokenIdx = ex.t;
-			String pos = ex.sent.pos()[tokenIdx];
+			String pos = ex.sent.pos[tokenIdx];
 			fa.add("pos=" + pos);
 //			fa.add("pos=" + pos + "&lcword=" + ex.sent.sentence()[ex.t].toLowerCase(), 0.2);
 			fa.add("t=" + tokenIdx);
 			fa.add("pos=" + pos + "&t=" + tokenIdx);
-			final Option<Object> oDepth = ex.sent.syntacticDependencies().depths().apply(tokenIdx);
+			final Option<Object> oDepth = ex.sent.syntacticDependencies.depths().apply(tokenIdx);
 			fa.add("depth=" + (oDepth.isDefined() ? oDepth.get() : "NULL"));
 			
 //			int q5 = (int) Math.floor(ex.t*1.0 / ex.sent.size() * 5);
@@ -48,7 +48,7 @@ public class TopClassifier implements TopnessScorer {
 		InputAnnotatedSentence[] inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		for (InputAnnotatedSentence s1 : inputSentences) {
 			for (int t=0; t<s1.size(); t++) {
-				boolean y = s1.isTop()[t];
+				boolean y = s1.isTop[t];
 				logreg.addTrainingExample(y, new TokenCtx(t, s1));
 			}
 		}

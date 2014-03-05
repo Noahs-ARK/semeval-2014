@@ -7,11 +7,11 @@ public class PruneFeatsForSemparser extends FE.FeatureExtractor implements FE.To
 
 	@Override
 	public void features(int tokenIdx, FeatureAdder fa) {
-		if (sent.singletonPredictions()[tokenIdx]==null || sent.predicatePredictions()[tokenIdx]==null) {
+		if (sent.singletonPredictions==null || sent.predicatePredictions==null) {
 			throw new RuntimeException("the preprocessor 'pruner' was not run?");
 		}
-		fa.add("IsSingletonPrediction=" + sent.singletonPredictions()[tokenIdx]);
-		fa.add("IsPredicatePrediction=" + sent.predicatePredictions()[tokenIdx]);
+		fa.add("IsSingletonPrediction=" + sent.singletonPredictions[tokenIdx]);
+		fa.add("IsPredicatePrediction=" + sent.predicatePredictions[tokenIdx]);
 	}
 
 }

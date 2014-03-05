@@ -14,13 +14,13 @@ public class CoarseDependencyFeatures extends FE.FeatureExtractor implements FE.
 
 	public int treeDistance(int src, int dest) {
 		int distance=0;
-		int currentHead=sent.syntacticDependencies().deps()[src].head();
+		int currentHead=sent.syntacticDependencies.deps()[src].head();
 		while(currentHead >= 0) {
 			distance++;
 			if (currentHead == dest) {
 				return distance;
 			}
-			currentHead=sent.syntacticDependencies().deps()[currentHead].head();
+			currentHead=sent.syntacticDependencies.deps()[currentHead].head();
 		}
 		return -1;
 	}

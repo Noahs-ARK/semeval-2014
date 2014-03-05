@@ -27,11 +27,11 @@ public class FeaturesForPruner extends FE.FeatureExtractor implements FE.TokenFE
 	}
 
 	private void setLemmaPostags() {
-		final int n = sent.sentence().length;
+		final int n = sent.size();
 		lemmas = new String[n];
 		for (int tokIdx = 0; tokIdx < n; tokIdx++) {
-			final String postag = sent.pos()[tokIdx];
-			final String word = sent.sentence()[tokIdx];
+			final String postag = sent.pos[tokIdx];
+			final String word = sent.sentence[tokIdx];
 			final String lemma = morpha.getLemma(word, postag);
 			lemmas[tokIdx] = lemma;
 		}
@@ -39,7 +39,7 @@ public class FeaturesForPruner extends FE.FeatureExtractor implements FE.TokenFE
 
 	@Override
 	public void features(int tokenIdx, FeatureAdder fa) {
-		final String postag = sent.pos()[tokenIdx];
+		final String postag = sent.pos[tokenIdx];
         final String lemma = lemmas[tokenIdx];
         fa.add(U.sf("pos:%s", postag));
 		//fa.add(U.sf("lem:%s", lemma));

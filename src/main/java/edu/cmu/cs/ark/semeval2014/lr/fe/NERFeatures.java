@@ -118,10 +118,10 @@ public class NERFeatures extends FE.FeatureExtractor implements FE.TokenFE,
 	 */
 	public void setupSentence(InputAnnotatedSentence _sent) {
 		super.setupSentence(_sent);
-		int id = Integer.valueOf(sent.sentenceId());
+		int id = Integer.valueOf(sent.sentenceId);
 
-		currentNer3 = new String[sent.pos().length];
-		currentNer7 = new String[sent.pos().length];
+		currentNer3 = new String[sent.pos.length];
+		currentNer7 = new String[sent.pos.length];
 
 		if (ner3Features.containsKey(id)) {
 			Map<Integer, String> feats = ner3Features.get(id);
@@ -210,7 +210,7 @@ public class NERFeatures extends FE.FeatureExtractor implements FE.TokenFE,
 			String srcNER = currentNer7[srcTokenIdx];
 
 			if (targetLabels.contains(srcNER)) {
-				final String destLex = sent.sentence()[destTokenIdx];
+				final String destLex = sent.sentence[destTokenIdx];
 
 				fa.add(U.sf("ner7lex:%s_%s", srcNER, destLex));
 			}
