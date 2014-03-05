@@ -56,20 +56,30 @@ public class MyGraph {
 		g.isTop[i] = true;
 	}
 	
-	public static MyGraph decodeEdgeProbsToGraph(InputAnnotatedSentence sent, double[][][] probs, Vocabulary labelVocab) {
+	public static MyGraph decodeEdgeProbsToGraph(InputAnnotatedSentence sent, double[][][] probs, Vocabulary labelVocab, boolean doPostproc) {
+		int noedgeID = labelVocab.num(LRParser.NO_EDGE);
 		final List<Triple<Integer,Integer,String>> edgeList = new ArrayList<>();
 		for (int i = 0; i < sent.size(); i++) {
 			for (int j = 0; j < sent.size(); j++) {
 				if (LRParser.badDistance(i, j)) continue;
 				int predLabel = Arr.argmax(probs[i][j]);
+				if (predLabel==noedgeID) continue;
+
+				if (doPostproc) {
+					// single direction consistency
+					int labelOtherDir = Arr.argmax(probs[j][i]);
+					if (labelOtherDir != noedgeID && Arr.max(probs[j][i]) > Arr.max(probs[i][j])) {
+						continue;
+					}
+				}
+
 				Triple<Integer,Integer,String> tt = new Triple<>(i, j, labelVocab.name(predLabel));
-				if (tt.third.equals(LRParser.NO_EDGE)) continue;
 				edgeList.add(tt);
 			}
 		}
 		return new MyGraph(sent.size(), edgeList);
 	}
-
+	
 	public void print(PrintWriter out, InputAnnotatedSentence sent) {
 		out.println("#" + sent.sentenceId());
 		for (int i = 0; i < sent.size(); i++) {

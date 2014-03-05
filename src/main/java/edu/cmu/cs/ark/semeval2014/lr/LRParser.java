@@ -94,7 +94,7 @@ public class LRParser {
 	static boolean usePasLabelFeatures = false;
 	@Parameter(names = "-usePcedtLabelFeatures")
 	static boolean usePcedtLabelFeatures = false;
-
+	
 	@Parameter(names="-mode", required=true)
 	static String mode;
     @Parameter(names="-model",required=true)
@@ -475,7 +475,8 @@ public class LRParser {
 	}
 	
 	public static MyGraph decodeToGraph(InputAnnotatedSentence sent, NumberizedSentence ns) {
-	    MyGraph g = MyGraph.decodeEdgeProbsToGraph(sent, model.inferEdgeProbs(ns), model.labelVocab);
+	    MyGraph g = MyGraph.decodeEdgeProbsToGraph(
+	    		sent, model.inferEdgeProbs(ns), model.labelVocab, true);
 	    MyGraph.decideTops(g, sent);
 //	    MyGraph.decideTopsStupid(g, sent);
 	    return g;
