@@ -15,8 +15,10 @@ import edu.cmu.cs.ark.semeval2014.nlp.DependencyParse
 case class InputAnnotatedSentence(sentenceId: String,
                                   sentence: Array[String],
                                   syntacticDependencies: DependencyParse,
-                                  isTop: Array[Boolean],
-                                  pos: Array[String]) {
+                                  pos: Array[String],
+                                  predicatePredictions: Array[Integer],
+                                  singletonPredictions: Array[Integer],
+                                  isTop: Array[Boolean]) {
   def size = sentence.length
 }
 
@@ -44,6 +46,8 @@ object InputAnnotatedSentence {
                             new Array(lines.size),
                             DependencyParse(new Array(lines.size)),
                             if (lines.size > 0 && lines(0).matches("""^DEPS\t.*|.*\t###\tDEPS\t.*""")) { new Array(lines.size) } else { new Array(0) },
+                            new Array(lines.size),
+                            new Array(lines.size),
                             new Array(lines.size))
         for ((line, i) <- lines.zipWithIndex) {
             val field = splitLine(line)
