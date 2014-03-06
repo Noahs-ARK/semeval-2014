@@ -70,8 +70,10 @@ public class LRParser {
 	static int maxEdgeDistance = 10;
 	@Parameter(names="-l2reg")
 	static double l2reg = 1;
-	@Parameter(names="-noedgeWeight")
-	static double noedgeWeight = 0.2;
+	@Parameter(names="-noedgeWeight", description="defaults to formalism-specific value")
+	static double noedgeWeight = -1;
+	@Parameter(names="-formalism", required=true)
+	static String formalism;
 	
 	// 4. Runtime options
 	@Parameter(names="-verboseFeatures")
@@ -109,11 +111,13 @@ public class LRParser {
     	assert numHashBuckets > 0 : "must have positive number of hashbuckets";
     	assert numHashBuckets < Integer.MAX_VALUE : "numhashbuckets must be a signed 4byte integer, so less than 2 billion or so";
 		assert mode.equals("train") || mode.equals("test") : "Need to say either train or test mode.";
+		assert formalism.equals("pas") || formalism.equals("dm") || formalism.equals("pcedt");
     }
     
     public static void main(String[] args) throws IOException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
 		validateParameters();
+		setDefaultNoedgeWeights();
 
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
@@ -144,6 +148,18 @@ public class LRParser {
 	private static void preprocessInputSentences(){
 		preprocessor.loadModels();
 		preprocessor.predictIntoInputs();
+	}
+	
+	static void setDefaultNoedgeWeights() {
+		if (noedgeWeight == -1) {
+			noedgeWeight = 
+					formalism.equals("pas") ? 0.4 :
+					formalism.equals("dm") ? 0.3 :
+					formalism.equals("pcedt") ? 0.3 :
+					-1;
+				assert noedgeWeight != -1;
+		}
+		U.pf("Set noedgeWeight = %s\n", noedgeWeight);
 	}
 
 	private static Model trainModel() throws IOException {
