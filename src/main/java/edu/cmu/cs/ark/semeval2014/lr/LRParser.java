@@ -13,7 +13,6 @@ import edu.cmu.cs.ark.semeval2014.prune.Prune;
 import edu.cmu.cs.ark.semeval2014.prune.PruneFeatsForSemparser;
 import edu.cmu.cs.ark.semeval2014.topness.DetermTopness;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
-import edu.cmu.cs.ark.semeval2014.topness.TopnessScorer;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 import sdp.graph.Edge;
 import sdp.graph.Graph;
@@ -61,7 +60,7 @@ public class LRParser {
 	static Model model;
 	static float[] ssGrad;  // adagrad history info. parallel to coefs[].
 	
-	static TopClassifier topnessScorer = new TopClassifier();
+	static TopClassifier topClassifier = new TopClassifier();
     static Prune preprocessor;
 
 	@Parameter(names="-learningRate")
@@ -123,11 +122,11 @@ public class LRParser {
 		preprocessor = new Prune(inputSentences, modelFile);
 		
 		if (mode.equals("train")) {
-			topnessScorer.train(depFile, modelFile + ".topmodel");
+			topClassifier.train(depFile, modelFile + ".topmodel");
 			trainModel();
 		}
 		else if (mode.equals("test")) {
-			topnessScorer.loadModel(modelFile + ".topmodel");
+			topClassifier.loadModel(modelFile + ".topmodel");
 			model = Model.load(modelFile);
 			preprocessInputSentences();
 			U.pf("Writing predictions to %s\n", sdpFile);
@@ -144,7 +143,7 @@ public class LRParser {
 	// inputSentences that are already stored in p.
 	private static void preprocessInputSentences(){
 		preprocessor.loadModels();
-		preprocessor.predict();
+		preprocessor.predictIntoInputs();
 	}
 
 	private static Model trainModel() throws IOException {
@@ -184,7 +183,7 @@ public class LRParser {
 		// Preprocessor training & prediction ... its predictions will be used as semparser features.
 		// Note that its predictions are stored in the inputSentences.
 		preprocessor.trainModels(labelVocab, graphMatrices);
-		preprocessor.predict();
+		preprocessor.predictIntoInputs();
 //		preprocessor.dumpDecisions(10);
 
 		// Train the edge-based semparser.

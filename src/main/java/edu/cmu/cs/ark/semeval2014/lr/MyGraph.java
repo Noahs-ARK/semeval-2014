@@ -49,7 +49,7 @@ public class MyGraph {
 				topnesses[i] = -1e6;
 			}
 			else {
-				topnesses[i] = LRParser.topnessScorer.topness(sent, i);
+				topnesses[i] = LRParser.topClassifier.topness(sent, i);
 			}
 		}
 		int i = Arr.argmax(topnesses);

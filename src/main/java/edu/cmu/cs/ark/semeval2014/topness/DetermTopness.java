@@ -2,10 +2,9 @@ package edu.cmu.cs.ark.semeval2014.topness;
 
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 
-public class DetermTopness implements TopnessScorer {
+public class DetermTopness {
 
-	@Override
-	public double topness(InputAnnotatedSentence sent, int t) {
+	public static double topness(InputAnnotatedSentence sent, int t) {
 		double relpos = 1.0*t / sent.size();
 		String pos = sent.pos[t];
 		

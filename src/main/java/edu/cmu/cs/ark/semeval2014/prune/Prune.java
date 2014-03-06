@@ -352,7 +352,7 @@ public class Prune {
 	}
 	
 	/** Do predictions and save them in the input sentence objects. */
-	public void predict(){
+	public void predictIntoInputs(){
 		predictForInputSentences(singletonModel, predicateModel);
 	}
 

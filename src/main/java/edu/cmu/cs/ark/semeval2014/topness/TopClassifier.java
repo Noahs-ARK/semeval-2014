@@ -8,7 +8,7 @@ import util.U;
 
 import java.io.IOException;
 
-public class TopClassifier implements TopnessScorer {
+public class TopClassifier {
 	BinaryLogreg<TokenCtx> logreg;
 	
 	static class TokenCtx {
@@ -67,15 +67,19 @@ public class TopClassifier implements TopnessScorer {
 		return probs;
 	}
 	
-	public static void main(String[] args) {
-		
-		TopClassifier c = new TopClassifier();
-//		c.train(args[0]);
-		
-	}
-	
-	@Override
 	public double topness(InputAnnotatedSentence sent, int t) {
 		return logreg.predictLabelProb(new TokenCtx(t, sent));
+	}
+	
+	public void predictIntoInputs(InputAnnotatedSentence[] sents) {
+		for (InputAnnotatedSentence s : sents) {
+			predictIntoInput(s);
+		}
+	}
+	public void predictIntoInput(InputAnnotatedSentence sent) {
+		sent.topnessPredProbs = new double[sent.size()];
+		for (int t=0; t<sent.size(); t++) {
+			sent.topnessPredProbs[t] = topness(sent, t);
+		}
 	}
 }
