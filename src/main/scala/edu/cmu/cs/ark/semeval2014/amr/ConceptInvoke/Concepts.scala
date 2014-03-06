@@ -1,6 +1,5 @@
 package edu.cmu.cs.ark.semeval2014.amr.ConceptInvoke
 
-
 import scala.collection.mutable.Map
 import edu.cmu.cs.ark.semeval2014.amr.Input
 

@@ -20,8 +20,8 @@ case class MulAssoc(x: Double) { def * (v: FeatureVector) = mul(x, v) }
 // in package.scala:
 // implicit def doubleToMulAssoc(x: Double) = new MulAssoc(x)
 
-case class FeatureVector(fmap : Map[String, Double]) {
-    def this() = this(Map[String, Double]())
+case class FeatureVector(fmap : Map[String, Double] = Map[String, Double]()) {
+    //def this() = this(Map[String, Double]())
     def dot(v: FeatureVector) : Double = {
         if (fmap.size <= v.fmap.size) {
             (fmap :\ 0.0)((f, sum) => f._2 * v.fmap.getOrElse(f._1, 0.0) + sum)
