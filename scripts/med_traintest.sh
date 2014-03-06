@@ -32,8 +32,10 @@ do
     set -x
     (
     ./java.sh lr.LRParser -mode train -saveEvery -1 \
+      -formalism $formalism \
       -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts}
     ./java.sh lr.LRParser -mode test \
+      -formalism $formalism \
       -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts}
     ./scripts/eval.sh "${test_file}" "${pred_file}" | tee "${reports_dir}/${model_name}.eval.log"
     ./scripts/eval_to_csv.py < "${reports_dir}/${model_name}.eval.log" > "${reports_dir}/${model_name}.eval.csv"
