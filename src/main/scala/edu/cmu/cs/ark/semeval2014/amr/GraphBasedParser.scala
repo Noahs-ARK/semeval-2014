@@ -1,4 +1,4 @@
-package package edu.cmu.cs.ark.semeval2014.amr
+package edu.cmu.cs.ark.semeval2014.amr
 
 import java.lang.Math.abs
 import java.lang.Math.log
@@ -14,9 +14,9 @@ import scala.util.matching.Regex
 import scala.collection.mutable.Map
 import scala.collection.mutable.Set
 import scala.collection.mutable.ArrayBuffer
-
-import edu.cmu.lti.nlp.amr.GraphDecoder._
-import edu.cmu.lti.nlp.amr.ConceptInvoke.PhraseConceptPair
+import edu.cmu.cs.ark.semeval2014.amr.GraphDecoder._
+import edu.cmu.cs.ark.semeval2014.common._
+import edu.cmu.cs.ark.semeval2014.utils._
 
 object GraphBasedParser {
 
@@ -65,7 +65,7 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
 
         verbosity = options.getOrElse('verbosity, "0").toInt
 
-        if (!options.contains('mode) {
+        if (!options.contains('mode)) {
                 System.err.println("Error: please specify either -mode train or -mode test")
                 sys.exit(1)
         }
@@ -91,7 +91,10 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
             decoder.features.weights.read(Source.fromFile(options('model)).getLines())
             logger(0, "done")
 
-
+        }
+    }
+}
+/*
             val input = stdin.getLines.toArray
             val tokenized = fromFile(options('tokenized).asInstanceOf[String]).getLines.toArray
             val nerFile = Corpus.splitOnNewline(fromFile(options('ner).asInstanceOf[String]).getLines).toArray
@@ -203,4 +206,4 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
         }
     }
 }
-
+*/
