@@ -2,14 +2,12 @@ package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
 import scala.collection.mutable.Set
 import scala.collection.mutable.PriorityQueue
-import edu.cmu.cs.ark.semeval2014.common.{logger, FeatureVector}
-import edu.cmu.cs.ark.semeval2014.amr.graph.{Graph, Node}
-import edu.cmu.cs.ark.semeval2014.amr.{Input, DecoderResult}
+import edu.cmu.cs.ark.semeval2014.amr._
+import edu.cmu.cs.ark.semeval2014.common._
+import edu.cmu.cs.ark.semeval2014.amr.graph._
 
-class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected: Boolean = true)
-    extends Decoder(featureNames) {
-    // Base class has defined:
-    // val features: Features
+class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected: Boolean = true) extends Decoder {
+    val features = new Features(featureNames)
 
     private var inputSave: Input = _
     def input : Input = inputSave
@@ -45,6 +43,11 @@ class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected
                 }
             }
         }
+    }
+
+    def decode(i: Input) : DecoderResult = { 
+        input = i 
+        decode 
     }
 
     def decode() : DecoderResult = {
@@ -119,7 +122,7 @@ class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected
                 val node1 = nodes(index1)
                 for ((labelWeights, index2) <- nodes2.zipWithIndex) yield {
                     val node2 = nodes(index2)
-                    val (label, weight) = labelWeights.map(x => (x._1, x._2 + features.weights.dot(features.ffLabelWithId(node1, node2, x._1)))).maxBy(_._2)
+                    val (label, weight) = labelWeights.map(x => (x._1, x._2 + features.weights.dot(features.ffLRLabelWithId(node1, node2, x._1)))).maxBy(_._2)
                     if (weight > 0) {   // Add if positive
                         addEdge(node1, index1, node2, index2, label, weight)
                     }

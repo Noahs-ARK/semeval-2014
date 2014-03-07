@@ -10,7 +10,7 @@ import edu.cmu.cs.ark.semeval2014.amr._
 
 /**************************** Feature Functions *****************************/
 
-class Features(featureNames: List[String]) {
+class Features(var featureNames: List[String]) {
     var weights = new FeatureVector()
     private var inputSave: Input = _
     private var graph: Graph = _
@@ -34,8 +34,8 @@ class Features(featureNames: List[String]) {
     type RootFeatureFunction = (Node) => FeatureVector
 
     val ffTable = Map[String, FeatureFunction](
-        "edgeId" -> ffEdgeId _,
-        "labelWithId" -> ffLabelWithId _,
+        "CostAugEdgeId" -> ffCostAugEdgeId,
+        "LRLabelWithId" -> ffLRLabelWithId,
         "bias" -> ffBias _,
         "biasCSuf" -> ffBiasCSuf _,
         "typeBias" -> ffTypeBias _,
@@ -65,11 +65,11 @@ class Features(featureNames: List[String]) {
 
     // node1 is always the tail, and node2 the head
 
-    def ffEdgeId(node1: Node, node2: Node, label: String) : FeatureVector = {       // Used for Dual Decomposition
-        return FeatureVector(Map(("Id1="+node1.id+"+Id2="+node2.id+"+L="+label) -> 1.0))
+    def ffCostAugEdgeId(node1: Node, node2: Node, label: String) : FeatureVector = {        // Used for cost augmented decoding
+        return FeatureVector(Map(("CA:Id1="+node1.id+"+Id2="+node2.id+"+L="+label) -> 1.0))
     }
 
-    def ffLabelWithId(node1: Node, node2: Node, label: String) : FeatureVector = {  // Used for Langragian Relaxation
+    def ffLRLabelWithId(node1: Node, node2: Node, label: String) : FeatureVector = {  // Used for Langragian Relaxation
         return FeatureVector(Map(("Id1="+node1.id+"+L="+label) -> 1.0))
     }
 
@@ -391,6 +391,17 @@ class Features(featureNames: List[String]) {
     def setFeatures(featureNames: List[String]) {
         featureFunctions = featureNames.filter(x => !notFast.contains(x)).map(x => ffTable(x))
         //featureFunctionsNotFast = featureNames.filter(x => notFast.contains(x)).map(x => ffTable(x))
+    }
+
+    def addFeatureFunction(featureName: String) {
+        if (!featureNames.contains(featureName)) {
+            featureNames = featureName :: featureNames
+            if (rootFeature.contains(featureName)) {
+                rootFeatureFunctions = rootFFTable(featureName) :: rootFeatureFunctions
+            } else {
+                featureFunctions = ffTable(featureName) :: featureFunctions
+            }
+        }
     }
 
     def localFeatures(node1: Node, node2: Node, label: String) : FeatureVector = {

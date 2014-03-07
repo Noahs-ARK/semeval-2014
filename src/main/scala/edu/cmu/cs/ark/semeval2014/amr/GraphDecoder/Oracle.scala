@@ -1,21 +1,14 @@
 package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
-import edu.cmu.cs.ark.semeval2014.common.FeatureVector
-import edu.cmu.cs.ark.semeval2014.amr.{Input, DecoderResult}
+import edu.cmu.cs.ark.semeval2014.amr.graph._
+import edu.cmu.cs.ark.semeval2014.common._
+import edu.cmu.cs.ark.semeval2014.amr._
 
-class Oracle(featureNames: List[String])
-    extends Decoder(featureNames) {
-    // Base class has defined:
-    // val features: Features
+class Oracle(featureNames: List[String]) extends Decoder {
+    val features = new Features(featureNames)
 
-    private var inputSave: Input = _
-    def input : Input = inputSave
-    def input_= (i: Input) {
-        inputSave = i
-        features.input = i
-    }
-
-    def decode() : DecoderResult = {
+    def decode(input: Input) : DecoderResult = {
+        features.input = input
         val graph = input.graph.get
         var feats = new FeatureVector()
 

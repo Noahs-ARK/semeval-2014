@@ -18,7 +18,7 @@ import edu.cmu.cs.ark.semeval2014.amr.GraphDecoder._
 import edu.cmu.cs.ark.semeval2014.common._
 import edu.cmu.cs.ark.semeval2014.utils._
 
-object GraphBasedParser {
+object SemanticParser {
 
     val usage = """Usage:
 scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage1-decode --stage1-weights weights --concept-table concepts --ner namedEntities --tok tokenized.txt < inputFile
@@ -94,6 +94,10 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
         }
     }
 }
+
+
+// The rest of this stuff can be deleted
+
 /*
             val input = stdin.getLines.toArray
             val tokenized = fromFile(options('tokenized).asInstanceOf[String]).getLines.toArray
