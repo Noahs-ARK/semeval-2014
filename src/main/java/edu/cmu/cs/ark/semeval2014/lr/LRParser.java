@@ -69,7 +69,7 @@ public class LRParser {
 	// 3. Model parameter-ish options
 	static int maxEdgeDistance = 10;
 	@Parameter(names="-l2reg")
-	static double l2reg = 1;
+	static double l2reg = 0.5;
 	@Parameter(names="-noedgeWeight", description="defaults to formalism-specific value")
 	static double noedgeWeight = -1;
 	@Parameter(names="-formalism", required=true)
