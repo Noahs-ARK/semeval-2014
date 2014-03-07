@@ -15,8 +15,8 @@ public class WordVectors extends FE.FeatureExtractor implements FE.EdgeFE {
 	public static HashMap<String, double[]> wordToVector = loadWordVectors();
   
   public WordVectors(String fileLoc){
-    vectorFileName = fileLoc;
     super();
+    vectorFileName = fileLoc;
   }
 
   /* Make sure the embeddings are pre-normalized */
@@ -43,8 +43,8 @@ public class WordVectors extends FE.FeatureExtractor implements FE.EdgeFE {
   
 	@Override
 	public void features(int srcTokenIdx, int destTokenIdx, FE.FeatureAdder fa) {
-    String srcToken = sent.sentence()[srcTokenIdx].toLowerCase();
-    String destToken = sent.sentence()[destTokenIdx].toLowerCase();
+    String srcToken = sent.sentence[srcTokenIdx].toLowerCase();
+    String destToken = sent.sentence[destTokenIdx].toLowerCase();
 	  double[] srcWordVector = wordToVector.get(srcToken);
 	  double[] destWordVector = wordToVector.get(destToken);
     
