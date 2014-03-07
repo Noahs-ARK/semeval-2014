@@ -11,8 +11,13 @@ import util.BasicFileIO;
 import util.U;
 
 public class WordVectors extends FE.FeatureExtractor implements FE.EdgeFE {
-	public static String vectorFileName = "resources/word_vectors_norm.txt";
+	public static String vectorFileName;// = "resources/word_vectors_norm.txt";
 	public static HashMap<String, double[]> wordToVector = loadWordVectors();
+  
+  public WordVectors(String fileLoc){
+    vectorFileName = fileLoc;
+    super();
+  }
 
   /* Make sure the embeddings are pre-normalized */
   public static HashMap<String, double[]> loadWordVectors() {
