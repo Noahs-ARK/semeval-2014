@@ -106,6 +106,9 @@ public class LRParser {
     static String sdpFile;
     @Parameter(names="-depInput", required=true)
 	static String depFile;
+    @Parameter(names="-wordVectors", required=true)
+	static String wordVecFile;
+    
     
     static long numPairs = 0, numTokens = 0; // purely for diagnosis
     
@@ -581,6 +584,7 @@ public class LRParser {
 		allFE.add(new CoarseDependencyFeatures());
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
+		allFE.add(new WordVectors(wordVecFile));
 //		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
 	}
