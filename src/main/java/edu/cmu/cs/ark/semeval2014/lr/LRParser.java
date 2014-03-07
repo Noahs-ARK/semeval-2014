@@ -107,6 +107,8 @@ public class LRParser {
     @Parameter(names="-depInput", required=true)
 	static String depFile;
     
+    static long numPairs = 0, numTokens = 0; // purely for diagnosis
+    
     static void validateParameters() {
     	assert numHashBuckets > 0 : "must have positive number of hashbuckets";
     	assert numHashBuckets < Integer.MAX_VALUE : "numhashbuckets must be a signed 4byte integer, so less than 2 billion or so";
@@ -367,6 +369,7 @@ public class LRParser {
 			}
 			for (edgeAdder.j=0; edgeAdder.j<ns.T; edgeAdder.j++) {
 				if (badDistance(edgeAdder.i,edgeAdder.j)) continue;
+				numPairs++;
 				
 				// bias term
 				ns.add(edgeAdder.i, edgeAdder.j, biasIdx, 1.0);
@@ -394,7 +397,9 @@ public class LRParser {
     	featureExtractionPass();
 		closeCacheAfterWriting();
     	allocateCoefs();
-		U.pf("FE done: %d percepts, %d nnz\n", model.perceptVocab.size(), NumberizedSentence.totalNNZ);
+        U.pf("\n");
+        U.pf("%d sentences, %d tokens, %.2f tokens/sent, %d pairs (candidate edges), %.2f pairs/sent\n", inputSentences.length, numTokens, numTokens*1.0/inputSentences.length, numPairs, numPairs*1.0/inputSentences.length);
+		U.pf("%d percepts, %d nnz\n", model.perceptVocab.size(), NumberizedSentence.totalNNZ);
 		cacheReadMode = true;
 		
     	for (int outer=0; outer<numIters; outer++) {
@@ -446,6 +451,7 @@ public class LRParser {
             			Runtime.getRuntime().totalMemory()/1e6
             			);
             }
+            numTokens += inputSentences[snum].size();
         }
     }
     
