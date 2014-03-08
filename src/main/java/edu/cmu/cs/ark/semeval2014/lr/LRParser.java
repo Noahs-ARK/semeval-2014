@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
@@ -62,6 +63,7 @@ public class LRParser {
 
 	static TopClassifier topClassifier = new TopClassifier();
     static Prune preprocessor;
+    static HashMap<String, double[]> wordToVector;
 
 	@Parameter(names="-learningRate")
 	static double learningRate = .1;
@@ -127,7 +129,8 @@ public class LRParser {
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
-
+		
+		wordToVector = WordVectors.loadWordVectors(wordVecFile);
 		preprocessor = new Prune(inputSentences, modelFile);
 
 		if (mode.equals("train")) {
@@ -584,7 +587,7 @@ public class LRParser {
 		allFE.add(new CoarseDependencyFeatures());
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
-		allFE.add(new WordVectors(wordVecFile));
+		allFE.add(new WordVectors(wordToVector));
 //		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
 	}
