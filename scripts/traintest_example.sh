@@ -7,7 +7,7 @@ model_dir="bladir"
 mkdir -p "${model_dir}"
 model_file="${model_dir}/${model_name}"
 
-formalism="pas"
+formalism="pcedt"
 data_dir="lildata/lil"
 train_file="${data_dir}train.${formalism}.sdp"
 train_deps="${train_file}.dependencies"
@@ -18,11 +18,13 @@ test_deps="${test_file}.dependencies"
 
 pred_file="${model_file}.pred.${formalism}.sdp"
 
+word_vectors="resources/word_vectors_norm.txt"
+
 set -x
 ./java.sh lr.LRParser -mode train \
   -formalism $formalism \
-  -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts}
+  -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts} -wordVectors ${word_vectors}
 ./java.sh lr.LRParser -mode test \
   -formalism $formalism \
-  -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts}
+  -model ${model_file} -sdpInput ${test_file} -depInput ${test_deps} ${feature_opts} -wordVectors ${word_vectors}
 scripts/eval.sh ${test_file} ${pred_file}

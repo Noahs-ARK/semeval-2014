@@ -12,6 +12,8 @@ reports_dir="target/reports_run=${timestamp}_commit=${gitid}"
 mkdir -p "${reports_dir}"
 (cd $(dirname $reports_dir) && ln -sf $(basename $reports_dir) reports)
 echo "REPORTS DIR: ${reports_dir}"
+word_vectors="resources/word_vectors_norm.txt"
+
 
 archive_dir=/cab0/brendano/www/semeval/reports
 
@@ -33,10 +35,10 @@ do
     (
     ./java.sh lr.LRParser -mode train -saveEvery -1 \
       -formalism $formalism \
-      -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts}
+      -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts} -wordVectors ${word_vectors}
     ./java.sh lr.LRParser -mode test \
       -formalism $formalism \
-      -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts}
+      -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts} -wordVectors ${word_vectors}
     ./scripts/eval.sh "${test_file}" "${pred_file}" | tee "${reports_dir}/${model_name}.eval.log"
     ./scripts/eval_to_csv.py < "${reports_dir}/${model_name}.eval.log" > "${reports_dir}/${model_name}.eval.csv"
     python errorAnalysis/confusionMatrix.py "${test_file}" "${pred_file}" > "${reports_dir}/${model_name}_confusion.html"
