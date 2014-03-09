@@ -1,9 +1,9 @@
 package edu.cmu.cs.ark.semeval2014.lr.fe;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
+import util.BasicFileIO;
 import util.U;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
@@ -11,16 +11,26 @@ import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureExtractor;
 
 public class BrownFeatures extends FeatureExtractor implements FE.TokenFE, FE.EdgeFE {
 	
-	Map<String, String> brownMap;
-	final int maxClusterLength = 12; // best length is 12
+	private String brownFileName;
+	private Map<String, String> brownMap;
+	private final int maxClusterLength = 12; // best length is 12
 
-	public BrownFeatures(Map<String, String> brownMap) {
-		this.brownMap = brownMap;
+	public BrownFeatures(String brownFileName) {
+		this.brownFileName = brownFileName;
 	}
 
 	@Override
 	public void setupSentence(InputAnnotatedSentence _sent) {
 		super.setupSentence(_sent);
+	}
+	
+	@Override
+	public void initializeAtStartup() {
+		brownMap = new HashMap<String, String>();
+		for (String line : BasicFileIO.openFileLines(brownFileName)) {
+			String[] parts =line.trim().split(" +");
+		    brownMap.put(parts[1], parts[0]);
+		}
 	}
 
 	private String getPrefix(String brown, int length) {
@@ -81,7 +91,7 @@ public class BrownFeatures extends FeatureExtractor implements FE.TokenFE, FE.Ed
         final String destPostag = sent.pos[destTokenIdx];
 		final String srcToken = sent.sentence[srcTokenIdx];
 		final String destToken = sent.sentence[srcTokenIdx];
-        final String dir = srcTokenIdx > destTokenIdx ? "dir=i>j" : "dir=i<j";
+        //final String dir = srcTokenIdx > destTokenIdx ? "dir=i>j" : "dir=i<j";
 
         String brownSrc = brownMap.get(srcToken);
         String brown4src = getPrefix(brownSrc, 4);

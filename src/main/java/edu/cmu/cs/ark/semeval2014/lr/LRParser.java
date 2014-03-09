@@ -132,10 +132,6 @@ public class LRParser {
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
-		
-		// Brown cluster loading
-		brownMap = readClusters(brownFile);
-		clusterMap = readClusters(clusterFile);
 
 		preprocessor = new Prune(inputSentences, modelFile);
 		
@@ -580,29 +576,9 @@ public class LRParser {
     	}
     	kryoInput = new Input(new FileInputStream(featureCacheFile));
     }
-    
-    private static Map<String, String> readClusters(String fileName) {
-		Map<String, String> brownMap = new HashMap<String, String>();
-		try {						
-			FileInputStream fstream = new FileInputStream(new File(fileName));
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String strLine;
-			while ((strLine = br.readLine()) != null) {
-				String[] toks = strLine.split("\t");
-				brownMap.put(toks[1], toks[0]);
-			}	
-			br.close();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		return brownMap;
-	}
-
-    
+       
     // END feature cache stuff
     
-
 	///////////////////////////////////////////////////////////
 	
 	static List<FE.FeatureExtractor> initializeFeatureExtractors() {
@@ -613,8 +589,8 @@ public class LRParser {
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
 //		allFE.add(new PruneFeatsForSemparser());
-		//allFE.add(new BrownFeatures(brownMap));
-		allFE.add(new ClusterFeatures(clusterMap));
+		allFE.add(new BrownFeatures(brownFile));
+		//allFE.add(new ClusterFeatures(clusterMap));
 		return allFE;
 	}
 
