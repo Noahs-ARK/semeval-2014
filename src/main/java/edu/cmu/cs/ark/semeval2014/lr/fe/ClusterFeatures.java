@@ -22,7 +22,7 @@ public class ClusterFeatures extends FeatureExtractor implements TokenFE {
 	public void initializeAtStartup() {
 		clusterMap = new HashMap<String, String>();
 		for (String line : BasicFileIO.openFileLines(clusterFileName)) {
-			String[] parts =line.trim().split(" +");
+			String[] parts =line.trim().split("\t");
 			clusterMap.put(parts[1], parts[0]);
 		}
 	}

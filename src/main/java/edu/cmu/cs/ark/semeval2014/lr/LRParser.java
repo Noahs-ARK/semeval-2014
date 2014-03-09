@@ -18,6 +18,7 @@ import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 import sdp.graph.Edge;
 import sdp.graph.Graph;
 import sdp.io.GraphReader;
+import util.BasicFileIO;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
@@ -132,6 +133,8 @@ public class LRParser {
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
+		
+		brownMap = readClusters(brownFile);
 
 		preprocessor = new Prune(inputSentences, modelFile);
 		
@@ -576,6 +579,15 @@ public class LRParser {
     	}
     	kryoInput = new Input(new FileInputStream(featureCacheFile));
     }
+    
+    static Map<String, String> readClusters(String fileName) {
+    	Map<String, String> clusterMap = new HashMap<String, String>();
+		for (String line : BasicFileIO.openFileLines(fileName)) {
+			String[] parts =line.trim().split("\t");
+			clusterMap.put(parts[1], parts[0]);
+		}
+		return clusterMap;
+    }
        
     // END feature cache stuff
     
@@ -589,7 +601,7 @@ public class LRParser {
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
 //		allFE.add(new PruneFeatsForSemparser());
-		allFE.add(new BrownFeatures(brownFile));
+		allFE.add(new BrownFeatures(brownMap));
 		//allFE.add(new ClusterFeatures(clusterFile));
 		return allFE;
 	}

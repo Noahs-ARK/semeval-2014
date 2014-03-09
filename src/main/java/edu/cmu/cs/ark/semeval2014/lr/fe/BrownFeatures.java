@@ -11,12 +11,21 @@ import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureExtractor;
 
 public class BrownFeatures extends FeatureExtractor implements FE.TokenFE, FE.EdgeFE {
 	
-	private String brownFileName;
+	//private String brownFileName;
 	private Map<String, String> brownMap;
 	private final int maxClusterLength = 12; // best length is 12
 
 	public BrownFeatures(String brownFileName) {
-		this.brownFileName = brownFileName;
+    	Map<String, String> clusterMap = new HashMap<String, String>();
+		for (String line : BasicFileIO.openFileLines(brownFileName)) {
+			String[] parts =line.trim().split("\t");
+			clusterMap.put(parts[1], parts[0]);
+		}
+		this.brownMap = clusterMap;    
+	}
+	
+	public BrownFeatures(Map<String, String> brownMap) {
+		this.brownMap = brownMap;
 	}
 
 	@Override
@@ -24,14 +33,14 @@ public class BrownFeatures extends FeatureExtractor implements FE.TokenFE, FE.Ed
 		super.setupSentence(_sent);
 	}
 	
-	@Override
+	/*@Override
 	public void initializeAtStartup() {
 		brownMap = new HashMap<String, String>();
 		for (String line : BasicFileIO.openFileLines(brownFileName)) {
-			String[] parts =line.trim().split(" +");
+			String[] parts =line.trim().split("\t");
 		    brownMap.put(parts[1], parts[0]);
 		}
-	}
+	}*/
 
 	private String getPrefix(String brown, int length) {
 		String prefix;
@@ -70,14 +79,14 @@ public class BrownFeatures extends FeatureExtractor implements FE.TokenFE, FE.Ed
 //	    fa.add(U.sf("brown6:%s", brown6));
 	    
 	    // brown prefix for postag
-	    fa.add(U.sf("brown0p:%s_%s", brownId, postag));
+	    //fa.add(U.sf("brown0p:%s_%s", brownId, postag));
 //	    fa.add(U.sf("brown4p:%s_%s",  brown4, postag));
 //	    fa.add(U.sf("brown6p:%s_%s",  brown6, postag));
 	    
 	    // brown prefix for token
 //	    fa.add(U.sf("brown0:%s_%s", brownId, token));
-	    fa.add(U.sf("brown4:%s_%s",  brown4, token));
-	    fa.add(U.sf("brown6:%s_%s",  brown6, token));
+	    //fa.add(U.sf("brown4:%s_%s",  brown4, token));
+	    //fa.add(U.sf("brown6:%s_%s",  brown6, token));
 	    
 	    // brown prefix for postag + token -- removing this helps
 //	    fa.add(U.sf("brown0:%s_%s_%s", brownId, token, postag));
@@ -93,23 +102,14 @@ public class BrownFeatures extends FeatureExtractor implements FE.TokenFE, FE.Ed
 		final String destToken = sent.sentence[srcTokenIdx];
         //final String dir = srcTokenIdx > destTokenIdx ? "dir=i>j" : "dir=i<j";
 
-        String brownSrc = brownMap.get(srcToken);
-        String brown4src = getPrefix(brownSrc, 4);
-	    String brown6src = getPrefix(brownSrc, 6);
-	    
+        String brownSrc = brownMap.get(srcToken);	    
         String brownDest = brownMap.get(destToken);
-        String brown4dest = getPrefix(brownDest, 4);
-	    String brown6dest = getPrefix(brownDest, 6);
 		
-		//fa.add(U.sf("brown:bg:%s_%s_%s_%s", brownSrc, srcPostag, brownDest, destPostag));
-        //fa.add(U.sf("brown:bg:%s_%s_%s_%s", brownSrc, srcToken, brownDest, destToken));
-		fa.add(U.sf("brown:bg:%s_%s_%s_%s", brownSrc, srcPostag, brownDest, destPostag));
-			    
-	    fa.add(U.sf("brown4:bg:%s_%s_%s_%s", brown4src, srcPostag, brown4dest, destPostag));
-	    //fa.add(U.sf("brown4:bg:%s_%s_%s_%s", brown4src, srcToken, brown4dest, destToken));
-	    fa.add(U.sf("brown6:bg:%s_%s_%s_%s", brown6src, srcPostag, brown6dest, destPostag));
-	    //fa.add(U.sf("brown6:bg:%s_%s_%s_%s", brown6src, srcToken, brown6dest, destToken));
+	    for (Integer i = 2; i <= maxClusterLength; i+=2) {
+	    	String srcPrefix = getPrefix(brownSrc, i);
+	    	String destPrefix = getPrefix(brownDest, i);
+	    	fa.add(U.sf("brown%s:bg:%s_%s_%s_%s", 
+	    			i.toString(), srcPrefix, srcPostag, destPrefix, destPostag));
+	    }	
 	}
-	
-	
 }
