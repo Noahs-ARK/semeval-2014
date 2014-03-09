@@ -6,6 +6,7 @@ import com.beust.jcommander.internal.Lists;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+
 import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.*;
@@ -26,7 +27,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
 
@@ -107,6 +110,11 @@ public class LRParser {
     @Parameter(names="-depInput", required=true)
 	static String depFile;
     
+    static Map<String, String> brownMap;
+    static String brownFile = "clusters.brown";
+    static Map<String, String> clusterMap;
+    static String clusterFile = "clusters_full.manaal";
+    
     static long numPairs = 0, numTokens = 0; // purely for diagnosis
     
     static void validateParameters() {
@@ -124,6 +132,10 @@ public class LRParser {
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
+		
+		// Brown cluster loading
+		brownMap = readClusters(brownFile);
+		clusterMap = readClusters(clusterFile);
 
 		preprocessor = new Prune(inputSentences, modelFile);
 		
@@ -569,6 +581,25 @@ public class LRParser {
     	kryoInput = new Input(new FileInputStream(featureCacheFile));
     }
     
+    private static Map<String, String> readClusters(String fileName) {
+		Map<String, String> brownMap = new HashMap<String, String>();
+		try {						
+			FileInputStream fstream = new FileInputStream(new File(fileName));
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			String strLine;
+			while ((strLine = br.readLine()) != null) {
+				String[] toks = strLine.split("\t");
+				brownMap.put(toks[1], toks[0]);
+			}	
+			br.close();
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		return brownMap;
+	}
+
+    
     // END feature cache stuff
     
 
@@ -582,6 +613,8 @@ public class LRParser {
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
 //		allFE.add(new PruneFeatsForSemparser());
+		//allFE.add(new BrownFeatures(brownMap));
+		allFE.add(new ClusterFeatures(clusterMap));
 		return allFE;
 	}
 
