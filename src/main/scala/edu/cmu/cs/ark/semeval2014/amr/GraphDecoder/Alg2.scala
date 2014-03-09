@@ -24,12 +24,6 @@ class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected
         // TODO: fix this so errors don't occur
         var graph = input.graph.get.duplicate
         val nodes : Array[Node] = graph.nodes.filter(_.name != None).toArray
-        //val nonDistinctLabels = labelSet.toList.filter(x => x._2 > 1) // TODO: remove
-        //val distinctLabels = labelSet.filter(x => x._2 == 1)  // TODO: remove
-        //val nonDistinctLabels : Array[(String, Int)] = new Array(0)
-        //val distinctLabels = labelSet
-        //edgeWeightsDistict = weightMatrix(nodes, distinctLabels)
-        //edgeWeightsND = weightMatrix(nodes, nonDistinctLabels)
         edgeWeights = weightMatrix(nodes, labelSet)
     }
 
@@ -53,13 +47,7 @@ class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected
     def decode() : DecoderResult = {
         // Assumes that Node.relations has been setup correctly for the graph fragments
         var graph = input.graph.get.duplicate
-        //val nodes : Array[Node] = graph.nodes.filter.toArray
         val nodes : Array[Node] = graph.nodes.filter(_.name != None).toArray
-        //val nonDistinctLabels = labelSet.toList.filter(x => x._2 > 1) // TODO: remove
-        val nonDistinctLabels : Array[(String, Int)] = new Array(0)
-        //logger(2,"ndLabels = "+nonDistinctLabels.toList)
-        //val distinctLabels = labelSet.filter(x => x._2 == 1)  // TODO: remove
-        val distinctLabels = labelSet
 
         // Each node is numbered by its index in 'nodes'
         // Each set is numbered by its index in 'setArray'
@@ -130,43 +118,6 @@ class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected
                 }
             }
         }
-
-/*
-        val neighbors : Array[Array[(String, Double)]] = {
-            for ((node1, index1) <- nodes.zipWithIndex) yield {
-                for ((node2, index2) <- nodes.zipWithIndex) yield {
-                    if (index1 == index2) {
-                        (":self", 0.0) // we won't add this to the queue anyway, so it's ok
-                    } else {
-                    val (label, weight) = distinctLabels.map(x => (x._1, features.localScore(node1, node2, x._1))).maxBy(_._2)
-                    //logger(1,"distinctLabels = "+distinctLabels.map(x => (x._1, features.localScore(node1, node2, x._1))).sortBy(-_._2).toList.take(5)+"...")
-                    //logger(1,"label = "+label)
-                    //logger(1,"weight = "+weight)
-                    val ndLabels = nonDistinctLabels.map(x => (x._1, features.localScore(node1, node2, x._1))).filter(x => x._2 > 0 && x._1 != label)
-                    //logger(2,"ndLabels = "+nonDistinctLabels.map(x => (x._1, features.localScore(node1, node2, x._1))))
-                    //logger(2,"ndLabels = "+ndLabels.toList)
-                    ndLabels.filter(_._2 > 0).map(x => addEdge(node1, index1, node2, index2, x._1, x._2))
-                    if (weight > 0) {   // Add all positive weights
-                        addEdge(node1, index1, node2, index2, label, weight)
-                    }
-                    if (ndLabels.size > 0) {
-                        val (label2, weight2) = ndLabels.maxBy(_._2)
-                        if (weight > weight2) {
-                            //logger(1, "1neighbors("+node1.concept+","+node2.concept+")="+label)
-                            (label, weight)
-                        } else {
-                            //logger(1, "2neighbors("+node1.concept+","+node2.concept+")="+label2)
-                            (label2, weight2)
-                        }
-                    } else {
-                        //logger(1, "neighbors("+node1.concept+","+node2.concept+")="+label)
-                        //logger(1, "neighbors("+index1.toString+","+index2.toString+")="+label+" "+weight.toString)
-                        (label, weight)
-                    }
-                    }
-                }
-            }
-        } */
 
         // Uncomment to print neighbors matrix
         /*logger(1, "Neighbors matrix")
