@@ -590,7 +590,7 @@ public class LRParser {
 		allFE.add(new SubcatSequenceFE());
 //		allFE.add(new PruneFeatsForSemparser());
 		allFE.add(new BrownFeatures(brownFile));
-		//allFE.add(new ClusterFeatures(clusterMap));
+		//allFE.add(new ClusterFeatures(clusterFile));
 		return allFE;
 	}
 
