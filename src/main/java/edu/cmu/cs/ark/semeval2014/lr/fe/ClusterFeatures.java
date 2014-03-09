@@ -32,7 +32,7 @@ public class ClusterFeatures extends FeatureExtractor implements TokenFE {
 			cluster = "oov";
 		}
 		//fa.add(U.sf("cluster:%s", cluster));
-		fa.add(U.sf("cluster:%s_%s", cluster, token));
+		//fa.add(U.sf("cluster:%s_%s", cluster, token));
 		//fa.add(U.sf("cluster:%s_%s", cluster, postag));
 	}
 
