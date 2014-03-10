@@ -19,7 +19,7 @@ public class Prune {
 	private PruneModel singletonModel;
 	private PruneModel predicateModel;
 	private InputAnnotatedSentence[] inputSentences;
-	private List<FE.FeatureExtractor> allFE = new ArrayList<>();
+	//private List<FE.FeatureExtractor> allFE = new ArrayList<>();
 	
 	// model parameters
 	private Vocabulary labelVocab;

@@ -1,7 +1,5 @@
 package edu.cmu.cs.ark.semeval2014.common;
 
-import java.util.Arrays;
-
 import edu.cmu.cs.ark.semeval2014.nlp.DependencyParse;
 
 /** see also scala InputAnnotatedSentenceParser */

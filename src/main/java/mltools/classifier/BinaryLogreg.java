@@ -17,7 +17,6 @@ import util.U;
 import util.Vocabulary;
 import util.LBFGS.Status;
 import util.misc.Pair;
-import util.misc.Triple;
 
 public class BinaryLogreg<ExampleType> {
 	public List<FeatureExtractor<ExampleType>> featureExtractors;
