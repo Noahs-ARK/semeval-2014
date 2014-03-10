@@ -22,60 +22,23 @@ class TrainObj(val options : Map[Symbol, String]) extends edu.cmu.cs.ark.semeval
 
     val decoder = Decoder(options)
     val oracle = new Oracle(getFeatures(options))
+    val costAug = new CostAugmented(Decoder(options), options.getOrElse('trainingCostScale,"10.0").toDouble)
     val weights = decoder.features.weights
     oracle.features.weights = weights
-    //costAugDecoder.features.weights = weights
+    costAug.features.weights = weights
 
     val outputFormat = options.getOrElse('outputFormat,"triples").split(",").toList
 
     def decode(i: Int) : FeatureVector = {
-        val amrdata1 = AMRTrainingData(training(i))
-        logger(0, "Sentence:\n"+amrdata1.sentence.mkString(" ")+"\n")
-        val result = decoder.decode(Input(amrdata1, input(i), oracle = false))
-        logger(0, "Spans:")
-        for ((span, i) <- amrdata1.graph.spans.zipWithIndex) {
-            logger(0, "Span "+(i+1).toString+":  "+span.words+" => "+span.amr)
-        }
-        logger(0, "AMR:")
-        if (outputFormat.contains("AMR")) {
-            logger(0, result.graph.root.prettyString(detail = 1, pretty = true)+"\n")
-        }
-        if (outputFormat.contains("triples")) {
-            //logger(0, result.graph.printTriples(detail = 1)+"\n")
-            logger(0, result.graph.printTriples(
-                detail = 1,
-                extra = (node1, node2, relation) => {
-                    "\t"+decoder.features.ffDependencyPathv2(node1, node2, relation).toString.split("\n").filter(_.matches("^C1.*")).toList.toString+"\t"+decoder.features.localScore(node1, node2, relation).toString
-                })+"\n")
-        }
-        logger(1, "Decoder features:\n"+result.features+"\n")
-        return result.features
+        return decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).features
     }
 
     def oracle(i: Int) : FeatureVector = {
-        val amrdata = AMRTrainingData(training(i))
-        val result = oracle.decode(Input(amrdata, input(i), oracle = true))
-        logger(0, "Oracle:")
-        if (outputFormat.contains("AMR")) {
-           val result2 = oracle.decode(Input(amrdata, input(i), oracle = true, clearUnalignedNodes = false))
-           logger(0, result2.graph.root.prettyString(detail = 1, pretty = true)+"\n")
-        }
-        if (outputFormat.contains("triples")) {
-           //logger(0, result.graph.printTriples(detail = 1)+"\n")
-           logger(0, result.graph.printTriples(
-                detail = 1,
-                extra = (node1, node2, relation) => {
-                    "\t"+oracle.features.ffDependencyPathv2(node1, node2, relation).toString.split("\n").filter(_.matches("^C1.*")).toList.toString+"\t"+decoder.features.localScore(node1, node2, relation).toString
-                })+"\n")
-        }
-        //logger(0, "Dependencies:\n"+dependencies(i)+"\n")
-        logger(1, "Oracle features:\n"+result.features+"\n")
-        return result.features
+        return oracle.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i))).features
     }
 
     def costAugmented(i: Int) : FeatureVector = {
-        assert(false, "Need to implement stage1 cost augmented decoding")
-        return decoder.decode(input(i)).features
+        return costAug.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i))).features
     }
 }
 

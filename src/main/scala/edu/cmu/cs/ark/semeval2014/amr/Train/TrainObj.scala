@@ -27,28 +27,20 @@ abstract class TrainObj(options: Map[Symbol, String])  {
 
     ////////////////// Training Setup ////////////////
 
-    val passes = options.getOrElse('trainingPasses, "20").toInt
+    val passes = options.getOrElse('trainingPasses, "5").toInt
     val stepsize = options.getOrElse('trainingStepsize, "1.0").toDouble
     val regularizerStrength = options.getOrElse('trainingRegularizerStrength, "0.0").toDouble
-    if (!options.contains('trainingLoss)) {
-        System.err.println("Error: No training loss specified"); sys.exit(1)
-    }
-    val loss = options('trainingLoss)
-    if (!options.contains('trainingOptimizer)) {
-        System.err.println("Error: No training optimizer specified"); sys.exit(1)
-    }
-    val optimizer: Optimizer = options('trainingOptimizer).asInstanceOf[String] match {
+    val loss = options.getOrElse('trainingLoss, "SVM")
+    val optimizer: Optimizer = options.getOrElse('trainingOptimizer, "Adagrad") match {
         case "SSGD" => new SSGD()
         case "Adagrad" => new Adagrad()
         case x => { System.err.println("Error: unknown training optimizer " + x); sys.exit(1) }
     }
 
-    val input = Input.loadInputfiles(options)
-
-    val training: Array[String] = (for {
-        block <- Corpus.splitOnNewline(io.Source.stdin.getLines())
-        if block.matches("(.|\n)*\n\\((.|\n)*")     // needs to contain some AMR
-    } yield block).toArray
+    val inputAnnotatedSentences = Input.loadInputAnnotatedSentences(options)
+    val inputGraphs = Input.loadSDPGraphs(options)
+    val oracleGraphs = Input.loadSDPGraphs(options, oracle = true)
+    assert(inputAnnotatedSentences.size == inputGraphs.size && inputGraphs.size == oracleGraphs.size, "sdp and dep file lengths do not match")
 
     Runtime.getRuntime().addShutdownHook(new Thread() {
         override def run() {
@@ -79,7 +71,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
         optimizer.learnParameters(
             i => gradient(i),
             weights,
-            training.size,
+            inputGraphs.size,
             passes,
             stepsize,
             avg = false)

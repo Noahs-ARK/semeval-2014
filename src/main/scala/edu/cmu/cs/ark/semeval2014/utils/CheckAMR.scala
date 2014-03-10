@@ -2,7 +2,7 @@ package edu.cmu.cs.ark.semeval2014.utils
 
 import scala.io.Source
 import scala.collection.mutable.Map
-import edu.cmu.cs.ark.semeval2014.amr.graph.Graph
+import edu.cmu.cs.ark.semeval2014.amr.graph.SDPGraph
 import edu.cmu.cs.ark.semeval2014.common.verbosity
 
 object CheckAMR {
@@ -34,7 +34,7 @@ object CheckAMR {
         for (block <- Corpus.splitOnNewline(Source.stdin.getLines)) {
             //if (block matches "(.|\n)*\n\\((.|\n)*") { // Does it containt some AMR? . does not match \n
                 //val Block(extras, amrstr) = block
-                val graph = Graph.parse(block)
+                val graph = SDPGraph.fromGold(block.split("\n"), clearRelations = false)
                 //graph.normalizeInverseRelations
                 if (CycleTester.hasCycle(graph.nodes.toList, graph.nodes.map(x => (x, x.relations.map(y => y._2))).toMap)) {
                     println("Contains a cycle")

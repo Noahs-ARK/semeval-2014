@@ -1,4 +1,5 @@
 package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
+import edu.cmu.cs.ark.semeval2014.amr._
 
 import scala.collection.mutable.Set
 import scala.collection.mutable.PriorityQueue
@@ -22,8 +23,8 @@ class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected
     def precomputeEdgeWeights() {
         // WARNING: THIS CODE ASSUMES THAT THE LAGRANGE MULTIPLIERS ARE SET TO ZERO
         // TODO: fix this so errors don't occur
-        var graph = input.graph.get.duplicate
-        val nodes : Array[Node] = graph.nodes.filter(_.name != None).toArray
+        var graph = input.graph.duplicate
+        val nodes : Array[Node] = graph.nodes.toArray
         edgeWeights = weightMatrix(nodes, labelSet)
     }
 
@@ -33,6 +34,7 @@ class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected
                 if (index1 == index2) {
                     Array((":self", 0.0)) // we won't add this to the queue anyway, so it's ok
                 } else {
+                    features.setupNodes(node1, node2)
                     labels.map(x => (x._1, features.localScore(node1, node2, x._1)))
                 }
             }
@@ -46,8 +48,8 @@ class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected
 
     def decode() : DecoderResult = {
         // Assumes that Node.relations has been setup correctly for the graph fragments
-        var graph = input.graph.get.duplicate
-        val nodes : Array[Node] = graph.nodes.filter(_.name != None).toArray
+        var graph = input.graph.duplicate
+        val nodes : Array[Node] = graph.nodes.toArray
 
         // Each node is numbered by its index in 'nodes'
         // Each set is numbered by its index in 'setArray'
@@ -65,6 +67,7 @@ class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected
                 if (addRelation) {
                     node1.relations = (label, node2) :: node1.relations
                 }
+                features.setupNodes(node1, node2)
                 feats += features.localFeatures(node1, node2, label)
                 score += weight
             }
@@ -93,8 +96,10 @@ class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected
             //logger(1, "1: node2 = "+node2.concept+" "+node2.id)
             if (nodeIds.indexWhere(_ == node2.id) != -1) {
                 val index2 = nodeIds.indexWhere(_ == node2.id)
+                features.setupNodes(node1, node2)
                 addEdge(node1, index1, node2, index2, label, features.localScore(node1, node2, label), addRelation=false)
             } else {
+                features.setupNodes(node1, node2)
                 feats += features.localFeatures(node1, node2, label)
                 score += features.localScore(node1, node2, label)
             }
@@ -152,24 +157,6 @@ class Alg2(featureNames: List[String], labelSet: Array[(String, Int)], connected
             }
         }
         
-        //logger(1, "nodes = "+nodes.toList)
-        if(nodes.size > 0) {
-            if (features.rootFeatureFunctions.size != 0) {
-                graph.root = nodes.map(x => (x, features.rootScore(x))).maxBy(_._2)._1
-            } else {
-                //logger(1, "Setting root to "+nodes(0).id)
-                graph.root = nodes(0)
-            }
-            feats += features.rootFeatures(graph.root)
-
-            nodes.map(node => { node.relations = node.relations.reverse })
-            if (connected) {
-                graph.makeTopologicalOrdering()
-            }
-        } else {
-            graph = Graph.empty()
-        }
-
         return DecoderResult(graph, feats, score)
     }
 }

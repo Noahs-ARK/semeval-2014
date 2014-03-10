@@ -552,7 +552,7 @@ public class LRParser {
 
 	///////////////////////////////////////////////////////////
 	
-	static List<FE.FeatureExtractor> initializeFeatureExtractors() {
+	public static List<FE.FeatureExtractor> initializeFeatureExtractors() {
 		final List<FE.FeatureExtractor> allFE = new ArrayList<>();
 		allFE.add(new BasicFeatures());
 		allFE.add(new LinearOrderFeatures());

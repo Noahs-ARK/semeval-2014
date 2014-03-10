@@ -9,14 +9,14 @@ class Oracle(featureNames: List[String]) extends Decoder {
 
     def decode(input: Input) : DecoderResult = {
         features.input = input
-        val graph = input.graph.get
+        val graph = input.graph
         var feats = new FeatureVector()
 
         for { node1 <- graph.nodes
               (label, node2) <- node1.relations } {
+            features.setupNodes(node1, node2)
             feats += features.localFeatures(node1, node2, label)
         }
-        feats += features.rootFeatures(graph.root)
 
         return DecoderResult(graph, feats, features.weights.dot(feats))
     }
