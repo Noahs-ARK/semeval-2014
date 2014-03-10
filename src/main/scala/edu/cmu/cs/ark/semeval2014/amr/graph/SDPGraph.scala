@@ -75,17 +75,20 @@ object SDPGraph {
         return SDPGraph(nodes.toArray)
     }
 
-    def fromGold(sdp: Array[String], clearRelations: Boolean) : SDPGraph = {
+    def fromGold(sdpInput: Array[String], clearRelations: Boolean) : SDPGraph = {
         // 1  Pierre  Pierre  NNP -    +     _   _   _   _   _   _   _   _   _   _   _
         // id form    lemma   pos top pred arg1 arg2
         // spd strings should have no trailing \n or whitespace
+        var sdp = sdpInput.filter(!_.matches("^#.*"))
         var fields = sdp.map(x => x.split("\t"))
         val len = sdp.size
         var singleton : Array[Boolean] = {
-            sdp.map(x => x.matches("""[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t-\t.(\t_)*"""))   // ... - . _ _ _ ... is a singleton
+            sdp.map(x => x.matches("""[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t-\t.(\t_)*"""))   // . . . . . - . _ _ _ ... is a singleton
         }
-        val nodes = (0 until len).filter(!singleton(_)).map(i => Node(fields(i)(0), fields(i)(1), List(), i)).toArray
-        val predicates = (0 until len).filter(i => fields(i)(5) == "+").map(i => nodes(i)).toList
+        //logger(0, sdp.mkString("\n"))
+        val nodeArray = (0 until len).map(i => if(!singleton(i)) { Some(Node(fields(i)(0), fields(i)(1), List(), i)) } else { None } ).toArray
+        val nodes = nodeArray.filter(_ != None).map(_.get)
+        val predicates = (0 until len).filter(i => fields(i)(5) == "+").map(i => nodeArray(i).get).toList
         if (!clearRelations) {
             for ((dependent, i) <- nodes.zipWithIndex) {
                 for ((relation, j) <- fields(i).drop(6).zipWithIndex) {

@@ -32,7 +32,7 @@ class Features(var featureNames: List[String]) {
     val ffTable = Map[String, FeatureFunction](
         "CostAugEdgeId" -> ffCostAugEdgeId,
         "LRLabelWithId" -> ffLRLabelWithId,
-        "SharedTaskFeatues" -> ffSharedTaskFeatures
+        "SharedTaskFeatures" -> ffSharedTaskFeatures
     )
 
     def precompute() {

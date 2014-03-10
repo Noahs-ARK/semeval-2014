@@ -32,12 +32,13 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
         list match {
             case Nil => map
             case "-decoder" :: value :: l =>             parseOptions(map + ('decoder -> value), l)
+            case "-labelset" :: value :: l =>            parseOptions(map + ('labelset -> value), l)
             case "-mode" :: value :: l =>                parseOptions(map + ('mode -> value), l)
             case "-model" :: value :: l =>               parseOptions(map + ('model -> value), l)
             case "-sdpOutput" :: value :: tail =>        parseOptions(map + ('sdpOutput -> value), tail)
             case "-sdpInput" :: value :: tail =>         parseOptions(map + ('sdpInput -> value), tail)
             case "-depInput" :: value :: tail =>         parseOptions(map + ('depInput -> value), tail)
-            case "-goldSingletons" :: value :: tail =>   parseOptions(map + ('goldSingletons -> value), tail)
+            case "-goldSingletons" :: tail =>            parseOptions(map + ('goldSingletons -> "true"), tail)
             case "-numIters" :: value :: l =>            parseOptions(map + ('trainingPasses -> value), l)
             case "-learningRate" :: value :: l =>        parseOptions(map + ('trainingStepsize -> value), l)
             case "-trainingLoss" :: value :: l =>        parseOptions(map + ('trainingLoss -> value), l)

@@ -21,16 +21,16 @@ package object GraphDecoder {
     type OptionMap = Map[Symbol, String]
 
     def getFeatures(options: OptionMap) : List[String] = {
-        options.getOrElse('stage2Features, "conceptBigram,rootConcept").split(",").toList.filter(x => x != "edgeId" && x != "labelWithId")
+        options.getOrElse('features, "SharedTaskFeatures").split(",").toList.filter(x => x != "edgeId" && x != "labelWithId")
     }
 
     def Decoder(options: OptionMap) : GraphDecoder.Decoder = {
-        if (!options.contains('stage2Labelset)) {
+        if (!options.contains('labelset)) {
             System.err.println("Error: No labelset file specified"); sys.exit(1)
         }
 
         val labelset: Array[(String, Int)] = {
-            Source.fromFile(options('stage2Labelset)).getLines().toArray.map(x => {
+            Source.fromFile(options('labelset)).getLines().toArray.map(x => {
                 val split = x.split(" +")
                 (split(0), if (split.size > 1) { split(1).toInt } else { 1000 })
             })
@@ -42,26 +42,12 @@ package object GraphDecoder {
         val connected = !options.contains('stage2NotConnected)
         logger(0, "connected = " + connected)
 
-        if (!options.contains('stage2Decoder)) {
-            System.err.println("Error: No stage2 decoder specified"); sys.exit(1)
-        }
-
-        val decoder: Decoder = options('stage2Decoder) match {
+        val decoder: Decoder = options.getOrElse('stage2Decoder, "LR") match {
             //case "Alg1" => new Alg1(features, labelset)
             //case "Alg1a" => new Alg1(features, labelset, connectedConstraint = "and")
             case "Alg2" => new Alg2(features, labelset, connected)
             case "LR" => new LagrangianRelaxation(features, labelset, 1, 500)
             case x => { System.err.println("Error: unknown stage2 decoder " + x); sys.exit(1) }
-        }
-
-        val outputFormat = options.getOrElse('outputFormat,"triples").split(",").toList
-        if (outputFormat.contains("AMR") && !connected) {
-            println("Cannot have both -stage2NotConnected flag and --outputFormat \"AMR\""); sys.exit(1)
-        }
-
-        if (options('stage2Decoder) == "Alg1" && outputFormat.contains("AMR")) {
-            println("Cannot have --outputFormat \"AMR\" for stage2 Alg1 (graph may not be connected!)")
-            sys.exit(1)
         }
 
         return decoder
