@@ -108,10 +108,12 @@ public class LRParser {
     static String depFile;
     @Parameter(names="-brownFile", required=false)
     static String brownFile = "data/resources/clusters.brown";
+    @Parameter(names="-clusterFile", required=false)
+    static String clusterFile = "data/resources/clusters_full.manaal";
 
     static Map<String, String> brownMap;
     static Map<String, String> clusterMap;
-    static String clusterFile = "clusters_full.manaal";
+    
     
     static long numPairs = 0, numTokens = 0; // purely for diagnosis
     
@@ -132,7 +134,7 @@ public class LRParser {
 		U.pf("%d input sentences\n", inputSentences.length);
 
 		brownMap = BrownFeatures.load(brownFile);
-
+        clusterMap = ClusterFeatures.load(clusterFile);
 
 		preprocessor = new Prune(inputSentences, modelFile);
 		

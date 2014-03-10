@@ -14,7 +14,6 @@ public class BrownFeatures extends FeatureExtractor implements FE.EdgeFE {
 
 	private final Map<String, String> brownMap;
 
-
 	public BrownFeatures(Map<String, String> brownMap) {
 		this.brownMap = brownMap;
 	}

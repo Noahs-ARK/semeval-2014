@@ -1,7 +1,9 @@
 package edu.cmu.cs.ark.semeval2014.lr.fe;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import util.BasicFileIO;
 import util.U;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE.EdgeFE;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
@@ -11,10 +13,20 @@ import edu.cmu.cs.ark.semeval2014.lr.fe.FE.TokenFE;
 public class ClusterFeatures extends FeatureExtractor implements EdgeFE, TokenFE {
 
 	private Map<String, String> clusterMap;
-	//private final String clusterFileName;
 	
 	public ClusterFeatures(Map<String, String> clusterMap) {
 		this.clusterMap = clusterMap;
+	}
+	
+	public static Map<String, String> load(String clusterFileName) {
+		System.err.println(U.sf("Loading Manaal clusters from %s", clusterFileName));
+		final Map<String, String> brownMap = new HashMap<>();
+		for (String line : BasicFileIO.openFileLines(clusterFileName)) {
+			String[] parts = line.trim().split("\t");
+			brownMap.put(parts[1], parts[0]);
+		}
+		System.err.println("Done loading Manaal clusters");
+		return brownMap;
 	}
 	
 	/*@Override
