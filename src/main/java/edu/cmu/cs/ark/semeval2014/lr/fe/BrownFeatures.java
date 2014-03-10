@@ -1,46 +1,39 @@
 package edu.cmu.cs.ark.semeval2014.lr.fe;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import util.BasicFileIO;
-import util.U;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureExtractor;
+import util.BasicFileIO;
+import util.U;
 
-public class BrownFeatures extends FeatureExtractor implements FE.TokenFE, FE.EdgeFE {
-	
-	//private String brownFileName;
-	private Map<String, String> brownMap;
-    private final int MAX_CLUSTER_LENGTH = 16; // best length is 12
+import java.util.HashMap;
+import java.util.Map;
 
-	public BrownFeatures(String brownFileName) {
-    	Map<String, String> clusterMap = new HashMap<String, String>();
-		for (String line : BasicFileIO.openFileLines(brownFileName)) {
-			String[] parts =line.trim().split("\t");
-			clusterMap.put(parts[1], parts[0]);
-		}
-		this.brownMap = clusterMap;    
-	}
-	
+public class BrownFeatures extends FeatureExtractor implements FE.EdgeFE {
+	private final static int MAX_CLUSTER_LENGTH = 12; // best length is 12
+
+	private final Map<String, String> brownMap;
+
+
 	public BrownFeatures(Map<String, String> brownMap) {
 		this.brownMap = brownMap;
+	}
+
+	public static Map<String, String> load(String brownFileName) {
+		System.err.println(U.sf("Loading Brown clusters from %s", brownFileName));
+		final Map<String, String> brownMap = new HashMap<>();
+		for (String line : BasicFileIO.openFileLines(brownFileName)) {
+			String[] parts = line.trim().split("\t");
+			brownMap.put(parts[1], parts[0]);
+		}
+		System.err.println("Done loading Brown clusters");
+		return brownMap;
 	}
 
 	@Override
 	public void setupSentence(InputAnnotatedSentence _sent) {
 		super.setupSentence(_sent);
 	}
-	
-	/*@Override
-	public void initializeAtStartup() {
-		brownMap = new HashMap<String, String>();
-		for (String line : BasicFileIO.openFileLines(brownFileName)) {
-			String[] parts =line.trim().split("\t");
-		    brownMap.put(parts[1], parts[0]);
-		}
-	}*/
 
 	private String getPrefix(String brown, int length) {
 		String prefix;
@@ -55,9 +48,9 @@ public class BrownFeatures extends FeatureExtractor implements FE.TokenFE, FE.Ed
 	    return prefix;
 	}
 	
-	@Override
+	/*@Override
 	public void features(int tokenIdx, FeatureAdder fa) {
-		/*final String token = sent.sentence[tokenIdx];
+		final String token = sent.sentence[tokenIdx];
 		final String postag = sent.pos[tokenIdx];
 		
 		if (brownMap.containsKey(token) == false) {
@@ -90,13 +83,13 @@ public class BrownFeatures extends FeatureExtractor implements FE.TokenFE, FE.Ed
 	    // brown prefix for postag + token -- removing this helps
 	    fa.add(U.sf("brown0:%s_%s_%s", brownId, token, postag));
 	    fa.add(U.sf("brown4:%s_%s_%s",  brown4, token, postag));
-	    fa.add(U.sf("brown6:%s_%s_%s",  brown6, token, postag));*/
-	}
+	    fa.add(U.sf("brown6:%s_%s_%s",  brown6, token, postag));
+	}*/
 
 	@Override
 	public void features(int srcTokenIdx, int destTokenIdx, FeatureAdder fa) {
 		final String srcPostag = sent.pos[srcTokenIdx];
-        final String destPostag = sent.pos[destTokenIdx];
+		final String destPostag = sent.pos[destTokenIdx];
 		final String srcToken = sent.sentence[srcTokenIdx];
 		final String destToken = sent.sentence[destTokenIdx];
         //final String dir = srcTokenIdx > destTokenIdx ? "dir=i>j" : "dir=i<j";

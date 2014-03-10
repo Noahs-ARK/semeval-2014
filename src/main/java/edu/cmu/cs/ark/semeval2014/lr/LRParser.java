@@ -2,23 +2,18 @@ package edu.cmu.cs.ark.semeval2014.lr;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.internal.Lists;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-
 import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.*;
 import edu.cmu.cs.ark.semeval2014.prune.Prune;
-import edu.cmu.cs.ark.semeval2014.prune.PruneFeatsForSemparser;
-import edu.cmu.cs.ark.semeval2014.topness.DetermTopness;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 import sdp.graph.Edge;
 import sdp.graph.Graph;
 import sdp.io.GraphReader;
-import util.BasicFileIO;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
@@ -28,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -109,11 +103,13 @@ public class LRParser {
     @Parameter(names={"-sdpInput","-sdpOutput"}, required=true)
     static String sdpFile;
     @Parameter(names="-depInput", required=true)
-	static String depFile;
+
     
-    // find these files in /cab1/corpora/LDC2013E167/resources/
+    static String depFile;
+    @Parameter(names="-brownFile", required=false)
+    static String brownFile = "data/resources/clusters.brown";
+
     static Map<String, String> brownMap;
-    static String brownFile = "clusters.brown";
     static Map<String, String> clusterMap;
     static String clusterFile = "clusters_full.manaal";
     
@@ -134,9 +130,9 @@ public class LRParser {
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
-		
-		brownMap = readClusters(brownFile);
-		clusterMap = readClusters(clusterFile);
+
+		brownMap = BrownFeatures.load(brownFile);
+
 
 		preprocessor = new Prune(inputSentences, modelFile);
 		
@@ -581,16 +577,7 @@ public class LRParser {
     	}
     	kryoInput = new Input(new FileInputStream(featureCacheFile));
     }
-    
-    static Map<String, String> readClusters(String fileName) {
-    	Map<String, String> clusterMap = new HashMap<String, String>();
-		for (String line : BasicFileIO.openFileLines(fileName)) {
-			String[] parts =line.trim().split("\t");
-			clusterMap.put(parts[1], parts[0]);
-		}
-		return clusterMap;
-    }
-       
+
     // END feature cache stuff
     
 	///////////////////////////////////////////////////////////
