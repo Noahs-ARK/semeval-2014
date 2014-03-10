@@ -111,6 +111,7 @@ public class LRParser {
     @Parameter(names="-depInput", required=true)
 	static String depFile;
     
+    // find these files in /cab1/corpora/LDC2013E167/resources/
     static Map<String, String> brownMap;
     static String brownFile = "clusters.brown";
     static Map<String, String> clusterMap;
@@ -135,6 +136,7 @@ public class LRParser {
 		U.pf("%d input sentences\n", inputSentences.length);
 		
 		brownMap = readClusters(brownFile);
+		clusterMap = readClusters(clusterFile);
 
 		preprocessor = new Prune(inputSentences, modelFile);
 		
@@ -602,7 +604,7 @@ public class LRParser {
 		allFE.add(new SubcatSequenceFE());
 //		allFE.add(new PruneFeatsForSemparser());
 		allFE.add(new BrownFeatures(brownMap));
-		//allFE.add(new ClusterFeatures(clusterFile));
+		//allFE.add(new ClusterFeatures(clusterMap));
 		return allFE;
 	}
 
