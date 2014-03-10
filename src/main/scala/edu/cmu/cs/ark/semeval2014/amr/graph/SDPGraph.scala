@@ -35,8 +35,28 @@ case class SDPGraph(val nodes : Array[Node]) extends Graph {
         return this
     }
 
-    def toConll(inputAnnotatedSentence: InputAnnotatedSentence) : String = {
-        return "" // TODO
+    def toConll(sent: InputAnnotatedSentence) : String = {
+        val output : ArrayBuffer[String] = ArrayBuffer()
+        output += "#" + sent.sentenceId
+        val nodeArray : Array[Option[Node]] = (0 until sent.size).map(x => None).toArray
+        val isPred : Array[Boolean] = (0 until sent.size).map(x => false).toArray
+        for ((node, i) <- nodes.zipWithIndex) {
+            if (node.relations.size > 0) {
+                isPred(i) = true
+                nodeArray(i) = Some(node)
+            }
+        }
+        for (i <- 0 until sent.size) {
+            var str = "%d\t%s\tlemmaz\t%s\t%s\t%s".format(i + 1, sent.sentence(i), sent.pos(i),
+                if(sent.isTop(i)) { "+" } else { "-" }, if(isPred(i)) { "+" } else { "-" })
+            for (head <- 0 until sent.size
+                 if (isPred(head))) {
+                val relation = nodeArray(head).get.relations.find(x => x._2.position == i)
+                str = str + "\t" + ( if(relation == None) { "_" } else { relation.get._1 } )
+            }
+            output += str
+        }
+        return output.mkString("\n")
     }
 }
 
