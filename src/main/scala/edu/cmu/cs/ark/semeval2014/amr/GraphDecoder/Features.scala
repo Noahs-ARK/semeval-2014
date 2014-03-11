@@ -27,7 +27,6 @@ class Features(var featureNames: List[String]) {
     }
 
     type FeatureFunction = (Node, Node, String) => FeatureVector
-    type RootFeatureFunction = (Node) => FeatureVector
 
     val ffTable = Map[String, FeatureFunction](
         "CostAugEdgeId" -> ffCostAugEdgeId,

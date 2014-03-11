@@ -10,9 +10,8 @@ class LagrangianRelaxation(featureNames: List[String], labelSet: Array[(String, 
         extends Decoder {
     // Base class has defined:
     // val features: Features
-    val features = new Features("LRLabelWithId" :: featureNames)
-    val alg2 = new Alg2(List(), labelSet)
-    alg2.features.weights = features.weights    // Set alg2's weights same our weights (shared weights)
+    val alg2 = new Alg2("LRLabelWithId" :: featureNames, labelSet)
+    val features = alg2.features
 
     val labelConstraint = labelSet.toMap
     val IdLabel = """LR:Id1.*[+]L=(.*)""".r
@@ -45,9 +44,9 @@ class LagrangianRelaxation(featureNames: List[String], labelSet: Array[(String, 
         } while (delta != 0.0 && counter < maxIterations)
 
         if (delta != 0.0) {
-            logger(1, "WARNING: Langrangian relaxation did not converge after "+counter.toString+" iterations. Delta = "+delta.toString)
+            logger(0, "WARNING: Langrangian relaxation did not converge after "+counter.toString+" iterations. Delta = "+delta.toString)
         } else {
-            logger(1, "Langrangian relaxation converged after "+counter.toString+" iterations. Delta = "+delta.toString)
+            logger(0, "Langrangian relaxation converged after "+counter.toString+" iterations. Delta = "+delta.toString)
         }
 
         val feats = result.features.slice(x => !x.startsWith("LR:Id1="))
