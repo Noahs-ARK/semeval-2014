@@ -407,7 +407,7 @@ public class LRParser {
     		trainOnlineIter();
     		
         	double dur = System.currentTimeMillis() - t0;
-        	U.pf("%.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
+        	U.pf(" %.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
     		
         	if (saveEvery >= 0 && outer % saveEvery == 0)
         		model.save(U.sf("%s.iter%s", modelFile, outer));
@@ -439,17 +439,23 @@ public class LRParser {
     }
     
     static void featureExtractionPass() {
+		double t0=System.currentTimeMillis(), dur;
+
         for (int snum=0; snum<inputSentences.length; snum++) {
-        	U.pf(".");
+        	if (snum % 100==0) U.pf(".");
         	extractFeaturesForExampleAndWriteToCache(snum);
             if (snum>0 && snum % 1000 == 0) {
-            	U.pf("%d sents, %.3fm percepts, %.1f MB mem used\n", 
+                dur = System.currentTimeMillis()-t0;
+            	U.pf("%d sents, %.3fm percepts, %.1f MB mem used, %.2f ms/sent\n", 
             			snum+1, model.perceptVocab.size()/1e6,
-            			Runtime.getRuntime().totalMemory()/1e6
+            			Runtime.getRuntime().totalMemory()/1e6,
+            			dur/(snum+1)
             			);
             }
             numTokens += inputSentences[snum].size();
         }
+        dur = System.currentTimeMillis()-t0;
+        U.pf("\nFE TIME %.1f sec, %.2f ms/sec\n", dur/1000, dur/inputSentences.length);
     }
     
     /** adagrad: http://www.ark.cs.cmu.edu/cdyer/adagrad.pdf */ 
@@ -459,7 +465,7 @@ public class LRParser {
 
 		double ll = 0;
         for (int snum=0; snum<inputSentences.length; snum++) {
-        	U.pf(".");
+        	if (snum % 100==0) U.pf(".");
             
             NumberizedSentence ns = getNextExample(snum);
     		int[][] edgeMatrix = graphMatrices.get(snum);
