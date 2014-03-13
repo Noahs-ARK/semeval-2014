@@ -3,7 +3,6 @@ package edu.cmu.cs.ark.semeval2014.lr.fe;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -106,7 +105,7 @@ public class NERFeatures extends FE.FeatureExtractor implements FE.TokenFE,
 				}
 
 			}
-
+			in1.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

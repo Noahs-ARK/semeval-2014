@@ -3,11 +3,7 @@ package edu.cmu.cs.ark.semeval2014.lr.fe;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureAdder;
 import edu.cmu.cs.ark.semeval2014.nlp.MorphaLemmatizer;
-import util.BasicFileIO;
 import util.U;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE.EdgeFE {
 	private final MorphaLemmatizer morpha = new MorphaLemmatizer();

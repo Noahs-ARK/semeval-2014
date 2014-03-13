@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
 
@@ -102,7 +103,17 @@ public class LRParser {
     @Parameter(names={"-sdpInput","-sdpOutput"}, required=true)
     static String sdpFile;
     @Parameter(names="-depInput", required=true)
-	static String depFile;
+
+    
+    static String depFile;
+    @Parameter(names="-brownFile", required=false)
+    static String brownFile = "data/resources/clusters.brown";
+    @Parameter(names="-clusterFile", required=false)
+    static String clusterFile = "data/resources/clusters_full.manaal";
+
+    static Map<String, String> brownMap;
+    static Map<String, String> clusterMap;
+    
     
     static long numPairs = 0, numTokens = 0; // purely for diagnosis
     
@@ -121,6 +132,9 @@ public class LRParser {
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
+
+		brownMap = BrownFeatures.load(brownFile);
+        clusterMap = ClusterFeatures.load(clusterFile);
 
 		preprocessor = new Prune(inputSentences, modelFile);
 		
@@ -579,10 +593,9 @@ public class LRParser {
     	}
     	kryoInput = new Input(new FileInputStream(featureCacheFile));
     }
-    
+
     // END feature cache stuff
     
-
 	///////////////////////////////////////////////////////////
 	
 	static List<FE.FeatureExtractor> initializeFeatureExtractors() {
@@ -594,6 +607,8 @@ public class LRParser {
 		allFE.add(new SubcatSequenceFE());
 		allFE.add(new UnlabeledDepFE());
 //		allFE.add(new PruneFeatsForSemparser());
+		allFE.add(new BrownFeatures(brownMap));
+		//allFE.add(new ClusterFeatures(clusterMap));
 		return allFE;
 	}
 
