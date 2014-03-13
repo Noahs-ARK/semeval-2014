@@ -3,7 +3,7 @@ set -eu
 
 model_name="mymodel"
 feature_opts=""
-model_dir="bladir"
+model_dir="graph_experiments"
 mkdir -p "${model_dir}"
 model_file="${model_dir}/${model_name}"
 
@@ -20,8 +20,8 @@ test_deps="${test_file}.dependencies"
 pred_file="${model_file}.pred.${formalism}.sdp"
 
 set -x
-./java.sh amr.SemanticParser -mode train -labelset labels.dm \
+./java.sh amr.SemanticParser -mode train -labelset scripts/labels.dm \
   -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts} | tail -n +6 > ${model_file}
-./java.sh amr.SemanticParser -mode test -labelset labels.dm -goldSingletons \
+./java.sh amr.SemanticParser -mode test -labelset scripts/labels.dm -goldSingletons \
   -model ${model_file} -sdpInput ${test_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts} > ${pred_file}
 scripts/eval.sh ${test_file} ${pred_file}
