@@ -28,6 +28,7 @@ do
     test_deps="${test_file}.dependencies"
 
     pred_file="${model_file}.pred.${formalism}.sdp"
+    trainpred_file="${model_file}.trainpred.${formalism}.sdp"
 
     set -x
     (
@@ -37,9 +38,15 @@ do
     ./java.sh lr.LRParser -mode test \
       -formalism $formalism \
       -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts}
+    ./java.sh lr.LRParser -mode test \
+      -formalism $formalism \
+      -model ${model_file} -sdpOutput ${trainpred_file} -depInput ${train_deps} ${feature_opts}
     ./scripts/eval.sh "${test_file}" "${pred_file}" | tee "${reports_dir}/${model_name}.eval.log"
+    ./scripts/eval.sh "${train_file}" "${trainpred_file}" | tee "${reports_dir}/${model_name}.train.eval.log"
     ./scripts/eval_to_csv.py < "${reports_dir}/${model_name}.eval.log" > "${reports_dir}/${model_name}.eval.csv"
+    ./scripts/eval_to_csv.py < "${reports_dir}/${model_name}.train.eval.log" > "${reports_dir}/${model_name}.train.eval.csv"
     python errorAnalysis/confusionMatrix.py "${test_file}" "${pred_file}" > "${reports_dir}/${model_name}_confusion.html"
+    python errorAnalysis/confusionMatrix.py "${train_file}" "${trainpred_file}" > "${reports_dir}/${model_name}_train_confusion.html"
     ) 2>&1 | tee -a ${reports_dir}/run.log
 
     set +x
