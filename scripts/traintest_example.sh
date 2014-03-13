@@ -20,7 +20,9 @@ pred_file="${model_file}.pred.${formalism}.sdp"
 
 set -x
 ./java.sh lr.LRParser -mode train \
+  -formalism $formalism \
   -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts}
 ./java.sh lr.LRParser -mode test \
+  -formalism $formalism \
   -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts}
 scripts/eval.sh ${test_file} ${pred_file}

@@ -124,6 +124,7 @@ public class Prune {
 	
 	// to learn the weight vectors 
 	public void trainModels(Vocabulary lv, List<int[][]> graphMatrices){
+		U.pf("Training preproc ('Prune') models.\n");
 		initialize(graphMatrices, lv);
 		
 		// to learn the weights for the singletons
@@ -161,7 +162,7 @@ public class Prune {
 		int correct = 0;
 		int incorrect = 0;
         for (int snum=0; snum<inputSentences.length; snum++) {
-        	U.pf(".");
+        	if (snum % 100==0) U.pf(".");
         	List<Map<String, Set<String>>> feats = ghettoFeats(snum);
     		int[] sequenceOfLabels = test.get(snum);
     		Viterbi v = new Viterbi(weights);
@@ -223,7 +224,7 @@ public class Prune {
 	// the inner training loop. Within the dataset, loops over each example.
 	private void trainOnlineIter(PruneModel model, List<int[]> train ) {
         for (int snum=0; snum<inputSentences.length; snum++) {
-        	U.pf(".");
+        	if (snum % 100==0) U.pf(".");
         	List<Map<String, Set<String>>> feats = ghettoFeats(snum);
     		int[] sequenceOfLabels = train.get(snum);
     		ghettoPerceptronUpdate(sequenceOfLabels, feats, model);

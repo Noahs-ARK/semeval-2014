@@ -2,7 +2,6 @@
 set -eu
 
 feature_opts=""
-data_dir="data/splits/med"
 model_dir="experiments"
 mkdir -p "${model_dir}"
 
@@ -17,10 +16,10 @@ archive_dir=/cab0/brendano/www/semeval/reports
 
 for formalism in "pas" "dm" "pcedt"
 do
-    model_name="${formalism}_med_model"
+    model_name="${formalism}_onefull_model"
     model_file="${model_dir}/${model_name}"
 
-    train_file="${data_dir}train.${formalism}.sdp"
+    train_file="data/splits/sec0019.${formalism}.sdp"
     # train_file="lildata/liltrain.${formalism}.sdp"
     train_deps="${train_file}.dependencies"
 
@@ -31,7 +30,7 @@ do
 
     set -x
     (
-    ./java.sh lr.LRParser -mode train -saveEvery -1 \
+    ./java.sh lr.LRParser -mode train -numIters 1 -useHashing -useFeatureCache false \
       -formalism $formalism \
       -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts}
     ./java.sh lr.LRParser -mode test \

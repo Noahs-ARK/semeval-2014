@@ -2,7 +2,6 @@ package edu.cmu.cs.ark.semeval2014.lr;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.internal.Lists;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -10,8 +9,6 @@ import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.*;
 import edu.cmu.cs.ark.semeval2014.prune.Prune;
-import edu.cmu.cs.ark.semeval2014.prune.PruneFeatsForSemparser;
-import edu.cmu.cs.ark.semeval2014.topness.DetermTopness;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 import sdp.graph.Edge;
@@ -69,9 +66,11 @@ public class LRParser {
 	// 3. Model parameter-ish options
 	static int maxEdgeDistance = 10;
 	@Parameter(names="-l2reg")
-	static double l2reg = 1;
-	@Parameter(names="-noedgeWeight")
-	static double noedgeWeight = 0.2;
+	static double l2reg = 0.5;
+	@Parameter(names="-noedgeWeight", description="defaults to formalism-specific value")
+	static double noedgeWeight = -1;
+	@Parameter(names="-formalism", required=true)
+	static String formalism;
 	
 	// 4. Runtime options
 	@Parameter(names="-verboseFeatures")
@@ -105,15 +104,19 @@ public class LRParser {
     @Parameter(names="-depInput", required=true)
 	static String depFile;
     
+    static long numPairs = 0, numTokens = 0; // purely for diagnosis
+    
     static void validateParameters() {
     	assert numHashBuckets > 0 : "must have positive number of hashbuckets";
     	assert numHashBuckets < Integer.MAX_VALUE : "numhashbuckets must be a signed 4byte integer, so less than 2 billion or so";
 		assert mode.equals("train") || mode.equals("test") : "Need to say either train or test mode.";
+		assert formalism.equals("pas") || formalism.equals("dm") || formalism.equals("pcedt");
     }
     
     public static void main(String[] args) throws IOException {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
 		validateParameters();
+		setDefaultNoedgeWeights();
 
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
@@ -144,6 +147,18 @@ public class LRParser {
 	private static void preprocessInputSentences(){
 		preprocessor.loadModels();
 		preprocessor.predictIntoInputs();
+	}
+	
+	static void setDefaultNoedgeWeights() {
+		if (noedgeWeight == -1) {
+			noedgeWeight = 
+					formalism.equals("pas") ? 0.4 :
+					formalism.equals("dm") ? 0.3 :
+					formalism.equals("pcedt") ? 0.3 :
+					-1;
+				assert noedgeWeight != -1;
+		}
+		U.pf("Set noedgeWeight = %s\n", noedgeWeight);
 	}
 
 	private static Model trainModel() throws IOException {
@@ -351,6 +366,7 @@ public class LRParser {
 			}
 			for (edgeAdder.j=0; edgeAdder.j<ns.T; edgeAdder.j++) {
 				if (badDistance(edgeAdder.i,edgeAdder.j)) continue;
+				numPairs++;
 				
 				// bias term
 				ns.add(edgeAdder.i, edgeAdder.j, biasIdx, 1.0);
@@ -372,14 +388,24 @@ public class LRParser {
 
     static void trainingOuterLoopOnline() throws IOException {
     	
-    	U.pf("First pass: extracting features, no model updates.\n");
-		cacheReadMode = false;
-		openCacheForWriting();
-    	featureExtractionPass();
-		closeCacheAfterWriting();
-    	allocateCoefs();
-		U.pf("FE done: %d percepts, %d nnz\n", model.perceptVocab.size(), NumberizedSentence.totalNNZ);
-		cacheReadMode = true;
+    	if (useFeatureCache) {
+        	U.pf("First pass: extracting features, no model updates.\n");
+    		cacheReadMode = false;
+    		openCacheForWriting();
+        	featureExtractionPass();
+    		closeCacheAfterWriting();
+        	allocateCoefs();
+            U.pf("\n");
+            U.pf("%d sentences, %d tokens, %.2f tokens/sent, %d pairs (candidate edges), %.2f pairs/sent\n", inputSentences.length, numTokens, numTokens*1.0/inputSentences.length, numPairs, numPairs*1.0/inputSentences.length);
+    		U.pf("%d percepts, %d nnz\n", model.perceptVocab.size(), NumberizedSentence.totalNNZ);
+    		cacheReadMode = true;
+    	}
+    	else if (useHashing) {
+    		allocateCoefs();
+    	}
+    	else {
+    		assert false : "bad option combination";
+    	}
 		
     	for (int outer=0; outer<numIters; outer++) {
     		U.pf("iter %3d ", outer);  System.out.flush();
@@ -389,7 +415,7 @@ public class LRParser {
     		trainOnlineIter();
     		
         	double dur = System.currentTimeMillis() - t0;
-        	U.pf("%.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
+        	U.pf(" %.1f sec, %.1f ms/sent\n", dur/1000, dur/inputSentences.length);
     		
         	if (saveEvery >= 0 && outer % saveEvery == 0)
         		model.save(U.sf("%s.iter%s", modelFile, outer));
@@ -421,16 +447,23 @@ public class LRParser {
     }
     
     static void featureExtractionPass() {
+		double t0=System.currentTimeMillis(), dur;
+
         for (int snum=0; snum<inputSentences.length; snum++) {
-        	U.pf(".");
+        	if (snum % 100==0) U.pf(".");
         	extractFeaturesForExampleAndWriteToCache(snum);
             if (snum>0 && snum % 1000 == 0) {
-            	U.pf("%d sents, %.3fm percepts, %.1f MB mem used\n", 
+                dur = System.currentTimeMillis()-t0;
+            	U.pf("%d sents, %.3fm percepts, %.1f MB mem used, %.2f ms/sent\n", 
             			snum+1, model.perceptVocab.size()/1e6,
-            			Runtime.getRuntime().totalMemory()/1e6
+            			Runtime.getRuntime().totalMemory()/1e6,
+            			dur/(snum+1)
             			);
             }
+            numTokens += inputSentences[snum].size();
         }
+        dur = System.currentTimeMillis()-t0;
+        U.pf("\nFE TIME %.1f sec, %.2f ms/sec\n", dur/1000, dur/inputSentences.length);
     }
     
     /** adagrad: http://www.ark.cs.cmu.edu/cdyer/adagrad.pdf */ 
@@ -440,7 +473,7 @@ public class LRParser {
 
 		double ll = 0;
         for (int snum=0; snum<inputSentences.length; snum++) {
-        	U.pf(".");
+        	if (snum % 100==0) U.pf(".");
             
             NumberizedSentence ns = getNextExample(snum);
     		int[][] edgeMatrix = graphMatrices.get(snum);
@@ -559,6 +592,7 @@ public class LRParser {
 		allFE.add(new CoarseDependencyFeatures());
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
+		allFE.add(new UnlabeledDepFE());
 //		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
 	}
