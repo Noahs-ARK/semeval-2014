@@ -388,16 +388,24 @@ public class LRParser {
 
     static void trainingOuterLoopOnline() throws IOException {
     	
-    	U.pf("First pass: extracting features, no model updates.\n");
-		cacheReadMode = false;
-		openCacheForWriting();
-    	featureExtractionPass();
-		closeCacheAfterWriting();
-    	allocateCoefs();
-        U.pf("\n");
-        U.pf("%d sentences, %d tokens, %.2f tokens/sent, %d pairs (candidate edges), %.2f pairs/sent\n", inputSentences.length, numTokens, numTokens*1.0/inputSentences.length, numPairs, numPairs*1.0/inputSentences.length);
-		U.pf("%d percepts, %d nnz\n", model.perceptVocab.size(), NumberizedSentence.totalNNZ);
-		cacheReadMode = true;
+    	if (useFeatureCache) {
+        	U.pf("First pass: extracting features, no model updates.\n");
+    		cacheReadMode = false;
+    		openCacheForWriting();
+        	featureExtractionPass();
+    		closeCacheAfterWriting();
+        	allocateCoefs();
+            U.pf("\n");
+            U.pf("%d sentences, %d tokens, %.2f tokens/sent, %d pairs (candidate edges), %.2f pairs/sent\n", inputSentences.length, numTokens, numTokens*1.0/inputSentences.length, numPairs, numPairs*1.0/inputSentences.length);
+    		U.pf("%d percepts, %d nnz\n", model.perceptVocab.size(), NumberizedSentence.totalNNZ);
+    		cacheReadMode = true;
+    	}
+    	else if (useHashing) {
+    		allocateCoefs();
+    	}
+    	else {
+    		assert false : "bad option combination";
+    	}
 		
     	for (int outer=0; outer<numIters; outer++) {
     		U.pf("iter %3d ", outer);  System.out.flush();
