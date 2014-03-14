@@ -285,8 +285,8 @@ public class LRParser {
 //				numCorrectPrunes = prune && sgGold[t]==1 ? 1 : 0;
 			}
 		}
-		U.pf("Pruning at threshold %f: pruned %d (%.3f out of %d tokens total).\n",
-				singletonPruneThresh, numPrunes, numPrunes*1.0/numTokens, numTokens);
+		U.pf("Pruning at singleton confidence threshold %f: pruned %d (%.1f%%).\n",
+				singletonPruneThresh, numPrunes, numPrunes*100.0/numTokens, numTokens);
 	
 //		U.pf("Pruning at threshold %f: pruned %d (%.3f out of %d tokens total).  %d/%d correct prunes = %.3f prec\n",
 //				singletonPruneThresh, numPrunes, numPrunes*1.0/numTokens, numTokens,
@@ -621,12 +621,12 @@ public class LRParser {
 	static List<FE.FeatureExtractor> initializeFeatureExtractors() {
 		final List<FE.FeatureExtractor> allFE = new ArrayList<>();
 		allFE.add(new BasicFeatures());
-//		allFE.add(new LinearOrderFeatures());
-//		allFE.add(new CoarseDependencyFeatures());
-//		allFE.add(new DependencyPathv1());
-//		allFE.add(new SubcatSequenceFE());
-//		allFE.add(new UnlabeledDepFE());
-//		
+		allFE.add(new LinearOrderFeatures());
+		allFE.add(new CoarseDependencyFeatures());
+		allFE.add(new DependencyPathv1());
+		allFE.add(new SubcatSequenceFE());
+		allFE.add(new UnlabeledDepFE());
+		
 //		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
 	}
