@@ -20,6 +20,7 @@ public class InputAnnotatedSentence {
 	public int[] predicatePredictions;
 	public int[] singletonPredictions;
 	public double[] topnessPredProbs;
+	public double[] singletonPredProbs;
 
 	public InputAnnotatedSentence(int size) {
 		sentence = new String[size];

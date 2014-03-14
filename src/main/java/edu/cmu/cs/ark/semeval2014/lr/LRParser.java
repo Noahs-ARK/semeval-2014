@@ -199,7 +199,8 @@ public class LRParser {
 		// Note that its predictions are stored in the inputSentences.
 		preprocessor.trainModels(labelVocab, graphMatrices);
 		preprocessor.predictIntoInputs();
-//		preprocessor.dumpDecisions(10);
+//		for (int snum=0; snum<inputSentences.length; snum++) preprocessor.dumpDecisions(snum);
+//		System.exit(0);
 
 		// Train the edge-based semparser.
 		final Vocabulary perceptVocab = new Vocabulary();
