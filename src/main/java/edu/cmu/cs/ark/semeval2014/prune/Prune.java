@@ -13,7 +13,7 @@ import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PassThroughFe;
 
 public class Prune {
-	private int numIter = 1;
+	private int numIter = 10;
 	private List<int[]> trainingSingletonIndicators;
 	private List<int[]> trainingPredicateIndicators;
 	private PruneModel singletonModel;
@@ -351,9 +351,101 @@ public class Prune {
 		predicateModel.load(modelFileName + "." + predicateFileName);
 	}
 	
-	/** Do predictions and save them in the input sentence objects. */
+	/** Do predictions and save them in the input sentence objects. 
+	 * @param graphMatrices 
+	 * @param labelVocab2 */
+	public void predictIntoInputs(List<int[][]> graphMatrices, Vocabulary graphLabelVocab){
+		predictForInputSentences(singletonModel, predicateModel);
+		computePrecisionAndRecall(graphMatrices, graphLabelVocab);
+	}
+	
+	// @param takes no params
+	// simply predicts, does not compute precision and recall. 
 	public void predictIntoInputs(){
 		predictForInputSentences(singletonModel, predicateModel);
+	}
+
+	private void computePrecisionAndRecall(List<int[][]> graphMatrices, Vocabulary graphLabelVocab) {
+		// generate the gold singletons and predicates
+		List<int[]> goldPreds = convertGraphsToPredicateIndicators(graphMatrices, graphLabelVocab);
+		List<int[]> goldSingles = convertGraphsToSingletonIndicators(graphMatrices, graphLabelVocab);
+		
+		int[] predCounts = new int[6]; 
+		int[] singleCounts = new int[6];
+		/* ordering of these arrays:
+		goldTrue
+		goldFalse
+		truePos
+		falseNeg
+		trueNeg
+		falsePos
+		*/
+		System.out.println("Length of graphMatrices: " + graphMatrices.size());
+		System.out.println("Length of goldPreds: " + goldPreds.size());
+		System.out.println("Length of inputSentences: " + inputSentences.length);
+				
+		for (int i = 0; i < inputSentences.length; i++){
+			/*
+			System.out.println("gold singletons: \t" + Arrays.toString(goldSingles.get(i)));
+			System.out.println(Arrays.toString(inputSentences[i].singletonPredictions.get(i)));
+			System.out.println(Arrays.toString(goldSingles.get(i)));
+			System.out.println(Arrays.toString(goldSingles.get(i)));
+			*/
+			computePAndR(goldSingles.get(i), inputSentences[i].singletonPredictions, singleCounts);
+			computePAndR(goldPreds.get(i), inputSentences[i].predicatePredictions, predCounts);
+		}
+		System.out.println();
+		System.out.println("Computed precision and recall for predicates and singletons!");
+		printPAndR(predCounts, "Predicates");
+		printPAndR(singleCounts, "Singletons");
+		System.out.println();
+	}
+	
+	private void printPAndR(int[] counts, String predName){
+		double precision = counts[2] * 1.0 / (counts[2] + counts[5]);
+		double recall = counts[2] * 1.0 / (counts[2] + counts[3]);
+		System.out.println("The " + predName + " precision and recall:");
+		System.out.println("Total false: " + counts[0]);
+		System.out.println("Total true: " + counts[1]);
+		// precision: tp / (tp + fp)
+		System.out.println("Precision: " + counts[2] + "/(" + counts[2] + "+" + counts[5] + ") = "  +
+				precision);
+		// recall: tp / (tp + fn)
+		System.out.println("Recall: " + counts[2] + "/(" + counts[2] + "+" + counts[3] + ") = " + 
+				recall);
+		// F1 = 2 * precision*recall / (precision + recall)
+		System.out.println("F1: " + ((2 * precision * recall) / (precision + recall)));
+		System.out.println("Accuracy: " + ((1.0*counts[2] + counts[4]) / (counts[0] + counts[1])));
+		System.out.println("Baseline: " + (1.0*counts[2] / (counts[0] + counts[1])));
+		System.out.println();
+	}
+	
+	private void computePAndR(int[] gold, int[] predictions, int[] counters){
+		for (int i = 0; i < gold.length; i++){
+			if (gold[i] == 1) 
+				counters[0]++;
+			else 
+				counters[1]++;
+			if (gold[i] == 1 && predictions[i] == 1)
+				counters[2]++;
+			else if (gold[i] == 1 && predictions[i] == 0)
+				counters[3]++;
+			else if (gold[i] == 0 && predictions[i] == 0)
+				counters[4]++;
+			else if (gold[i] == 0 && predictions[i] == 1)
+				counters[5]++;
+		}
+		/*
+		for (int i = 0 ;i < gold.length; i++){
+			System.out.print(gold[i]);
+		}
+		System.out.println();
+		for (int i = 0; i < predictions.length; i++){
+			System.out.print(predictions[i]);
+		}
+		System.out.println();
+		*/
+		
 	}
 
 	private void predictForInputSentences(PruneModel singletonModel, PruneModel predicateModel) {
@@ -363,6 +455,7 @@ public class Prune {
 			inputSentences[i].singletonPredictions = Arr.copy(singles);
 			inputSentences[i].predicatePredictions = Arr.copy(preds);
 		}
+		precisionRecall();
 	}
 
 	/** return predicted labels, as integers
@@ -379,6 +472,8 @@ public class Prune {
     		return predLabels;
 	}
 	
-	
+	private void precisionRecall(){
+		
+	}
 
 }
