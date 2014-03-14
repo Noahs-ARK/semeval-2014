@@ -1,32 +1,50 @@
-adj_ARG1
-prep_ARG2
-det_ARG1
-prep_ARG1
-noun_ARG1
-verb_ARG2
-verb_ARG1
-punct_ARG1
-aux_ARG2
-aux_ARG1
-coord_ARG2
-coord_ARG1
-comp_ARG1
-conj_ARG1
-app_ARG2
-app_ARG1
-conj_ARG2
-poss_ARG2
-poss_ARG1
-relative_ARG1
-verb_ARG3
-comp_MOD
-lgs_ARG2
-verb_MOD
-lparen_ARG3
-lparen_ARG2
-lparen_ARG1
-it_ARG1
-noun_ARG2
-dtv_ARG2
-comp_ARG2
-adj_ARG2
+mwe 3
+times 2
+subord 2
+poss 2
+loc 2
+conj 2
+compound 2
+_or_c 2
+_and_c 2
+ARG2 2
+ARG1 2
+unspec_manner 1
+temp 1
+plus 1
+parenthetical 1
+of 1
+neg 1
+measure 1
+discourse 1
+appos 1
+_yet_c 1
+_versus_c 1
+_then_c 1
+_rather+than_c 1
+_plus_c 1
+_not_c 1
+_not+to+mention_c 1
+_nor_c 1
+_much+less_c 1
+_minus_c 1
+_instead+of_c 1
+_if+not_c 1
+_formerly_c 1
+_except_c 1
+_except+that_c 1
+_even_c 1
+_but_c 1
+_but+not_c 1
+_but+also_c 1
+_as+well+as_c 1
+_and+yet_c 1
+_and+thus_c 1
+_and+then_c 1
+_and+so_c 1
+_and+not_c 1
+_and+also_c 1
+_after_c 1
+BV 1
+ARG4 1
+ARG3 1

@@ -25,6 +25,7 @@ Creates the labelset, and figures out which labels should be deterministic"""
 
     def main(args: Array[String]) {
         val options = parseOptions(Map(),args.toList)
+        verbosity = 0
         if (options.contains('verbosity)) {
             verbosity = options('verbosity).asInstanceOf[Int]
         }
@@ -51,7 +52,7 @@ Creates the labelset, and figures out which labels should be deterministic"""
                 val labelcount : List[(String, Int)] = node.relations.map(_._1).distinct.map(x => (x, node.relations.count(_._1 == x)))
                 logger(2, "labelcount = "+labelcount.toString)
             }
-            println()
+            logger(1,"")
         }
     }
 }

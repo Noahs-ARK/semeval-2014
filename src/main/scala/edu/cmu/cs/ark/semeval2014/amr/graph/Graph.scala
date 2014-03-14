@@ -12,6 +12,7 @@ abstract class Graph {
     def addEdge(node1: Node, node2: Node, label: String)
     def clearEdges : Graph
     def toConll(inputAnnotatedSentence: InputAnnotatedSentence) : String
+    def toString : String
 }
 
 object Graph {

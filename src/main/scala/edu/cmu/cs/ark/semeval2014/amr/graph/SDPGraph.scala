@@ -58,6 +58,28 @@ case class SDPGraph(val nodes : Array[Node]) extends Graph {
         }
         return output.mkString("\n")
     }
+
+    override def toString : String = {
+        val output : ArrayBuffer[String] = ArrayBuffer()
+        val nodeArray : Array[Option[Node]] = (0 until nodes.size).map(x => None).toArray
+        val isPred : Array[Boolean] = (0 until nodes.size).map(x => false).toArray
+        for ((node, i) <- nodes.zipWithIndex) {
+            if (node.relations.size > 0) {
+                isPred(i) = true
+                nodeArray(i) = Some(node)
+            }
+        }
+        for (i <- 0 until nodes.size) {
+            var str = "%d\t%s\t%s".format(i + 1, nodes(i).concept, if(isPred(i)) { "+" } else { "-" })
+            for (head <- 0 until nodes.size
+                 if (isPred(head))) {
+                val relation = nodeArray(head).get.relations.find(x => x._2.position == i)
+                str = str + "\t" + ( if(relation == None) { "_" } else { relation.get._1 } )
+            }
+            output += str
+        }
+        return output.mkString("\n")
+    }
 }
 
 object SDPGraph {
@@ -87,18 +109,17 @@ object SDPGraph {
         }
         //logger(0, sdp.mkString("\n"))
         val nodeArray = (0 until len).map(i => if(!singleton(i)) { Some(Node(fields(i)(0), fields(i)(1), List(), i)) } else { None } ).toArray
-        val nodes = nodeArray.filter(_ != None).map(_.get)
         val predicates = (0 until len).filter(i => fields(i)(5) == "+").map(i => nodeArray(i).get).toList
         if (!clearRelations) {
-            for ((dependent, i) <- nodes.zipWithIndex) {
+            for ((dependent, i) <- nodeArray.zipWithIndex if dependent != None) {
                 for ((relation, j) <- fields(i).drop(6).zipWithIndex) {
                     if (relation != "_") {
-                        predicates(j).relations = (relation, dependent) :: predicates(j).relations
+                        predicates(j).relations = (relation, dependent.get) :: predicates(j).relations
                     }
                 }
             }
         }
-        return SDPGraph(nodes)
+        return SDPGraph(nodeArray.filter(_ != None).map(_.get))
     }
 }
 

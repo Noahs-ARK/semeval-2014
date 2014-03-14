@@ -20,7 +20,7 @@ object Input {
         if (!options.contains('sdpInput)) {
             System.err.println("Error: please specify -sdpInput filename"); sys.exit(1)
         }
-        val sdp = Corpus.splitOnNewline(fromFile(options('sdpInput)).getLines).map(
+        val sdp = Corpus.splitOnNewline(fromFile(options('sdpInput), "utf-8").getLines).map(
             x => SDPGraph.fromGold(x.split("\n"), !oracle)).toArray
         return sdp
     }
