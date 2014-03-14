@@ -31,6 +31,9 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     val stepsize = options.getOrElse('trainingStepsize, "1.0").toDouble
     val regularizerStrength = options.getOrElse('trainingRegularizerStrength, "0.0").toDouble
     val loss = options.getOrElse('trainingLoss, "SVM")
+    if (!options.contains('trainingWeightsFile)) {
+        System.err.println("Error: No model filename specified"); sys.exit(1)
+    }
     val optimizer: Optimizer = options.getOrElse('trainingOptimizer, "Adagrad") match {
         case "SSGD" => new SSGD()
         case "Adagrad" => new Adagrad()
@@ -45,7 +48,9 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     Runtime.getRuntime().addShutdownHook(new Thread() {
         override def run() {
             System.err.print("Writing out weights... ")
-            print(weights.unsorted)
+            val file = new java.io.PrintWriter(new java.io.File(options('trainingWeightsFile), "UTF-8"))
+            try { file.print(weights.toString) }
+            finally { file.close }
             System.err.println("done")
         }
     })
@@ -67,6 +72,15 @@ abstract class TrainObj(options: Map[Symbol, String])  {
         }
     }
 
+    def trainingObserver(pass: Int) : Boolean = {
+        if (options.contains('trainingSaveInterval) && pass % options('trainingSaveInterval).toInt == 0 && pass > 0) {
+            val file = new java.io.PrintWriter(new java.io.File(options('trainingWeightsFile) + ".iter" + pass.toString, "UTF-8"))
+            try { file.print(weights.toString) }
+            finally { file.close }
+        }
+        return true
+    }
+
     def train() {
         optimizer.learnParameters(
             i => gradient(i),
@@ -74,6 +88,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
             inputGraphs.size,
             passes,
             stepsize,
+            trainingObserver,
             avg = false)
     }
 }
