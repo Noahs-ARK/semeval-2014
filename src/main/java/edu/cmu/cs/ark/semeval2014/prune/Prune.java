@@ -49,6 +49,9 @@ public class Prune {
 		labelVocab = new Vocabulary();
 		labelVocab.num(FALSE);
 		labelVocab.num(TRUE);
+		
+		singletonLR = new BinaryLogreg<>();
+		singletonLR.featureExtractors.add(new SomeFeats());
 	}
 	
 	/*
@@ -81,22 +84,26 @@ public class Prune {
 	private List<int[]> convertGraphsToSingletonIndicators(List<int[][]> graphs, Vocabulary graphLabelVocab){
 		List<int[]> singletons = new ArrayList<>();
 		for (int[][] g : graphs){
-			int[] singles = new int[g.length];
-			// to instantiate the array of singletons
-			for (int i = 0; i < singles.length; i++){
-				singles[i] = labelVocab.num(TRUE);
-			}
-			for (int i = 0; i < g.length; i++){
-				for (int j = 0; j < g.length; j++){
-					if (g[i][j] != graphLabelVocab.num(LRParser.NO_EDGE)){
-						singles[i] = labelVocab.num(FALSE);
-						singles[j] = labelVocab.num(FALSE);
-					}
-				}
-			}
-			singletons.add(singles);
+			singletons.add(convertGraphToSingletonIndicators(g, graphLabelVocab));
 		}
 		return singletons;
+	}
+	
+	public int[] convertGraphToSingletonIndicators(int[][] g, Vocabulary graphLabelVocab){
+		int[] singles = new int[g.length];
+		// to instantiate the array of singletons
+		for (int i = 0; i < singles.length; i++){
+			singles[i] = labelVocab.num(TRUE);
+		}
+		for (int i = 0; i < g.length; i++){
+			for (int j = 0; j < g.length; j++){
+				if (g[i][j] != graphLabelVocab.num(LRParser.NO_EDGE)){
+					singles[i] = labelVocab.num(FALSE);
+					singles[j] = labelVocab.num(FALSE);
+				}
+			}
+		}
+		return singles;
 	}
 	
 	
@@ -152,8 +159,6 @@ public class Prune {
 		//trainError(pModel.weights, predicates);
 //		dumpDecisions(10);
 		
-		singletonLR = new BinaryLogreg<>();
-		singletonLR.featureExtractors.add(new SomeFeats());
 		addSingletonLRTrainingData();
 		singletonLR.doTraining(modelFileName + "." + singletonLRFileName);
 		
@@ -388,7 +393,6 @@ public class Prune {
 			inputSentences[i].predicatePredictions = Arr.copy(preds);
 
 			inputSentences[i].singletonPredProbs = predictSingletonProbs(inputSentences[i]);
-
 		}
 	}
 	double[] predictSingletonProbs(InputAnnotatedSentence sent) {
