@@ -61,7 +61,7 @@ public class MyGraph {
 		final List<Triple<Integer,Integer,String>> edgeList = new ArrayList<>();
 		for (int i = 0; i < sent.size(); i++) {
 			for (int j = 0; j < sent.size(); j++) {
-				if (LRParser.badDistance(i, j)) continue;
+				if (LRParser.badPair(sent, i, j)) continue;
 				int predLabel = Arr.argmax(probs[i][j]);
 				if (predLabel==noedgeID) continue;
 

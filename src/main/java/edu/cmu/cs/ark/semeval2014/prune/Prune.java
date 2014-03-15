@@ -1,16 +1,29 @@
 package edu.cmu.cs.ark.semeval2014.prune;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import mltools.classifier.BinaryLogreg;
+import scala.Option;
 import util.Arr;
 import util.U;
 import util.Vocabulary;
-
-
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.LRParser;
-import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
+import edu.cmu.cs.ark.semeval2014.lr.NumberizedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PassThroughFe;
+import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
+import edu.cmu.cs.ark.semeval2014.lr.fe.CoarseDependencyFeatures;
+import edu.cmu.cs.ark.semeval2014.lr.fe.DependencyPathv1;
+import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
+import edu.cmu.cs.ark.semeval2014.lr.fe.LinearOrderFeatures;
+import edu.cmu.cs.ark.semeval2014.lr.fe.SubcatSequenceFE;
+import edu.cmu.cs.ark.semeval2014.lr.fe.UnlabeledDepFE;
 
 public class Prune {
 	private int numIter = 1;
@@ -18,8 +31,9 @@ public class Prune {
 	private List<int[]> trainingPredicateIndicators;
 	private PruneModel singletonModel;
 	private PruneModel predicateModel;
+	private BinaryLogreg<TokenCtx> singletonLR;
 	private InputAnnotatedSentence[] inputSentences;
-	private List<FE.FeatureExtractor> allFE = new ArrayList<>();
+	private List<FE.FeatureExtractor> allFE;
 	
 	// model parameters
 	private Vocabulary labelVocab;
@@ -30,6 +44,7 @@ public class Prune {
 	private final String modelFileName;
 	private final String singletonFileName = "singletonModel.ser";
 	private final String predicateFileName = "predicateModel.ser";
+	private final String singletonLRFileName = "singletonLR.txt";
 		
 	// featuresByLabel: map from the labels to the features computed from the labels
 	// labelFeatureVocab maps from the features computed from the labels to a number representing that feature
@@ -41,6 +56,9 @@ public class Prune {
 		labelVocab = new Vocabulary();
 		labelVocab.num(FALSE);
 		labelVocab.num(TRUE);
+		
+		singletonLR = new BinaryLogreg<>();
+		singletonLR.featureExtractors.add(new SomeFeats());
 	}
 	
 	/*
@@ -73,22 +91,26 @@ public class Prune {
 	private List<int[]> convertGraphsToSingletonIndicators(List<int[][]> graphs, Vocabulary graphLabelVocab){
 		List<int[]> singletons = new ArrayList<>();
 		for (int[][] g : graphs){
-			int[] singles = new int[g.length];
-			// to instantiate the array of singletons
-			for (int i = 0; i < singles.length; i++){
-				singles[i] = labelVocab.num(TRUE);
-			}
-			for (int i = 0; i < g.length; i++){
-				for (int j = 0; j < g.length; j++){
-					if (g[i][j] != graphLabelVocab.num(LRParser.NO_EDGE)){
-						singles[i] = labelVocab.num(FALSE);
-						singles[j] = labelVocab.num(FALSE);
-					}
-				}
-			}
-			singletons.add(singles);
+			singletons.add(convertGraphToSingletonIndicators(g, graphLabelVocab));
 		}
 		return singletons;
+	}
+	
+	public int[] convertGraphToSingletonIndicators(int[][] g, Vocabulary graphLabelVocab){
+		int[] singles = new int[g.length];
+		// to instantiate the array of singletons
+		for (int i = 0; i < singles.length; i++){
+			singles[i] = labelVocab.num(TRUE);
+		}
+		for (int i = 0; i < g.length; i++){
+			for (int j = 0; j < g.length; j++){
+				if (g[i][j] != graphLabelVocab.num(LRParser.NO_EDGE)){
+					singles[i] = labelVocab.num(FALSE);
+					singles[j] = labelVocab.num(FALSE);
+				}
+			}
+		}
+		return singles;
 	}
 	
 	
@@ -124,6 +146,12 @@ public class Prune {
 	
 	// to learn the weight vectors 
 	public void trainModels(Vocabulary lv, List<int[][]> graphMatrices){
+		allFE = initializeFeatureExtractors();
+		for (FE.FeatureExtractor fe : allFE) {
+			assert (fe instanceof FE.TokenFE) || (fe instanceof FE.EdgeFE) : "all feature extractors need to implement one of the interfaces!";
+			fe.initializeAtStartup();
+		}
+		
 		U.pf("Training preproc ('Prune') models.\n");
 		initialize(graphMatrices, lv);
 		
@@ -144,14 +172,19 @@ public class Prune {
 		//trainError(pModel.weights, predicates);
 //		dumpDecisions(10);
 		
+		addSingletonLRTrainingData();
+		singletonLR.doTraining(modelFileName + "." + singletonLRFileName);
+		
 	}
+	
 	
 	public void dumpDecisions(int snum) {
 		InputAnnotatedSentence sent = inputSentences[snum];
 		U.pf("\nSENTENCE %s\n", sent.sentenceId);
 		for (int t=0; t<inputSentences[snum].size(); t++) {
-			U.pf("issg(g,p) = %d,%d  ispred(g,p) = %d,%d  ||| %s\n", 
-					trainingSingletonIndicators.get(snum)[t], sent.singletonPredictions[t], 
+			U.pf("issg(g,p,pr) = %d,%d,%.3f  ispred(g,p) = %d,%d  ||| %s\n", 
+					trainingSingletonIndicators.get(snum)[t], sent.singletonPredictions[t],
+					sent.singletonPredProbs[t],
 					trainingPredicateIndicators.get(snum)[t], sent.predicatePredictions[t], 
 					sent.sentence[t]);
 		}
@@ -163,7 +196,7 @@ public class Prune {
 		int incorrect = 0;
         for (int snum=0; snum<inputSentences.length; snum++) {
         	if (snum % 100==0) U.pf(".");
-        	List<Map<String, Set<String>>> feats = ghettoFeats(snum);
+        	List<Map<String, Set<String>>> feats = computeFeats(snum);
     		int[] sequenceOfLabels = test.get(snum);
     		Viterbi v = new Viterbi(weights);
     		String[] labels = v.decode(feats);
@@ -195,7 +228,7 @@ public class Prune {
 	
 	private void initializeWeights(PruneModel model){
 		for (int i = 0; i < inputSentences.length; i++){
-			List<Map<String, Set<String>>> feats = ghettoFeats(i);
+			List<Map<String, Set<String>>> feats = computeFeats(i);
 			for (int j = 0; j < feats.size(); j++){
 				for (String l : feats.get(j).keySet()){
 					for (String w : feats.get(j).get(l)){
@@ -225,7 +258,7 @@ public class Prune {
 	private void trainOnlineIter(PruneModel model, List<int[]> train ) {
         for (int snum=0; snum<inputSentences.length; snum++) {
         	if (snum % 100==0) U.pf(".");
-        	List<Map<String, Set<String>>> feats = ghettoFeats(snum);
+        	List<Map<String, Set<String>>> feats = computeFeats(snum);
     		int[] sequenceOfLabels = train.get(snum);
     		ghettoPerceptronUpdate(sequenceOfLabels, feats, model);
         }
@@ -266,38 +299,63 @@ public class Prune {
 			}
 		}
 	}
-
-
-	private List<Map<String, Set<String>>> ghettoFeats(int snum){
+	
+	class TokenFeatAdder extends FE.FeatureAdder {
+		public List<Map<String, Set<String>>> feats = new ArrayList<Map<String, Set<String>>>();
+		private Map<String, Set<String>> featsByLabel = initializeFeats();
 		
-		List<Map<String, Set<String>>> feats = new ArrayList<Map<String, Set<String>>>();
+		@Override
+		public void add(String featname, double value) {
+			HashSet<String> featSet = new HashSet<String>();
+			featSet.add(featname);
+			makeFeatsByLabel(featSet, featsByLabel);
+		}
+		
+		public void completeToken(){
+			feats.add(featsByLabel);
+			featsByLabel = initializeFeats();
+		}
+	}
+	
+	
+	private List<Map<String, Set<String>>> computeFeats(int snum){
+		
+		TokenFeatAdder featureAdder = new TokenFeatAdder();
+		
+		for (FE.FeatureExtractor fe : allFE) {
+			fe.setupSentence(inputSentences[snum]);
+		}
 		
 		Map<String, Set<String>> start = new HashMap<String, Set<String>>();
 		start.put("<START>", new HashSet<String>());
-		feats.add(start);
-
+		featureAdder.feats.add(start);
+		
 		for (int i = 0; i < inputSentences[snum].size(); i++){
-			// adding the token itself as a feature
-			Set<String> wordFeats = new HashSet<String>();
-			wordFeats.add("token=" + inputSentences[snum].sentence[i]);
-			
-			Set<String> posFeats = new HashSet<String>();
-			posFeats.add("pos=" + inputSentences[snum].pos[i]);
-			
-			
-			Map<String, Set<String>> featsByLabel = initializeFeats();
-			makeFeatsByLabel(wordFeats, featsByLabel);
-			makeFeatsByLabel(posFeats, featsByLabel);
-			
-			feats.add(featsByLabel);
+			for (FE.FeatureExtractor fe : allFE){
+				assert (fe instanceof FE.TokenFE);
+				((FE.TokenFE) fe).features(i, featureAdder);
+			}
+			featureAdder.completeToken();
 		}
+
 		Map<String, Set<String>> stop = new HashMap<String, Set<String>>();
 		stop.put("<STOP>", new HashSet<String>());
-		feats.add(stop);
-		
-		return feats;
+		featureAdder.feats.add(stop);
+				
+		return featureAdder.feats;
 	}
 	
+	private List<FE.FeatureExtractor> initializeFeatureExtractors() {
+		final List<FE.FeatureExtractor> allFE = new ArrayList<>();
+		allFE.add(new BasicFeatures());
+		//allFE.add(new LinearOrderFeatures());
+		//allFE.add(new CoarseDependencyFeatures());
+		//allFE.add(new DependencyPathv1());
+		//allFE.add(new SubcatSequenceFE());
+		//allFE.add(new UnlabeledDepFE());
+		return allFE;
+	}
+
 	private Map<String, Set<String>> initializeFeats(){
 		Map<String, Set<String>> featsByLabel = new HashMap<String, Set<String>>();
 		Set<String> conjoinedTrue = new HashSet<String>();
@@ -350,11 +408,19 @@ public class Prune {
 		
 		predicateModel = new PruneModel();
 		predicateModel.load(modelFileName + "." + predicateFileName);
+		
+		try {
+			singletonLR.loadModel(modelFileName + "." + singletonLRFileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/** Do predictions and save them in the input sentence objects. */
 	public void predictIntoInputs(){
 		predictForInputSentences(singletonModel, predicateModel);
+		
 	}
 
 	private void predictForInputSentences(PruneModel singletonModel, PruneModel predicateModel) {
@@ -363,13 +429,22 @@ public class Prune {
 			int[] preds = predict(predicateModel, i);
 			inputSentences[i].singletonPredictions = Arr.copy(singles);
 			inputSentences[i].predicatePredictions = Arr.copy(preds);
+
+			inputSentences[i].singletonPredProbs = predictSingletonProbs(inputSentences[i]);
 		}
+	}
+	double[] predictSingletonProbs(InputAnnotatedSentence sent) {
+		double[] sgProbs = new double[sent.size()];
+		for (int t=0; t<sent.size(); t++) {
+			sgProbs[t] = singletonLR.predictLabelProb(new TokenCtx(t,sent));
+		}
+		return sgProbs;
 	}
 
 	/** return predicted labels, as integers
 	 * todo eventually: clean up messiness with labels vs integers and all that.  why not just use the raw integer numberings? */
 	private int[] predict(PruneModel model, int snum) {
-        	List<Map<String, Set<String>>> feats = ghettoFeats(snum);
+        	List<Map<String, Set<String>>> feats = computeFeats(snum);
         	// run viterbi
     		Viterbi v = new Viterbi(model.weights);
     		String[] labelsAsStrings = v.decode(feats);
@@ -380,6 +455,43 @@ public class Prune {
     		return predLabels;
 	}
 	
+
+	/////////////////////////////////
+	// stuff for binarylogreg system
 	
+	static class TokenCtx {
+		int t = -1;
+		InputAnnotatedSentence sent;
+		TokenCtx(int _t, InputAnnotatedSentence _sent) {
+			t=_t; sent=_sent;
+		}
+	}
+
+	static class SomeFeats extends mltools.classifier.FeatureExtractor<TokenCtx> {
+		@Override
+		public void computeFeatures(TokenCtx ex, mltools.classifier.FeatureExtractor.FeatureAdder fa) {
+			final int tokenIdx = ex.t;
+			String pos = ex.sent.pos[tokenIdx];
+			fa.add("pos=" + pos);
+//			fa.add("pos=" + pos + "&lcword=" + ex.sent.sentence()[ex.t].toLowerCase(), 0.2);
+			fa.add("t=" + tokenIdx);
+			fa.add("t=-" + (ex.sent.size()-tokenIdx-1));
+			fa.add("pos=" + pos + "&t=" + tokenIdx);
+			// TODO dep relation coming out of it
+			final Option<Object> oDepth = ex.sent.syntacticDependencies.depths().apply(tokenIdx);
+			fa.add("depth=" + (oDepth.isDefined() ? oDepth.get() : "NULL"));
+		}
+	}
+	
+	void addSingletonLRTrainingData() {
+		for (int snum=0; snum<trainingSingletonIndicators.size(); snum++) {
+			int[] sgInd = trainingSingletonIndicators.get(snum);
+			InputAnnotatedSentence sent = inputSentences[snum];
+			for (int t=0; t<sgInd.length; t++) {
+				singletonLR.addTrainingExample(sgInd[t]==1, new TokenCtx(t,sent));
+			}
+		}
+	}
+
 
 }
