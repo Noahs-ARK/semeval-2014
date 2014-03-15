@@ -46,7 +46,7 @@ class Features(var featureNames: List[String]) {
     }
 
     def ffLRLabelWithId(node1: Node, node2: Node, label: String) : FeatureVector = {        // Used for Langragian Relaxation
-        return FeatureVector(Map(("Id1="+node1.id+"+L="+label) -> 1.0))
+        return FeatureVector(Map(("LR:Id1="+node1.id+"+L="+label) -> 1.0))
     }
 
     def ffBiasFeatures(node1: Node, node2: Node, label: String) : FeatureVector = {

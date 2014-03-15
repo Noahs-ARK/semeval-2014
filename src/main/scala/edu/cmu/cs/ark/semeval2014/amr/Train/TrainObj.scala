@@ -27,11 +27,11 @@ abstract class TrainObj(options: Map[Symbol, String])  {
 
     ////////////////// Training Setup ////////////////
 
-    val passes = options.getOrElse('trainingPasses, "5").toInt
+    val passes = options.getOrElse('trainingPasses, "30").toInt
     val stepsize = options.getOrElse('trainingStepsize, "1.0").toDouble
     val regularizerStrength = options.getOrElse('trainingRegularizerStrength, "0.0").toDouble
     val loss = options.getOrElse('trainingLoss, "SVM")
-    if (!options.contains('trainingWeightsFile)) {
+    if (!options.contains('model)) {
         System.err.println("Error: No model filename specified"); sys.exit(1)
     }
     val optimizer: Optimizer = options.getOrElse('trainingOptimizer, "Adagrad") match {
@@ -48,7 +48,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     Runtime.getRuntime().addShutdownHook(new Thread() {
         override def run() {
             System.err.print("Writing out weights... ")
-            val file = new java.io.PrintWriter(new java.io.File(options('trainingWeightsFile), "UTF-8"))
+            val file = new java.io.PrintWriter(new java.io.File(options('model)), "UTF-8")
             try { file.print(weights.toString) }
             finally { file.close }
             System.err.println("done")
@@ -74,7 +74,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
 
     def trainingObserver(pass: Int) : Boolean = {
         if (options.contains('trainingSaveInterval) && pass % options('trainingSaveInterval).toInt == 0 && pass > 0) {
-            val file = new java.io.PrintWriter(new java.io.File(options('trainingWeightsFile) + ".iter" + pass.toString, "UTF-8"))
+            val file = new java.io.PrintWriter(new java.io.File(options('model) + ".iter" + pass.toString), "UTF-8")
             try { file.print(weights.toString) }
             finally { file.close }
         }

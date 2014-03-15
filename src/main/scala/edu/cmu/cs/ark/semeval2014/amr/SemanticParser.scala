@@ -38,7 +38,7 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
             case "-formalism" :: value :: l =>           parseOptions(map + ('formalism -> value), l)
             case "-labelset" :: value :: l =>            parseOptions(map + ('labelset -> value), l)
             case "-mode" :: value :: l =>                parseOptions(map + ('mode -> value), l)
-            case "-model" :: value :: l =>               parseOptions(map + ('trainingWeightsFile -> value), l)
+            case "-model" :: value :: l =>               parseOptions(map + ('model -> value), l)
             case "-sdpOutput" :: value :: tail =>        parseOptions(map + ('sdpOutput -> value), tail)
             case "-sdpInput" :: value :: tail =>         parseOptions(map + ('sdpInput -> value), tail)
             case "-depInput" :: value :: tail =>         parseOptions(map + ('depInput -> value), tail)
@@ -106,6 +106,7 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
             logger(0, "done")
 
             val inputAnnotatedSentences = Input.loadInputAnnotatedSentences(options)
+            options('goldSingletons) = "true"
             val inputGraphs = if (options.contains('goldSingletons)) {
                 Input.loadSDPGraphs(options, oracle = false)
             } else {
@@ -119,12 +120,17 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
             val topClassifier = new TopClassifier()
             topClassifier.loadModel(options('model)+".topmodel")
 
-            for (i <- 0 until inputGraphs.size) {
-                val graph = decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).graph
-                if (!options.contains('goldTops)) {
-                    decideTops(topClassifier, graph.asInstanceOf[SDPGraph], inputAnnotatedSentences(i))
+            val file = new java.io.PrintWriter(new java.io.File(options('sdpOutput)), "UTF-8")
+            try {
+                for (i <- 0 until inputGraphs.size) {
+                    val graph = decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).graph
+                    if (!options.contains('goldTops)) {
+                        decideTops(topClassifier, graph.asInstanceOf[SDPGraph], inputAnnotatedSentences(i))
+                    }
+                    file.println(graph.toConll(inputAnnotatedSentences(i))+"\n")
                 }
-                println(graph.toConll(inputAnnotatedSentences(i))+"\n")
+            } finally {
+                file.close
             }
         }
     }
