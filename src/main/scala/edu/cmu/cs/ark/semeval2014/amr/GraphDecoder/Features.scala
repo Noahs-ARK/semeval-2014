@@ -31,6 +31,7 @@ class Features(var featureNames: List[String]) {
     val ffTable = Map[String, FeatureFunction](
         "CostAugEdgeId" -> ffCostAugEdgeId,
         "LRLabelWithId" -> ffLRLabelWithId,
+        "BiasFeatures" -> ffBiasFeatures,
         "SharedTaskFeatures" -> ffSharedTaskFeatures
     )
 
@@ -46,6 +47,10 @@ class Features(var featureNames: List[String]) {
 
     def ffLRLabelWithId(node1: Node, node2: Node, label: String) : FeatureVector = {        // Used for Langragian Relaxation
         return FeatureVector(Map(("Id1="+node1.id+"+L="+label) -> 1.0))
+    }
+
+    def ffBiasFeatures(node1: Node, node2: Node, label: String) : FeatureVector = {
+        return FeatureVector(Map("Bias" -> 1.0, ("L="+label) -> 1.0))
     }
 
     class TokenFeatureAdder extends FE.FeatureAdder {

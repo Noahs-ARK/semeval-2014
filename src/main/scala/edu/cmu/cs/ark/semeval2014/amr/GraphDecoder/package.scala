@@ -21,7 +21,7 @@ package object GraphDecoder {
     type OptionMap = Map[Symbol, String]
 
     def getFeatures(options: OptionMap) : List[String] = {
-        options.getOrElse('features, "SharedTaskFeatures").split(",").toList.filter(x => x != "edgeId" && x != "labelWithId")
+        options.getOrElse('features, "SharedTaskFeatures,BiasFeatures").split(",").toList.filter(x => x != "edgeId" && x != "labelWithId")
     }
 
     def loadLabelset(filename: String) : Array[(String, Int)] = {
