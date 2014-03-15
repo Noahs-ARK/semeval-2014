@@ -24,17 +24,29 @@ package object GraphDecoder {
         options.getOrElse('features, "SharedTaskFeatures").split(",").toList.filter(x => x != "edgeId" && x != "labelWithId")
     }
 
+    def loadLabelset(filename: String) : Array[(String, Int)] = {
+        Source.fromFile(filename).getLines().toArray.map(x => {
+            val split = x.split(" +")
+            (split(0), if (split.size > 1) { split(1).toInt } else { 1000 })
+        })
+    }
+
     def Decoder(options: OptionMap) : GraphDecoder.Decoder = {
+        if (!options.contains('formalism)) {
+            System.err.println("Error: No formalism specified"); sys.exit(1)
+        }
+
         if (!options.contains('labelset)) {
             System.err.println("Error: No labelset file specified"); sys.exit(1)
         }
 
-        val labelset: Array[(String, Int)] = {
-            Source.fromFile(options('labelset)).getLines().toArray.map(x => {
-                val split = x.split(" +")
-                (split(0), if (split.size > 1) { split(1).toInt } else { 1000 })
-            })
-        }
+        val labelset: Array[(String, Int)] = loadLabelset(
+            if (options.contains('labelset)) {
+                options('labelset)
+            } else {
+                "scripts/labels." + options('formalism)
+            }
+        )
 
         val features = getFeatures(options)
         logger(0, "features = " + features)
