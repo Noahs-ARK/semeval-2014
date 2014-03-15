@@ -36,10 +36,6 @@ package object GraphDecoder {
             System.err.println("Error: No formalism specified"); sys.exit(1)
         }
 
-        if (!options.contains('labelset)) {
-            System.err.println("Error: No labelset file specified"); sys.exit(1)
-        }
-
         val labelset: Array[(String, Int)] = loadLabelset(
             if (options.contains('labelset)) {
                 options('labelset)
