@@ -15,8 +15,10 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.Set
 import scala.collection.mutable.ArrayBuffer
 import edu.cmu.cs.ark.semeval2014.amr.GraphDecoder._
+import edu.cmu.cs.ark.semeval2014.amr.graph._
 import edu.cmu.cs.ark.semeval2014.common._
 import edu.cmu.cs.ark.semeval2014.utils._
+import edu.cmu.cs.ark.semeval2014.prune.Prune
 
 object SemanticParser {
 
@@ -99,8 +101,10 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
             val inputGraphs = if (options.contains('goldSingletons)) {
                 Input.loadSDPGraphs(options, oracle = false)
             } else {
-                System.err.println("Singleton prediction not implemented")
-                sys.exit(1)
+                val singletonPredictor = new Prune(inputAnnotatedSentences, options('model))
+                singletonPredictor.loadModels
+                singletonPredictor.predictIntoInputs
+                inputAnnotatedSentences.map(x => SDPGraph.fromInputAnnotatedSentence(x))
             }
             assert(inputAnnotatedSentences.size == inputGraphs.size, "Input sdp and dependency files not the same line count")
 
