@@ -19,6 +19,7 @@ import edu.cmu.cs.ark.semeval2014.amr.graph._
 import edu.cmu.cs.ark.semeval2014.common._
 import edu.cmu.cs.ark.semeval2014.utils._
 import edu.cmu.cs.ark.semeval2014.prune.Prune
+import edu.cmu.cs.ark.semeval2014.topness.TopClassifier
 
 object SemanticParser {
 
@@ -83,6 +84,12 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
             val trainObj = new GraphDecoder.TrainObj(options)
             trainObj.train
 
+            val topClassifier = new TopClassifier()
+            topClassifier.train(options('depInput), options('model) + ".topmodel")
+
+            //val singletonPredictor = new Prune(inputAnnotatedSentences, options('model))
+            // TODO: train singletonPredictor
+
         } else {
 
             /////////////////// Decoding /////////////////
@@ -108,10 +115,30 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
             }
             assert(inputAnnotatedSentences.size == inputGraphs.size, "Input sdp and dependency files not the same line count")
 
+            val topClassifier = new TopClassifier()
+            topClassifier.loadModel(options('model)+".topmodel")
+
             for (i <- 0 until inputGraphs.size) {
-                println(decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).graph.toConll(inputAnnotatedSentences(i))+"\n")
+                val graph = decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).graph
+                if (!options.contains('goldTops)) {
+                    decideTops(topClassifier, graph.asInstanceOf[SDPGraph], inputAnnotatedSentences(i))
+                }
+                println(graph.toConll(inputAnnotatedSentences(i))+"\n")
             }
         }
+    }
+
+    // TODO: this should probably go somewhere else
+    def decideTops(topClassifier: TopClassifier, graph: SDPGraph, inputAnnotatedSentence: InputAnnotatedSentence) {
+        val topness : Array[Double] = Array.fill(inputAnnotatedSentence.size)(-1e6)
+        val preds : Set[Int] = graph.preds
+        for (i <- 0 until topness.size) {
+            if (preds.contains(i)) {
+                topness(i) = topClassifier.topness(inputAnnotatedSentence, i)
+            }
+        }
+        inputAnnotatedSentence.isTop = topness.map(x => false)
+        inputAnnotatedSentence.isTop(topness.view.zipWithIndex.maxBy(_._1)._2) = true   // .view.zipWithIndex.maxBy(_._1)._2 is argmax
     }
 }
 

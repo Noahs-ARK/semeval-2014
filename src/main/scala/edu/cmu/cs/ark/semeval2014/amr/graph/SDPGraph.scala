@@ -35,6 +35,10 @@ case class SDPGraph(val nodes : Array[Node]) extends Graph {
         return this
     }
 
+    def preds : Set[Int] = {
+        return Set() ++ nodes.filter(_.relations.size > 0).map(x => x.position).toSet
+    }
+
     def toConll(sent: InputAnnotatedSentence) : String = {
         val output : ArrayBuffer[String] = ArrayBuffer()
         output += "#" + sent.sentenceId
