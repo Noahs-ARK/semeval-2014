@@ -50,7 +50,7 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
             case "-trainingLoss" :: value :: l =>        parseOptions(map + ('trainingLoss -> value), l)
             case "-trainingOptimizer" :: value :: l =>   parseOptions(map + ('trainingOptimizer -> value), l)
             case "-trainingCostScale" :: value :: l =>   parseOptions(map + ('trainingCostScale -> value), l)
-            case "-l2reg" :: value :: l =>               parseOptions(map + ('trainingRegularizerStrength -> value), l)
+            case "-l2reg" :: value :: l =>               parseOptions(map + ('trainingL2RegularizerStrength -> value), l)
             case "-v" :: value :: tail =>                parseOptions(map ++ Map('verbosity -> value), tail)
             case string :: opt2 :: tail if isSwitch(opt2) => parseOptions(map ++ Map('infile -> string), list.tail)
             case string :: Nil =>  parseOptions(map ++ Map('infile -> string), list.tail)

@@ -88,6 +88,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
             inputGraphs.size,
             passes,
             stepsize,
+            options.getOrElse('trainingL2RegularizerStrength, "0.0").toDouble,
             trainingObserver,
             avg = false)
     }
