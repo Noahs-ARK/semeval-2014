@@ -51,8 +51,8 @@ public class BasicFeatures extends FE.FeatureExtractor implements FE.TokenFE, FE
 		final String destLemma = lemmas[destTokenIdx];
         final String dir = srcTokenIdx > destTokenIdx ? "dir=i>j" : "dir=i<j";
 
-        fa.add(U.sf("lem:bg:%s_%s", srcLemma, destLemma));
-        fa.add(U.sf("lem:bg:%s_%s_%s_%s", srcLemma, srcPostag, destLemma, destPostag));
+        //fa.add(U.sf("lem:bg:%s_%s", srcLemma, destLemma));
+        //fa.add(U.sf("lem:bg:%s_%s_%s_%s", srcLemma, srcPostag, destLemma, destPostag));
 		fa.add(U.sf("pos:bg:%s_%s", srcPostag, destPostag));
 		fa.add(U.sf("pos:bg:%s_%s_%s", srcPostag, destPostag, dir));
 	}

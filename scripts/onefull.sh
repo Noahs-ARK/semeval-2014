@@ -2,7 +2,6 @@
 set -eu
 
 feature_opts=""
-data_dir="data/splits/med"
 model_dir="experiments"
 mkdir -p "${model_dir}"
 
@@ -17,10 +16,10 @@ archive_dir=/cab0/brendano/www/semeval/reports
 
 for formalism in "pas" "dm" "pcedt"
 do
-    model_name="${formalism}_med_model"
+    model_name="${formalism}_onefull_model"
     model_file="${model_dir}/${model_name}"
 
-    train_file="${data_dir}train.${formalism}.sdp"
+    train_file="data/splits/sec0019.${formalism}.sdp"
     # train_file="lildata/liltrain.${formalism}.sdp"
     train_deps="${train_file}.dependencies"
 
@@ -28,11 +27,11 @@ do
     test_deps="${test_file}.dependencies"
 
     pred_file="${model_file}.pred.${formalism}.sdp"
-    trainpred_file="${model_file}.trainpred.${formalism}.sdp"
+    trainpred_file="${model_file}.train.pred.${formalism}.sdp"
 
     set -x
     (
-    ./java.sh lr.LRParser -mode train -saveEvery -1 \
+    ./java.sh lr.LRParser -mode train -numIters 1 -useHashing -useFeatureCache false \
       -formalism $formalism \
       -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts}
     ./java.sh lr.LRParser -mode test \
@@ -44,7 +43,7 @@ do
     ./scripts/eval.sh "${test_file}" "${pred_file}" | tee "${reports_dir}/${model_name}.eval.log"
     ./scripts/eval.sh "${train_file}" "${trainpred_file}" | tee "${reports_dir}/${model_name}.train.eval.log"
     ./scripts/eval_to_csv.py < "${reports_dir}/${model_name}.eval.log" > "${reports_dir}/${model_name}.eval.csv"
-    ./scripts/eval_to_csv.py < "${reports_dir}/${model_name}.train.eval.log" > "${reports_dir}/${model_name}.train.eval.csv"
+    ./scripts/eval_to_csv.py < "${reports_dir}/${model_name}.train.eval.log" > "${reports_dir}/${model_name}.eval.csv"
     python errorAnalysis/confusionMatrix.py "${test_file}" "${pred_file}" > "${reports_dir}/${model_name}_confusion.html"
     python errorAnalysis/confusionMatrix.py "${train_file}" "${trainpred_file}" > "${reports_dir}/${model_name}_train_confusion.html"
     ) 2>&1 | tee -a ${reports_dir}/run.log

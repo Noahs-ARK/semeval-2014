@@ -13,6 +13,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
+
 /** note the behavior of this class does depend on globals in LRParser !  */
 public class Model {
 	private static final String LABEL_VOCAB_HEADER = "LABELVOCAB";
@@ -64,12 +66,12 @@ public class Model {
 	/** returns:  (#tokens x #tokens x #labelvocab)
 	 * for token i and token j, prob dist over the possible edge labels.
 	 */
-	public double[][][] inferEdgeProbs(NumberizedSentence ns) {
+	public double[][][] inferEdgeProbs(NumberizedSentence ns, InputAnnotatedSentence isent) {
 		double[][][] scores = inferEdgeScores(ns);
 		// transform in-place into probs
 		for (int i=0; i<ns.T; i++) {
 			for (int j=0; j<ns.T; j++) {
-				if (LRParser.badDistance(i, j)) continue;
+				if (LRParser.badPair(isent, i, j)) continue;
 				Arr.softmaxInPlace(scores[i][j]);
 			}
 		}
@@ -255,5 +257,6 @@ public class Model {
 				}
 			}
 		}
+		U.pf("Done saving model");
 	}
 }
