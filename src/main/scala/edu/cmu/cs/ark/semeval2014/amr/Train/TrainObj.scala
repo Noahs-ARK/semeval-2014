@@ -41,7 +41,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     }
 
     val inputAnnotatedSentences = Input.loadInputAnnotatedSentences(options)
-    val inputGraphs = Input.loadSDPGraphs(options)
+    val inputGraphs = Input.loadSDPGraphs(options, oracle = false)
     val oracleGraphs = Input.loadSDPGraphs(options, oracle = true)
     assert(inputAnnotatedSentences.size == inputGraphs.size && inputGraphs.size == oracleGraphs.size, "sdp and dep file lengths do not match")
 

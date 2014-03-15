@@ -16,7 +16,7 @@ object Input {
         }
         return Corpus.getInputAnnotatedSentences(options('depInput))
     }
-    def loadSDPGraphs(options: Map[Symbol, String], oracle: Boolean = false) : Array[SDPGraph] = {
+    def loadSDPGraphs(options: Map[Symbol, String], oracle: Boolean) : Array[SDPGraph] = {
         if (!options.contains('sdpInput)) {
             System.err.println("Error: please specify -sdpInput filename"); sys.exit(1)
         }

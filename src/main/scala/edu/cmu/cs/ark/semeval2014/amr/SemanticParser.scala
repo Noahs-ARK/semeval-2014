@@ -97,7 +97,7 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
 
             val inputAnnotatedSentences = Input.loadInputAnnotatedSentences(options)
             val inputGraphs = if (options.contains('goldSingletons)) {
-                Input.loadSDPGraphs(options)
+                Input.loadSDPGraphs(options, oracle = false)
             } else {
                 System.err.println("Singleton prediction not implemented")
                 sys.exit(1)
