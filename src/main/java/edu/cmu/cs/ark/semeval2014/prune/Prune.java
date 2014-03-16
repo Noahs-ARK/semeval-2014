@@ -466,12 +466,6 @@ public class Prune {
 		System.out.println("Length of inputSentences: " + inputSentences.length);
 				
 		for (int i = 0; i < inputSentences.length; i++){
-			/*
-			System.out.println("gold singletons: \t" + Arrays.toString(goldSingles.get(i)));
-			System.out.println(Arrays.toString(inputSentences[i].singletonPredictions.get(i)));
-			System.out.println(Arrays.toString(goldSingles.get(i)));
-			System.out.println(Arrays.toString(goldSingles.get(i)));
-			*/
 			computePAndR(goldSingles.get(i), inputSentences[i].singletonPredictions, singleCounts);
 			computePAndR(goldPreds.get(i), inputSentences[i].predicatePredictions, predCounts);
 			int[] singletonLROutput = computeSingletonProbs(inputSentences[i].singletonPredProbs);
