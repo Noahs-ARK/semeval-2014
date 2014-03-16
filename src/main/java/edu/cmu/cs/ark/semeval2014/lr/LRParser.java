@@ -176,13 +176,6 @@ public class LRParser {
 		graphMatrices = generateGAndV.getGraphMatrices();
 		labelVocab = generateGAndV.getLabelVocab();
 		
-		// build up label feature vocab
-		initializeLabelFeatureExtractors();
-		final Pair<Vocabulary, List<int[]>> vocabAndFeatsByLabel =
-				extractAllLabelFeatures(labelVocab, labelFeatureExtractors);
-		final Vocabulary labelFeatureVocab = vocabAndFeatsByLabel.first;
-		final List<int[]> featuresByLabel = vocabAndFeatsByLabel.second;
-		
 		assert graphMatrices.size() == inputSentences.length;
 		
 		// Preprocessor training & prediction ... its predictions will be used as semparser features.
@@ -190,8 +183,13 @@ public class LRParser {
 		preprocessor.trainModels(labelVocab, graphMatrices);
 		preprocessor.predictIntoInputs();
 		preprocessor.predictIntoInputs(graphMatrices, labelVocab);
-//		for (int snum=0; snum<inputSentences.length; snum++) preprocessor.dumpDecisions(snum);
-//		System.exit(0);
+		
+		// build up label feature vocab
+		initializeLabelFeatureExtractors();
+		final Pair<Vocabulary, List<int[]>> vocabAndFeatsByLabel =
+				extractAllLabelFeatures(labelVocab, labelFeatureExtractors);
+		final Vocabulary labelFeatureVocab = vocabAndFeatsByLabel.first;
+		final List<int[]> featuresByLabel = vocabAndFeatsByLabel.second;
 
 		// Train the edge-based semparser.
 		final Vocabulary perceptVocab = new Vocabulary();
