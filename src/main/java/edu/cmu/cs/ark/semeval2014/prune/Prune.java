@@ -21,9 +21,11 @@ import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
 import edu.cmu.cs.ark.semeval2014.lr.fe.CoarseDependencyFeatures;
 import edu.cmu.cs.ark.semeval2014.lr.fe.DependencyPathv1;
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
+import edu.cmu.cs.ark.semeval2014.lr.fe.FE.FeatureExtractor;
 import edu.cmu.cs.ark.semeval2014.lr.fe.LinearOrderFeatures;
 import edu.cmu.cs.ark.semeval2014.lr.fe.SubcatSequenceFE;
 import edu.cmu.cs.ark.semeval2014.lr.fe.UnlabeledDepFE;
+import edu.cmu.cs.ark.semeval2014.util.CounterMap;
 
 public class Prune {
 	private int numIter = 10;
@@ -34,6 +36,7 @@ public class Prune {
 	private BinaryLogreg<TokenCtx> singletonLR;
 	private InputAnnotatedSentence[] inputSentences;
 	private List<FE.FeatureExtractor> allFE;
+	//private List<FeatureExtractor> singletonLRFeatures;
 	
 	// model parameters
 	private Vocabulary labelVocab;
@@ -57,8 +60,17 @@ public class Prune {
 		labelVocab.num(FALSE);
 		labelVocab.num(TRUE);
 		
+		initializeSingletonLR();
+
+	}
+	
+	private void initializeSingletonLR(){
+		List<FeatureExtractor> singletonLRFeatures = new ArrayList<FE.FeatureExtractor>();
+		initializeFeatureExtractorsForLR(singletonLRFeatures);
+		
 		singletonLR = new BinaryLogreg<>();
-		singletonLR.featureExtractors.add(new SomeFeats());
+		
+		singletonLR.featureExtractors.add(new SingletonLRFeats(singletonLRFeatures));
 	}
 	
 	/*
@@ -302,21 +314,20 @@ public class Prune {
 	
 	class TokenFeatAdder extends FE.FeatureAdder {
 		public List<Map<String, Set<String>>> feats = new ArrayList<Map<String, Set<String>>>();
-		private Map<String, Set<String>> featsByLabel = initializeFeats();
-		
+		private Map<String, Set<String>> singleTokenFeats = initializeFeats();
+
 		@Override
-		public void add(String featname, double value) {
+		public void add(String featName, double value) {
 			HashSet<String> featSet = new HashSet<String>();
-			featSet.add(featname);
-			makeFeatsByLabel(featSet, featsByLabel);
+			featSet.add(featName);
+			makeFeatsByLabel(featSet, singleTokenFeats);
 		}
-		
+
 		public void completeToken(){
-			feats.add(featsByLabel);
-			featsByLabel = initializeFeats();
+			feats.add(singleTokenFeats);
+			singleTokenFeats = initializeFeats();
 		}
 	}
-	
 	
 	private List<Map<String, Set<String>>> computeFeats(int snum){
 		
@@ -436,10 +447,8 @@ public class Prune {
 		// generate the gold singletons and predicates
 		List<int[]> goldPreds = convertGraphsToPredicateIndicators(graphMatrices, graphLabelVocab);
 		List<int[]> goldSingles = convertGraphsToSingletonIndicators(graphMatrices, graphLabelVocab);
-		
-		int[] predCounts = new int[6]; 
-		int[] singleCounts = new int[6];
-		/* ordering of these arrays:
+
+		/* keys:
 		goldTrue
 		goldFalse
 		truePos
@@ -447,6 +456,11 @@ public class Prune {
 		trueNeg
 		falsePos
 		*/
+		CounterMap<String> predCounts = new CounterMap<String>();
+		CounterMap<String> singleCounts = new CounterMap<String>();
+		CounterMap<String> singleLRCounts = new CounterMap<String>();		
+
+		System.out.println();
 		System.out.println("Length of graphMatrices: " + graphMatrices.size());
 		System.out.println("Length of goldPreds: " + goldPreds.size());
 		System.out.println("Length of inputSentences: " + inputSentences.length);
@@ -460,59 +474,75 @@ public class Prune {
 			*/
 			computePAndR(goldSingles.get(i), inputSentences[i].singletonPredictions, singleCounts);
 			computePAndR(goldPreds.get(i), inputSentences[i].predicatePredictions, predCounts);
+			int[] singletonLROutput = computeSingletonProbs(inputSentences[i].singletonPredProbs);
+			computePAndR(goldSingles.get(i), singletonLROutput, singleLRCounts);
 		}
 		System.out.println();
 		System.out.println("Computed precision and recall for predicates and singletons!");
 		printPAndR(predCounts, "Predicates");
 		printPAndR(singleCounts, "Singletons");
+		printPAndR(singleLRCounts, "Logistic Regression Singletons");
 		System.out.println();
 	}
 	
-	private void printPAndR(int[] counts, String predName){
-		double precision = counts[2] * 1.0 / (counts[2] + counts[5]);
-		double recall = counts[2] * 1.0 / (counts[2] + counts[3]);
+	private int[] computeSingletonProbs(double[] probs){
+		int[] thresholded = new int[probs.length];
+		for (int i = 0; i < probs.length; i++){
+			if (probs[i] > LRParser.singletonPruneThresh)
+				thresholded[i] = 1;
+			else
+				thresholded[i] = 0;
+		}
+		return thresholded;
+	}
+	
+	
+	
+	// precision:  tp / (tp + fp) 100
+	// recall: tp / (tp + fn)
+	private void printPAndR(CounterMap<String> predCounts, String predName){
+		double roundAmount = 1000.0;
+		double precision = Math.round(roundAmount *predCounts.value("truePos") / (predCounts.value("truePos") + predCounts.value("falsePos")) / roundAmount);
+		double recall = Math.round(roundAmount * predCounts.value("truePos") / (predCounts.value("truePos") + predCounts.value("falseNeg")))/ roundAmount;
 		System.out.println("The " + predName + " precision and recall:");
-		System.out.println("Total false: " + counts[0]);
-		System.out.println("Total true: " + counts[1]);
-		// precision: tp / (tp + fp)
-		System.out.println("Precision: " + counts[2] + "/(" + counts[2] + "+" + counts[5] + ") = "  +
-				precision);
-		// recall: tp / (tp + fn)
-		System.out.println("Recall: " + counts[2] + "/(" + counts[2] + "+" + counts[3] + ") = " + 
-				recall);
+		System.out.println("Total false: " + predCounts.value("goldPos"));
+		System.out.println("Total true: " + predCounts.value("goldNeg"));
+		System.out.println("Precision: " + predCounts.value("truePos") + "/(" 
+				+ predCounts.value("truePos") + "+" + predCounts.value("falsePos") + ") = " + precision);
+		System.out.println("Recall: " + predCounts.value("truePos") + "/(" 
+				+ predCounts.value("truePos") + "+" + predCounts.value("falseNeg") + ") = " + recall);
 		// F1 = 2 * precision*recall / (precision + recall)
-		System.out.println("F1: " + ((2 * precision * recall) / (precision + recall)));
-		System.out.println("Accuracy: " + ((1.0*counts[2] + counts[4]) / (counts[0] + counts[1])));
-		System.out.println("Baseline: " + (1.0*counts[2] / (counts[0] + counts[1])));
+		System.out.println("F1: " + Math.round(roundAmount * ((2 * precision * recall) / (precision + recall))) / roundAmount);
+		System.out.println("Accuracy: " + Math.round(roundAmount * ((predCounts.value("truePos") + predCounts.value("trueNeg")) / 
+				(predCounts.value("goldPos") + predCounts.value("goldNeg")))) / roundAmount);
+		System.out.println("Baseline: " + Math.round(roundAmount * (Math.max(predCounts.value("goldPos"), predCounts.value("goldNeg")) 
+				/ (predCounts.value("goldPos") + predCounts.value("goldNeg")))) / roundAmount);
 		System.out.println();
 	}
 	
-	private void computePAndR(int[] gold, int[] predictions, int[] counters){
+	/* keys for counters:
+	goldTrue
+	goldFalse
+	truePos
+	falseNeg
+	trueNeg
+	falsePos
+	*/
+	private void computePAndR(int[] gold, int[] predictions, CounterMap<String> counters){
 		for (int i = 0; i < gold.length; i++){
 			if (gold[i] == 1) 
-				counters[0]++;
+				counters.increment("goldPos");
 			else 
-				counters[1]++;
+				counters.increment("goldNeg");
 			if (gold[i] == 1 && predictions[i] == 1)
-				counters[2]++;
+				counters.increment("truePos");
 			else if (gold[i] == 1 && predictions[i] == 0)
-				counters[3]++;
+				counters.increment("falseNeg");
 			else if (gold[i] == 0 && predictions[i] == 0)
-				counters[4]++;
+				counters.increment("trueNeg");
 			else if (gold[i] == 0 && predictions[i] == 1)
-				counters[5]++;
+				counters.increment("falsePos");
 		}
-		/*
-		for (int i = 0 ;i < gold.length; i++){
-			System.out.print(gold[i]);
-		}
-		System.out.println();
-		for (int i = 0; i < predictions.length; i++){
-			System.out.print(predictions[i]);
-		}
-		System.out.println();
-		*/
-		
 	}
 
 	private void predictForInputSentences(PruneModel singletonModel, PruneModel predicateModel) {
@@ -560,10 +590,50 @@ public class Prune {
 			t=_t; sent=_sent;
 		}
 	}
+	
+	static class SingletonLRFeatAdder extends FE.FeatureAdder {
+		mltools.classifier.FeatureExtractor.FeatureAdder fa;
+		
+		public SingletonLRFeatAdder(mltools.classifier.FeatureExtractor.FeatureAdder _fa){
+			fa = _fa;
+		}
+		
+		@Override
+		public void add(String featName, double value) {
+			fa.add(featName, value);
+		}
+	}
 
-	static class SomeFeats extends mltools.classifier.FeatureExtractor<TokenCtx> {
+	static class SingletonLRFeats extends mltools.classifier.FeatureExtractor<TokenCtx> {
+		// set of feature extractors
+		List<FeatureExtractor> singletonLRFeatures;
+		// feature adder
+		
+		
+		public SingletonLRFeats(List<FeatureExtractor> _featureExtractors){
+			singletonLRFeatures = _featureExtractors;
+		}
+		
 		@Override
 		public void computeFeatures(TokenCtx ex, mltools.classifier.FeatureExtractor.FeatureAdder fa) {
+			for (FE.FeatureExtractor fe : singletonLRFeatures) {
+				fe.setupSentence(ex.sent);
+			}
+			
+			// instantiate a new feature adder
+			SingletonLRFeatAdder featAdder = new SingletonLRFeatAdder(fa);
+			
+			
+			// for each feature extractor
+			
+			// pass feature adder to the feature extractor (which adds the feature to the feature adder)
+			
+			for (FE.FeatureExtractor fe : singletonLRFeatures){
+				assert (fe instanceof FE.TokenFE);
+				((FE.TokenFE) fe).features(ex.t, featAdder);
+			}
+			
+			/*
 			final int tokenIdx = ex.t;
 			String pos = ex.sent.pos[tokenIdx];
 			fa.add("pos=" + pos);
@@ -574,6 +644,7 @@ public class Prune {
 			// TODO dep relation coming out of it
 			final Option<Object> oDepth = ex.sent.syntacticDependencies.depths().apply(tokenIdx);
 			fa.add("depth=" + (oDepth.isDefined() ? oDepth.get() : "NULL"));
+			*/
 		}
 	}
 	
@@ -581,11 +652,20 @@ public class Prune {
 		for (int snum=0; snum<trainingSingletonIndicators.size(); snum++) {
 			int[] sgInd = trainingSingletonIndicators.get(snum);
 			InputAnnotatedSentence sent = inputSentences[snum];
+			
 			for (int t=0; t<sgInd.length; t++) {
 				singletonLR.addTrainingExample(sgInd[t]==1, new TokenCtx(t,sent));
 			}
 		}
 	}
-
+	
+	private void initializeFeatureExtractorsForLR(List<FeatureExtractor> featureExtractors) {
+		featureExtractors.add(new BasicFeatures());
+		//allFE.add(new LinearOrderFeatures());
+		//allFE.add(new CoarseDependencyFeatures());
+		//allFE.add(new DependencyPathv1());
+		//allFE.add(new SubcatSequenceFE());
+		//allFE.add(new UnlabeledDepFE());
+	}
 
 }

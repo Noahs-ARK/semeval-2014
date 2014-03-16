@@ -10,6 +10,7 @@ import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.*;
 import edu.cmu.cs.ark.semeval2014.prune.Prune;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
+import edu.cmu.cs.ark.semeval2014.util.GenerateGraphsAndVocab;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
 import sdp.graph.Edge;
 import sdp.graph.Graph;
@@ -60,6 +61,9 @@ public class LRParser {
 	
 	static TopClassifier topClassifier = new TopClassifier();
     static Prune preprocessor;
+    
+    // the threshold for pruning the singletons from the logistic regression model in Prune
+	public static double singletonPruneThresh = 0.99;
 
 	@Parameter(names="-learningRate")
 	static double learningRate = .1;
@@ -144,7 +148,7 @@ public class LRParser {
 	
 	// this loads in the learned weights for the preprocessing models
 	// then predicts the 'predicates' and 'singelton' classes within the
-	// inputSentences that are already stored in p.
+	// inputSentences that are already stored in preprocessor.
 	private static void preprocessInputSentences(){
 		preprocessor.loadModels();
 		preprocessor.predictIntoInputs();
@@ -167,40 +171,25 @@ public class LRParser {
 		double t0;
 		double dur;
 		U.pf("Reading graphs from %s\n", sdpFile);
-		final List<Graph> graphs = readGraphs(sdpFile);
-
-		// build up the edge label vocabulary
-		labelVocab = new Vocabulary();
-		labelVocab.num(NO_EDGE);
-		for (Graph graph : graphs) {
-			for (Edge e : graph.getEdges()) {
-				labelVocab.num(e.label);
-			}
-		}
-		labelVocab.lock();
-
+		
+		GenerateGraphsAndVocab generateGAndV = new GenerateGraphsAndVocab(sdpFile);
+		graphMatrices = generateGAndV.getGraphMatrices();
+		labelVocab = generateGAndV.getLabelVocab();
+		
 		// build up label feature vocab
 		initializeLabelFeatureExtractors();
 		final Pair<Vocabulary, List<int[]>> vocabAndFeatsByLabel =
 				extractAllLabelFeatures(labelVocab, labelFeatureExtractors);
 		final Vocabulary labelFeatureVocab = vocabAndFeatsByLabel.first;
 		final List<int[]> featuresByLabel = vocabAndFeatsByLabel.second;
-
-		assert graphs.size() == inputSentences.length;
-
-		// convert graphs to adjacency matrices
-		graphMatrices = new ArrayList<>();
-		for (int snum=0; snum<graphs.size(); snum++) {
-			final InputAnnotatedSentence sent = inputSentences[snum];
-			final Graph graph = graphs.get(snum);
-//			assert sent.sentenceId.equals(graph.id.replace("#",""));
-			graphMatrices.add(convertGraphToAdjacencyMatrix(graph, sent.size(), labelVocab));
-		}
+		
+		assert graphMatrices.size() == inputSentences.length;
 		
 		// Preprocessor training & prediction ... its predictions will be used as semparser features.
 		// Note that its predictions are stored in the inputSentences.
 		preprocessor.trainModels(labelVocab, graphMatrices);
 		preprocessor.predictIntoInputs();
+		preprocessor.predictIntoInputs(graphMatrices, labelVocab);
 //		for (int snum=0; snum<inputSentences.length; snum++) preprocessor.dumpDecisions(snum);
 //		System.exit(0);
 
@@ -220,17 +209,6 @@ public class LRParser {
 		return model;
 	}
 
-	private static int[][] convertGraphToAdjacencyMatrix(Graph graph, int n, Vocabulary labelVocab) {
-		int[][] edgeMatrix = new int[n][n];
-		for (int[] row : edgeMatrix) {
-			Arrays.fill(row, labelVocab.num(NO_EDGE));
-		}
-		for (Edge e : graph.getEdges()) {
-			edgeMatrix[e.source-1][e.target-1] = labelVocab.num(e.label);
-		}
-		return edgeMatrix;
-	}
-
 	private static Pair<Vocabulary, List<int[]>> extractAllLabelFeatures(
 			Vocabulary labelVocab,
 			List<FE.LabelFE> labelFeatureExtractors)
@@ -248,17 +226,6 @@ public class LRParser {
 		return Pair.makePair(labelFeatVocab, featsByLabel);
 	}
 
-	private static List<Graph> readGraphs(String sdpFile) throws IOException {
-		final ArrayList<Graph> graphs = new ArrayList<>();
-		try (GraphReader reader = new GraphReader(sdpFile)) {
-			Graph graph;
-			while ((graph = reader.readGraph()) != null) {
-				graphs.add(graph);
-			}
-		}
-		return graphs;
-	}
-
 	private static boolean badDistance(int i, int j) {
 		return i==j || Math.abs(i-j) > maxEdgeDistance;
 	}
@@ -268,7 +235,6 @@ public class LRParser {
 	static boolean isTokenPruned(InputAnnotatedSentence sent, int t) {
 		return sent.singletonPredProbs[t] > singletonPruneThresh;
 	}
-	static double singletonPruneThresh = 0.99;
 	
 	
 	static void diagnosePruning() {
