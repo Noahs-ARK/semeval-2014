@@ -40,16 +40,20 @@ case class SDPGraph(val nodes : Array[Node]) extends Graph {
     }
 
     def toConll(sent: InputAnnotatedSentence) : String = {
+        //logger(1, "nodes = "+nodes.toList.map(x => (x.concept, x.position)).toString)
         val output : ArrayBuffer[String] = ArrayBuffer()
         output += "#" + sent.sentenceId
         val nodeArray : Array[Option[Node]] = (0 until sent.size).map(x => None).toArray
         val isPred : Array[Boolean] = (0 until sent.size).map(x => false).toArray
-        for ((node, i) <- nodes.zipWithIndex) {
+        for (node <- nodes) {
             if (node.relations.size > 0) {
-                isPred(i) = true
-                nodeArray(i) = Some(node)
+                isPred(node.position) = true
+                nodeArray(node.position) = Some(node)
             }
         }
+        //logger(1, "nodeArray = " + nodeArray.toList.map(x => if(x == None) { None } else { Some((x.get.concept,x.get.position)) }))
+        //logger(1, "isPred = "+isPred.toList.zip(nodeArray.toList.map(x => if(x == None) { None } else { Some((x.get.concept,x.get.position)) })))
+        //logger(1, "isPred = "+isPred.toList.toString)
         for (i <- 0 until sent.size) {
             var str = "%d\t%s\tlemmaz\t%s\t%s\t%s".format(i + 1, sent.sentence(i), sent.pos(i),
                 if(sent.isTop(i)) { "+" } else { "-" }, if(isPred(i)) { "+" } else { "-" })
@@ -67,10 +71,10 @@ case class SDPGraph(val nodes : Array[Node]) extends Graph {
         val output : ArrayBuffer[String] = ArrayBuffer()
         val nodeArray : Array[Option[Node]] = (0 until nodes.size).map(x => None).toArray
         val isPred : Array[Boolean] = (0 until nodes.size).map(x => false).toArray
-        for ((node, i) <- nodes.zipWithIndex) {
+        for (node <- nodes) {
             if (node.relations.size > 0) {
-                isPred(i) = true
-                nodeArray(i) = Some(node)
+                isPred(node.position) = true
+                nodeArray(node.position) = Some(node)
             }
         }
         for (i <- 0 until nodes.size) {
