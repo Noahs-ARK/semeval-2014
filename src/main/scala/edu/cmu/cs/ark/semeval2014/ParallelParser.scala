@@ -5,7 +5,7 @@ import java.io.PrintWriter
 import edu.cmu.cs.ark.semeval2014.lr.{Model, MyGraph}
 import edu.cmu.cs.ark.semeval2014.lr.LRParser.extractFeatures
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence
-import util.{U, BasicFileIO}
+import _root_.util.{U, BasicFileIO}
 import edu.cmu.cs.ark.semeval2014.lr.LRParser
 import resource.managed
 
