@@ -4,9 +4,12 @@ import scala.language.implicitConversions
 import java.lang.Math.min
 import edu.cmu.cs.ark.semeval2014.common.MulAssoc
 import edu.cmu.cs.ark.semeval2014.amr.Annotation
+import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector
 
 package object amr {
     implicit def doubleToMulAssoc(x: Double) = new MulAssoc(x)
+    implicit def doubleToFastMulAssoc(x: Double) = new FastFeatureVector.FastMulAssoc(x)
+    implicit def doubleToFastMul2Assoc(x: Double) = new FastFeatureVector.FastMul2Assoc(x)
     implicit def AnnotationToBaseAnnotation[T](a: Annotation[T]) = a.annotations
 
     /*************** MySeq ****************/

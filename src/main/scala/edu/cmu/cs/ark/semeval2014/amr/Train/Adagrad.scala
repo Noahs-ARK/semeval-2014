@@ -15,7 +15,8 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 import scala.math.sqrt
 import edu.cmu.cs.ark.semeval2014.amr._
-import edu.cmu.cs.ark.semeval2014.common._
+import edu.cmu.cs.ark.semeval2014.common.logger
+import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 class Adagrad extends Optimizer {
     def learnParameters(gradient: (Int, Int) => FeatureVector,
@@ -26,26 +27,42 @@ class Adagrad extends Optimizer {
                         l2strength: Double,
                         trainingObserver: Int => Boolean,
                         avg: Boolean) : FeatureVector = {
-        var avg_weights = FeatureVector()
-        var sumSq = FeatureVector()         // G_{i,i}
+        var avg_weights = FeatureVector(weights.labelset)
+        var sumSq = FeatureVector(weights.labelset)         // G_{i,i}
         var pass = 0
         while (pass < passes && trainingObserver(pass)) {
             logger(0,"Pass "+(pass+1).toString)
             for (t <- Random.shuffle(Range(0, trainingSize).toList)) {
                 // normally we would do weights -= stepsize * gradient(t)
                 // but instead we do this: (see equation 8 in SocherBauerManningNg_ACL2013.pdf)
-                for ((feat, value) <- gradient(pass, t).fmap
-                     if value != 0.0 ) {
-                    sumSq.fmap(feat) = sumSq.fmap.getOrElse(feat, 0.0) + value * value
-                    weights.fmap(feat) = weights.fmap.getOrElse(feat, 0.0) - stepsize * value / sqrt(sumSq.fmap(feat))
-                }
-                if (l2strength != 0.0) {
-                    for { (feat, v) <- weights.fmap
-                          if v != 0.0
-                          value = v * l2strength } {
-                        sumSq.fmap(feat) = sumSq.fmap.getOrElse(feat, 0.0) + value * value
-                        weights.fmap(feat) = weights.fmap.getOrElse(feat, 0.0) - stepsize * value / sqrt(sumSq.fmap(feat))
+                val grad = gradient(pass, t)
+                sumSq.update(grad, (feat, label, x , y) => x + y * y)
+                weights.update(grad, (feat, label, x, y) => {
+                    val sq = sumSq(feat, label)
+                    if (sq > 0.0) {
+                        x - stepsize * y / sqrt(sumSq(feat, label))
+                    } else {
+                        x
                     }
+                })
+                //logger(0, "*** sumSq ***")
+                //logger(0, sumSq.toString)
+                //logger(0, "*** weights ***")
+                //logger(0, weights.toString)
+                if (l2strength != 0.0) {
+                    sumSq.update(weights, (feat, label, x , y) => x + l2strength * l2strength * y * y)
+                    weights.update(weights, (feat, label, x, y) => {
+                        val sq = sumSq(feat, label)
+                        if (sq > 0.0) {
+                            x - stepsize * l2strength * y / sqrt(sumSq(feat, label))
+                        } else {
+                            x
+                        }
+                    })
+                //logger(0, "(after l2 update) *** sumSq ***")
+                //logger(0, sumSq.toString)
+                //logger(0, "*** weights ***")
+                //logger(0, weights.toString)
                 }
             }
             avg_weights += weights

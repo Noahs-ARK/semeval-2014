@@ -16,12 +16,13 @@ import scala.collection.mutable.Set
 import scala.collection.mutable.ArrayBuffer
 import scala.util.parsing.combinator._
 import edu.cmu.cs.ark.semeval2014.amr._
-import edu.cmu.cs.ark.semeval2014.common._
+import edu.cmu.cs.ark.semeval2014.common.logger
+import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 class TrainObj(val options : Map[Symbol, String]) extends edu.cmu.cs.ark.semeval2014.amr.Train.TrainObj(options) {
 
     val decoder = Decoder(options)
-    val oracle = new Oracle(getFeatures(options))
+    val oracle = new Oracle(getFeatures(options), decoder.features.weights.labelset)
     val costAug = new CostAugmented(Decoder(options), options.getOrElse('trainingCostScale,"10.0").toDouble)
     val weights = decoder.features.weights
     oracle.features.weights = weights

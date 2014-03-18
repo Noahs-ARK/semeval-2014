@@ -15,7 +15,8 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 import scala.math.sqrt
 import edu.cmu.cs.ark.semeval2014.amr._
-import edu.cmu.cs.ark.semeval2014.common._
+import edu.cmu.cs.ark.semeval2014.common.logger
+import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 class SSGD extends Optimizer {
     def learnParameters(gradient: (Int, Int) => FeatureVector,
@@ -26,7 +27,7 @@ class SSGD extends Optimizer {
                         l2reg: Double,
                         trainingObserver: Int => Boolean,
                         avg: Boolean) : FeatureVector = {
-        var avg_weights = FeatureVector()
+        var avg_weights = FeatureVector(weights.labelset)
         var i = 0
         while (i < passes && trainingObserver(i)) {
             logger(0,"Pass "+(i+1).toString)

@@ -3,15 +3,16 @@ package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
 import scala.collection.mutable.Set
 import edu.cmu.cs.ark.semeval2014.amr.graph.{Node, Graph}
-import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, logger}
+import edu.cmu.cs.ark.semeval2014.common.logger
+import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 case class GraphObj(graph: Graph,
                     nodes: Array[Node], // usually 'nodes' is graph.nodes.filter(_.name != None).toArray
                     features: Features,
                     var set: Array[Int],
                     var setArray: Array[Set[Int]],
-                    var score: Double = 0.0,
-                    var feats: FeatureVector = new FeatureVector()) {
+                    var score: Double /*= 0.0*/,
+                    var feats: FeatureVector /*= new FeatureVector(features.weights.labelset)*/) {
 
     // GraphObj is an object to keep track of the connectivity of the graph as edges are added to the graph.
     // It is code that was factored out of Alg2.  It is now also used in Alg1.
@@ -25,7 +26,7 @@ case class GraphObj(graph: Graph,
     // 'set' contains the index of the set that each node is assigned to
     // At the start each node is in its own set
 
-    def this(graph: Graph, nodes: Array[Node], features: Features) = this(graph, nodes, features, nodes.zipWithIndex.map(_._2).toArray, nodes.zipWithIndex.map(x => Set(x._2)).toArray)
+    def this(graph: Graph, nodes: Array[Node], features: Features) = this(graph, nodes, features, nodes.zipWithIndex.map(_._2).toArray, nodes.zipWithIndex.map(x => Set(x._2)).toArray, 0.0, FeatureVector(features.weights.labelset))
 
     def getSet(nodeIndex : Int) : Set[Int] = { setArray(set(nodeIndex)) }
 

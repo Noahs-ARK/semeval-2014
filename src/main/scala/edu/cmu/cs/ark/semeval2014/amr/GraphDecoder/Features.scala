@@ -5,13 +5,15 @@ import java.lang.Math.log
 import java.lang.Math.min
 import scala.collection.mutable.Map
 import edu.cmu.cs.ark.semeval2014.amr.graph._
-import edu.cmu.cs.ark.semeval2014.common._
+import edu.cmu.cs.ark.semeval2014.common.logger
+import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence
+import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 import edu.cmu.cs.ark.semeval2014.amr._
 import edu.cmu.cs.ark.semeval2014.lr.LRParser.initializeFeatureExtractors
 import edu.cmu.cs.ark.semeval2014.lr.fe.FE
 
-class Features(var featureNames: List[String]) {
-    var weights = new FeatureVector()
+class Features(var featureNames: List[String], labelSet: Array[String]) {
+    var weights = new FeatureVector(labelSet)   // TODO: maybe weights should be passed in to the constructor
     private var inputAnnotatedSentence: InputAnnotatedSentence = _
     private var graph: Graph = _
     private val allFE : Array[FE.FeatureExtractor] = initializeFeatureExtractors().toArray.map(_.asInstanceOf[FE.FeatureExtractor])
@@ -26,7 +28,7 @@ class Features(var featureNames: List[String]) {
         precompute
     }
 
-    type FeatureFunction = (Node, Node, String) => FeatureVector
+    type FeatureFunction = (Node, Node, List[(String, Value)]) => List[(String, Value)]
 
     val ffTable = Map[String, FeatureFunction](
         "CostAugEdgeId" -> ffCostAugEdgeId,
@@ -41,16 +43,18 @@ class Features(var featureNames: List[String]) {
         }
     }
 
-    def ffCostAugEdgeId(node1: Node, node2: Node, label: String) : FeatureVector = {        // Used for cost augmented decoding
-        return FeatureVector(Map(("CA:Id1="+node1.id+"+Id2="+node2.id+"+L="+label) -> 1.0))
+    def ffCostAugEdgeId(node1: Node, node2: Node, feats: List[(String, Value)]) : List[(String, Value)] = {
+        // Used for cost augmented decoding
+        return ("CA:Id1="+node1.id+"+Id2="+node2.id, Value(0.0, 1.0)) :: feats
     }
 
-    def ffLRLabelWithId(node1: Node, node2: Node, label: String) : FeatureVector = {        // Used for Langragian Relaxation
-        return FeatureVector(Map(("LR:Id1="+node1.id+"+L="+label) -> 1.0))
+    def ffLRLabelWithId(node1: Node, node2: Node, feats: List[(String, Value)]) : List[(String, Value)] = {
+        // Used for Langragian Relaxation
+        return ("LR:Id1="+node1.id, Value(0.0, 1.0)) :: feats
     }
 
-    def ffBiasFeatures(node1: Node, node2: Node, label: String) : FeatureVector = {
-        return FeatureVector(Map("Bias" -> 1.0, ("L="+label) -> 1.0))
+    def ffBiasFeatures(node1: Node, node2: Node, feats: List[(String, Value)]) : List[(String, Value)] = {
+        return ("Bias", Value(1.0, 1.0)) :: feats
     }
 
     class TokenFeatureAdder extends FE.FeatureAdder {
@@ -85,19 +89,17 @@ class Features(var featureNames: List[String]) {
         }
     }
 
-    def ffSharedTaskFeatures(node1: Node, node2: Node, label: String) : FeatureVector = {   // Computes all other features
+    def ffSharedTaskFeatures(node1: Node, node2: Node, feats: List[(String, Value)]) : List[(String, Value)] = {
         // WARNING: setupNodes must be called before this function is called
         // node1 is the edge tail (i.e. semantic head), and node2 the edge head (i.e. semantic dependent)
-        val feats = FeatureVector()
+        var features = feats
         for ((feat, value) <- tokenFeatures.features) {
-            feats.fmap(feat) = value
-            feats.fmap(feat+"+L="+label) = value
+            features = (feat, Value(value, value)) :: features
         }
         for ((feat, value) <- edgeFeatures.features) {
-            feats.fmap(feat) = value
-            feats.fmap(feat+"+L="+label) = value
+            features = (feat, Value(value, value)) :: features
         }
-        return feats
+        return features
     }
 
     var featureFunctions : List[FeatureFunction] = featureNames.map(x => ffTable(x))
@@ -113,20 +115,25 @@ class Features(var featureNames: List[String]) {
         }
     }
 
-    def localFeatures(node1: Node, node2: Node, label: String) : FeatureVector = {
-        val feats = new FeatureVector()
+    def localFeatures(node1: Node, node2: Node) : List[(String, Value)] = {
+        var feats : List[(String, Value)] = List()
         for (ff <- featureFunctions) {
-            feats += ff(node1, node2, label)
+            feats = ff(node1, node2, feats)
         }
         return feats
     }
 
+    def localFeatures(node1: Node, node2: Node, label: Int) : List[(String, ValuesList)] = {
+        return localFeatures(node1, node2).map(
+            x => (x._1, ValuesList(x._2.unconjoined, List(Conjoined(label, x._2.conjoined)))))
+    }
+
+    def localFeatures(node1: Node, node2: Node, label: String) : List[(String, ValuesList)] = {
+        return localFeatures(node1, node2, weights.labelToIndex(label))
+    }
+
     def localScore(node1: Node, node2: Node, label: String) : Double = {
-        var score = 0.0
-        for (ff <- featureFunctions) {
-            score += weights.dot(ff(node1, node2, label))
-        }
-        return score
+        return weights.dot(localFeatures(node1, node2, weights.labelToIndex(label)))
     }
 }
 

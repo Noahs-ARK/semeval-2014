@@ -16,7 +16,8 @@ import scala.util.parsing.combinator._
 import scala.util.Random
 import scala.math.sqrt
 import edu.cmu.cs.ark.semeval2014.amr._
-import edu.cmu.cs.ark.semeval2014.common._
+import edu.cmu.cs.ark.semeval2014.common.logger
+import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 abstract class Optimizer {
     def learnParameters(gradient: Int => FeatureVector,
@@ -42,7 +43,7 @@ abstract class Optimizer {
         return learnParameters(myGrad, weights, trainingSize, passes, stepsize, l2reg, trainingObserver, avg)
     }
 
-    def learnParameters(gradient: (Int, Int) => FeatureVector,      // Input: (pass, i) Output: gradient
+    def learnParameters(gradient: (Int, Int) => FeatureVector, // Input: (pass, i) Output: gradient
                         weights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
