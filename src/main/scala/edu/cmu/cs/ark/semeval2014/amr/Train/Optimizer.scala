@@ -26,9 +26,10 @@ abstract class Optimizer {
                         passes: Int,
                         stepsize: Double,
                         l2reg: Double,
+                        noreg: List[String],
                         avg: Boolean) : FeatureVector = {
         val myGrad : (Int, Int) => FeatureVector = (pass, i) => gradient(i)
-        return learnParameters(myGrad, weights, trainingSize, passes, stepsize, l2reg, (x: Int) => true, avg)
+        return learnParameters(myGrad, weights, trainingSize, passes, stepsize, l2reg, noreg, (x: Int) => true, avg)
     }
 
     def learnParameters(gradient: Int => FeatureVector,
@@ -37,10 +38,11 @@ abstract class Optimizer {
                         passes: Int,
                         stepsize: Double,
                         l2reg: Double,
+                        noreg: List[String],
                         trainingObserver: Int => Boolean,
                         avg: Boolean) : FeatureVector = {
         val myGrad : (Int, Int) => FeatureVector = (pass, i) => gradient(i)
-        return learnParameters(myGrad, weights, trainingSize, passes, stepsize, l2reg, trainingObserver, avg)
+        return learnParameters(myGrad, weights, trainingSize, passes, stepsize, l2reg, noreg, trainingObserver, avg)
     }
 
     def learnParameters(gradient: (Int, Int) => FeatureVector, // Input: (pass, i) Output: gradient
@@ -49,6 +51,7 @@ abstract class Optimizer {
                         passes: Int,
                         stepsize: Double,
                         l2reg: Double,
+                        noreg: List[String],
                         trainingObserver: Int => Boolean,    // Input: pass  Output: true stops training loop
                         avg: Boolean) : FeatureVector
 

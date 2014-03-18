@@ -25,18 +25,34 @@ class SSGD extends Optimizer {
                         passes: Int,
                         stepsize: Double,
                         l2reg: Double,
+                        noreg: List[String],
                         trainingObserver: Int => Boolean,
                         avg: Boolean) : FeatureVector = {
         var avg_weights = FeatureVector(weights.labelset)
         var i = 0
+        var scaling_trick = 1.0
         while (i < passes && trainingObserver(i)) {
             logger(0,"Pass "+(i+1).toString)
             for (t <- Random.shuffle(Range(0, trainingSize).toList)) {
-                weights -= stepsize * gradient(i, t)
-                if (l2reg != 0.0) {
-                    weights -= (stepsize * l2reg) * weights
+                // Usual update:
+                //  weights -= stepsize * gradient(i, t)
+                //  if (l2reg != 0.0) {
+                //      weights -= (stepsize * l2reg) * weights
+                //  }
+                /************** Scaling trick ***************/
+                //  true weights are scaling_trick * weights
+                /********************************************/
+                weights -= (stepsize / ((1.0-2.0*stepsize*l2reg)*scaling_trick)) * gradient(i, t)
+                for (feature <- noreg if weights.fmap.contains(feature)) {
+                    val values = weights.fmap(feature)
+                    values.unconjoined /= (1.0 - 2.0 * stepsize * l2reg)  // so that value * scaling_trick = true weights after scaling_trick gets updated ( = value * scaling_trick(t) / scaling_trick(t+1) )
+                    values.conjoined = values.conjoined.map(x => (x._1, x._2 / (1.0 - 2.0 * stepsize * l2reg)))
                 }
+                scaling_trick *= (1.0 - 2.0 * stepsize * l2reg)
             }
+            // Undo scaling trick
+            weights *= scaling_trick
+            scaling_trick = 1.0
             avg_weights += weights
             i += 1
         }

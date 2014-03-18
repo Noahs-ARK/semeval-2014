@@ -25,6 +25,7 @@ class Adagrad extends Optimizer {
                         passes: Int,
                         stepsize: Double,
                         l2strength: Double,
+                        noreg: List[String],
                         trainingObserver: Int => Boolean,
                         avg: Boolean) : FeatureVector = {
         var avg_weights = FeatureVector(weights.labelset)
@@ -45,10 +46,6 @@ class Adagrad extends Optimizer {
                         x
                     }
                 })
-                //logger(0, "*** sumSq ***")
-                //logger(0, sumSq.toString)
-                //logger(0, "*** weights ***")
-                //logger(0, weights.toString)
                 if (l2strength != 0.0) {
                     sumSq.update(weights, (feat, label, x , y) => x + l2strength * l2strength * y * y)
                     weights.update(weights, (feat, label, x, y) => {
@@ -59,10 +56,6 @@ class Adagrad extends Optimizer {
                             x
                         }
                     })
-                //logger(0, "(after l2 update) *** sumSq ***")
-                //logger(0, sumSq.toString)
-                //logger(0, "*** weights ***")
-                //logger(0, weights.toString)
                 }
             }
             avg_weights += weights

@@ -54,7 +54,7 @@ class Features(var featureNames: List[String], labelSet: Array[String]) {
     }
 
     def ffBiasFeatures(node1: Node, node2: Node, feats: List[(String, Value)]) : List[(String, Value)] = {
-        return ("Bias", Value(1.0, 1.0)) :: feats
+        return ("Bias", Value(0.01, 0.01)) :: feats     // Bias features are unregularized.  Adjusting these values only adjusts the condition number of the optimization problem.
     }
 
     class TokenFeatureAdder extends FE.FeatureAdder {

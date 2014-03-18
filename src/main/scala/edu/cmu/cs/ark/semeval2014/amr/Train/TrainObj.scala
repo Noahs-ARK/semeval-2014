@@ -90,6 +90,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
             passes,
             stepsize,
             options.getOrElse('trainingL2RegularizerStrength, "0.0").toDouble,
+            List("Bias"),   // don't regularize the bias terms
             trainingObserver,
             avg = false)
     }
