@@ -47,6 +47,8 @@ class Adagrad extends Optimizer {
                     }
                 })
                 if (l2strength != 0.0) {
+                    val values = noreg.map(feat => (feat, weights.fmap(feat)))
+                    noreg.map(feat => weights.fmap.remove(feat))
                     sumSq.update(weights, (feat, label, x , y) => x + l2strength * l2strength * y * y)
                     weights.update(weights, (feat, label, x, y) => {
                         val sq = sumSq(feat, label)
@@ -56,6 +58,7 @@ class Adagrad extends Optimizer {
                             x
                         }
                     })
+                    values.map(x => { weights.fmap(x._1) = x._2 })
                 }
             }
             avg_weights += weights
