@@ -431,7 +431,7 @@ public class Prune {
 	/** Do predictions and save them in the input sentence objects. 
 	 * @param graphMatrices 
 	 * @param labelVocab2 */
-	public void predictIntoInputs(List<int[][]> graphMatrices, Vocabulary graphLabelVocab){
+	public void predictAndPrintPrecisionAndRecall(List<int[][]> graphMatrices, Vocabulary graphLabelVocab){
 		predictForInputSentences(singletonModel, predicateModel);
 		computePrecisionAndRecall(graphMatrices, graphLabelVocab);
 	}
@@ -561,15 +561,20 @@ public class Prune {
 	/** return predicted labels, as integers
 	 * todo eventually: clean up messiness with labels vs integers and all that.  why not just use the raw integer numberings? */
 	private int[] predict(PruneModel model, int snum) {
-        	List<Map<String, Set<String>>> feats = computeFeats(snum);
-        	// run viterbi
-    		Viterbi v = new Viterbi(model.weights);
-    		String[] labelsAsStrings = v.decode(feats);
-    		int[] predLabels = new int[labelsAsStrings.length-1];
-    		for (int i = 1; i < labelsAsStrings.length; i++){
-    			predLabels[i-1] = Integer.parseInt(labelsAsStrings[i]);
-    		}
-    		return predLabels;
+		allFE = initializeFeatureExtractors();
+		for (FE.FeatureExtractor fe : allFE) {
+			assert (fe instanceof FE.TokenFE) || (fe instanceof FE.EdgeFE) : "all feature extractors need to implement one of the interfaces!";
+			fe.initializeAtStartup();
+		}
+		List<Map<String, Set<String>>> feats = computeFeats(snum);
+		// run viterbi
+		Viterbi v = new Viterbi(model.weights);
+		String[] labelsAsStrings = v.decode(feats);
+		int[] predLabels = new int[labelsAsStrings.length-1];
+		for (int i = 1; i < labelsAsStrings.length; i++){
+			predLabels[i-1] = Integer.parseInt(labelsAsStrings[i]);
+		}
+		return predLabels;
 	}
 	
 

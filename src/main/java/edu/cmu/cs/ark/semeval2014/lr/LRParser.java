@@ -182,7 +182,8 @@ public class LRParser {
 		// Note that its predictions are stored in the inputSentences.
 		preprocessor.trainModels(labelVocab, graphMatrices);
 		preprocessor.predictIntoInputs();
-		preprocessor.predictIntoInputs(graphMatrices, labelVocab);
+		// To print out the precision / recall / F1, place this call:
+		//preprocessor.predictAndPrintPrecisionAndRecall(graphMatrices, labelVocab);
 		
 		// build up label feature vocab
 		initializeLabelFeatureExtractors();
