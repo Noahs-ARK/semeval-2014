@@ -81,9 +81,11 @@ class Features(var featureNames: List[String], labelSet: Array[String]) {
             if (ff.isInstanceOf[FE.TokenFE]) {
                 ff.asInstanceOf[FE.TokenFE].features(node1.position, tokenFeatures)
                 ff.asInstanceOf[FE.TokenFE].features(node2.position, tokenFeatures)
-            } else if (ff.isInstanceOf[FE.EdgeFE]) {
+            }
+            if (ff.isInstanceOf[FE.EdgeFE]) {
                 ff.asInstanceOf[FE.EdgeFE].features(node1.position, node2.position, edgeFeatures)
-            } else {
+            }
+            if (ff.isInstanceOf[FE.LabelFE]) {
                 System.err.println("******** WARNING: skipping unimplemented feature extractor.  LabelFE's are not implemented yet. ********")
             }
         }
