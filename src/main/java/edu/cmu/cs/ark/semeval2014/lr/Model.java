@@ -257,6 +257,6 @@ public class Model {
 				}
 			}
 		}
-		U.pf("Done saving model");
+		U.pf("Done saving model\n");
 	}
 }
