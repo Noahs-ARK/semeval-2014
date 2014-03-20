@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
@@ -58,7 +59,10 @@ public class LRParser {
 	static Model model;
 	static float[] ssGrad;  // adagrad history info. parallel to coefs[].
 	static Vocabulary labelVocab;
-	
+
+	/** this is the ordering of sentences for the edgeparser training loop. */
+    static List<Integer> sentenceIndexOrder;
+    
 	static TopClassifier topClassifier = new TopClassifier();
     static Prune preprocessor;
     
@@ -86,6 +90,8 @@ public class LRParser {
     static int saveEvery = 10;  // -1 to disable intermediate model saves
     @Parameter(names="-numIters")
 	static int numIters = 30;
+    @Parameter(names="-shuffle", description="Randomly shuffle the training data -- note that with feature cache, it will use same order every iter.")
+    static boolean shuffle=false;
     
     @Parameter(names="-useHashing", description="only specify this when training. at testtime, whether it's a hash-based model is detected from the model file.")
     static boolean useHashing = false;
@@ -126,6 +132,7 @@ public class LRParser {
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
+		setSentenceIndexOrder();
 
 		preprocessor = new Prune(inputSentences, modelFile);
 		
@@ -170,6 +177,7 @@ public class LRParser {
 	private static Model trainModel() throws IOException {
 		double t0;
 		double dur;
+		
 		U.pf("Reading graphs from %s\n", sdpFile);
 		
 		GenerateGraphsAndVocab generateGAndV = new GenerateGraphsAndVocab(sdpFile);
@@ -196,6 +204,7 @@ public class LRParser {
 		final Vocabulary perceptVocab = new Vocabulary();
 		perceptVocab.num(BIAS_NAME);
 		model = new Model(labelVocab, labelFeatureVocab, featuresByLabel, perceptVocab);
+		
 
 		t0 = System.currentTimeMillis();
 		trainingOuterLoopOnline();
@@ -444,10 +453,23 @@ public class LRParser {
         return 1.0 / Math.sqrt(ssGrad[featnum]);
     }
     
+    static List<Integer> intRangeList(int n) {
+    	List<Integer> ret = new ArrayList<>();
+    	for (int i=0; i<n; i++) ret.add(i);
+    	return ret;
+    }
+    
+    static void setSentenceIndexOrder() {
+    	sentenceIndexOrder = intRangeList(inputSentences.length);
+		if (shuffle) {
+			Collections.shuffle(sentenceIndexOrder);
+		}
+    }
+    
     static void featureExtractionPass() {
 		double t0=System.currentTimeMillis(), dur;
 
-        for (int snum=0; snum<inputSentences.length; snum++) {
+    	for (int snum : sentenceIndexOrder) {
         	if (snum % 100==0) U.pf(".");
         	extractFeaturesForExampleAndWriteToCache(snum);
             if (snum>0 && snum % 1000 == 0) {
@@ -470,7 +492,8 @@ public class LRParser {
 		assert model.labelFeatureVocab.isLocked() : "since we have autolabelconj, can't tolerate label vocab expanding during a training pass.";
 
 		double ll = 0;
-        for (int snum=0; snum<inputSentences.length; snum++) {
+    	for (int snum : sentenceIndexOrder) {
+
         	if (snum % 100==0) U.pf(".");
             
             NumberizedSentence ns = getNextExample(snum);
