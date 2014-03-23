@@ -31,7 +31,11 @@ object InputAnnotatedSentenceParser {
         	val field = splitLine(line)
 			sent.sentence(i) = field("SDP")(1)
 			sent.pos(i) = field("SDP")(3)
-			sent.isTop(i) = field("SDP")(4)=="+"
+            if (field("SDP").size > 4) {
+			    sent.isTop(i) = field("SDP")(4)=="+"
+            } else {
+                sent.isTop(i) = false
+            }
 			if (field.contains("DEPS")) {
 				sent.syntacticDependencies.deps(i) = SyntacticDependency.fromSemEval8(field("DEPS").mkString("\t"))
 			}
