@@ -29,6 +29,21 @@ OUTPUTS:
 
 import sys,os,re
 
+# http://www.cis.upenn.edu/~treebank/tokenization.html
+ptb_escape_table = {
+        '(': '-LRB-',
+        ')': '-RRB-',
+        '{': '-LCB-',
+        '}': '-RCB-',
+        '[': '-LSB-',
+        ']': '-RSB-',
+}
+
+def ptb_escape(tag):
+    for lhs,rhs in ptb_escape_table.items():
+        tag = tag.replace(lhs,rhs)
+    return tag
+
 def yield_sentid_and_lines(filename):
     cur = []
     sentid = None
@@ -66,7 +81,7 @@ for sentid,lines in coltree_sents:
         assert False
 
     if lines[0]=='_\t_':
-        print "%s\tNOPARSE"
+        print "%s\tNOPARSE" % sentid
         continue
 
     new_sexpr = ""
@@ -74,7 +89,9 @@ for sentid,lines in coltree_sents:
         pos,star_fragment = line.split('\t')
         assert sum(int(char=='*') for char in star_fragment)==1, line
         ss = star_fragment
-        ss = ss.replace("*", "(%s %s)" % (pos, tokens[i]))
+        escaped_pos = ptb_escape(pos)
+        escaped_token = ptb_escape(tokens[i])
+        ss = ss.replace("*", "(%s %s)" % (escaped_pos, escaped_token))
         ss = ss.replace('(', ' (').replace(')',') ')
         new_sexpr += " " + ss
 
