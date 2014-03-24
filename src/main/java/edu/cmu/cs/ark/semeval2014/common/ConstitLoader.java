@@ -6,18 +6,16 @@ import util.BasicFileIO;
 import util.U;
 
 public class ConstitLoader {
-	/** 'null' indicates there was no parse for this sentence.  (be careful! Java Map returns 'null' if key doesnt exist!  check with containsKey() first.)
+	/** loads the ConstitTree's from a file, and returns a sentid2tree map.
 	 * 
+	 * 'null' indicates there was no parse for this sentence.  (be careful! Java Map returns 'null' if key doesnt exist!  check with containsKey() first.)
+	 *
 	 * as in InputAnnotatedSentence and StanfordNER, we do **not** include the hash in this version of the sentenceid.
-	 */
-	public static Map<String,ConstitTree> sentid2tree;
-	
-	static {
-		sentid2tree = new HashMap<>();
-	}
-	
-	/** loads the ConstitTree's from a file, and stores them in sentid2tree */
-	public static void loadSexprFile(String filename) {
+	 * 
+	 * */
+	public static Map<String,ConstitTree> loadSexprFile(String filename) {
+		Map<String,ConstitTree> sentid2tree = new HashMap<>();
+		
 		int n=0;
 		for (String line : BasicFileIO.openFileLines(filename)) {
 			n++;
@@ -40,6 +38,7 @@ public class ConstitLoader {
 			sentid2tree.put(sentid, tree);
 		}
 		U.pf("Loaded %d trees (or noparse markers) from %s\n", n, filename);
+		return sentid2tree;
 	}
 	static ConstitTree convertStanfordToOurTree(edu.stanford.nlp.trees.Tree stTree) {
 		ConstitNode root = convertStanfordToOurNode(stTree);

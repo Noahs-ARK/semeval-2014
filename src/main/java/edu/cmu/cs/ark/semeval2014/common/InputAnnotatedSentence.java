@@ -16,6 +16,11 @@ public class InputAnnotatedSentence {
 	public DependencyParse syntacticDependencies;
 	public String[] pos;
 
+	/** if sexpr loading is working, this will be 'null' if the constit parser failed to find a parse for the sentence.
+	 * if sexpr loading is not working, this will always be 'null'.
+	 */
+	public ConstitTree constitTree;
+
 	// Values predicted by preprocessor systems.  leave these null at initialization.
 	public int[] predicatePredictions;
 	public int[] singletonPredictions;

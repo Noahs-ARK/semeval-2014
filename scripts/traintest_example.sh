@@ -12,6 +12,8 @@ data_dir="lildata/lil"
 train_file="${data_dir}train.${formalism}.sdp"
 train_deps="${train_file}.dependencies"
 
+sexpr_file=/cab1/corpora/LDC2013E167/companion/updated_3_8_postproc/sb.berkeley.cpn.sexpr
+
 # sec20 files are from: /cab1/corpora/LDC2013E167/splits
 test_file="data/splits/sec20.${formalism}.sdp"
 test_deps="${test_file}.dependencies"
@@ -21,8 +23,10 @@ pred_file="${model_file}.pred.${formalism}.sdp"
 set -x
 ./java.sh lr.LRParser -mode train \
   -formalism $formalism \
+  -sexprInput $sexpr_file \
   -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts}
 ./java.sh lr.LRParser -mode test \
   -formalism $formalism \
+  -sexprInput $sexpr_file \
   -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts}
 scripts/eval.sh ${test_file} ${pred_file}
