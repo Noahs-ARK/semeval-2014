@@ -45,7 +45,7 @@ abstract class Optimizer {
         return learnParameters(myGrad, initialWeights, trainingSize, passes, stepsize, l2reg, noreg, trainingObserver, avg)
     }
 
-    def learnParameters(gradient: (Int, Int, FeatureVector) => FeatureVector,              // Input: (pass, i) Output: gradient
+    def learnParameters(gradient: (Int, Int, FeatureVector) => FeatureVector,              // Input: (pass, i, weights) Output: gradient
                         initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
