@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
@@ -58,6 +59,7 @@ public class LRParser {
 
 	static Model model;
 	static float[] ssGrad;  // adagrad history info. parallel to coefs[].
+
 	static Vocabulary labelVocab;
 
 	/** this is the ordering of sentences for the edgeparser training loop. */
@@ -69,9 +71,12 @@ public class LRParser {
     // the threshold for pruning the singletons from the logistic regression model in Prune
 	public static double singletonPruneThresh = 0.99;
 
+
+    static HashMap<String, double[]> wordToVector;
+
 	@Parameter(names="-learningRate")
 	static double learningRate = .1;
-	
+
 	// 3. Model parameter-ish options
 	static int maxEdgeDistance = 10;
 	@Parameter(names="-l2reg")
@@ -80,7 +85,7 @@ public class LRParser {
 	static double noedgeWeight = -1;
 	@Parameter(names="-formalism", required=true)
 	static String formalism;
-	
+
 	// 4. Runtime options
 	@Parameter(names="-verboseFeatures")
 	static boolean verboseFeatures = false;
@@ -105,7 +110,7 @@ public class LRParser {
 	static boolean usePasLabelFeatures = false;
 	@Parameter(names = "-usePcedtLabelFeatures")
 	static boolean usePcedtLabelFeatures = false;
-	
+
 	@Parameter(names="-mode", required=true)
 	static String mode;
     @Parameter(names="-model",required=true)
@@ -116,6 +121,10 @@ public class LRParser {
 	static String depFile;
     @Parameter(names="-outputFeatsToFile", description="specify a file for the dataset to be output to a file. format: one possible edge per line.")
 	static String outputFeatsToDiskForRF = "";
+    @Parameter(names="-wordVectors", required=true)
+	static String wordVecFile;
+    
+
     
     static long numPairs = 0, numTokens = 0, numTokenPrunes = 0, numCorrectTokenPrunes = 0; // purely for diagnosis
 
@@ -137,7 +146,11 @@ public class LRParser {
 		setSentenceIndexOrder();
 
 		preprocessor = new Prune(inputSentences, modelFile);
+
 		
+		wordToVector = WordVectors.loadWordVectors(wordVecFile);
+		preprocessor = new Prune(inputSentences, modelFile);
+
 		if (mode.equals("train")) {
 			topClassifier.train(depFile, modelFile + ".topmodel");
 			trainModel();
@@ -154,7 +167,7 @@ public class LRParser {
 			U.pf("\nPRED TIME %.1f sec, %.1f ms/sent\n", dur/1e3, dur/inputSentences.length);
 		}
 	}
-	
+
 	// this loads in the learned weights for the preprocessing models
 	// then predicts the 'predicates' and 'singelton' classes within the
 	// inputSentences that are already stored in preprocessor.
@@ -163,7 +176,7 @@ public class LRParser {
 		preprocessor.predictIntoInputs();
 		diagnosePruning();
 	}
-	
+
 	static void setDefaultNoedgeWeights() {
 		if (noedgeWeight == -1) {
 			noedgeWeight = 
@@ -271,8 +284,10 @@ public class LRParser {
 //				numCorrectPrunes, numPrunes, numCorrectPrunes*1.0/numPrunes);
 		
 	}
-	
-	
+
+
+	static long totalPairs = 0;  // only for diagnosis
+
 	static class TokenFeatAdder extends FE.FeatureAdder {
 		int i=-1;
 		NumberizedSentence ns;
@@ -290,7 +305,7 @@ public class LRParser {
 
 			String ff;
 			int featnum;
-			
+
 			ff = U.sf("%s::ashead", featname);
 			featnum = perceptNum(ff);
 			if (LRParser.useHashing || featnum!=-1) {
@@ -299,7 +314,7 @@ public class LRParser {
 					ns.add(i,j, featnum, value);
 				}
 			}
-			
+
 			ff = U.sf("%s::aschild", featname);
 			featnum = perceptNum(ff);
 			if (LRParser.useHashing || featnum!=-1) {
@@ -310,7 +325,7 @@ public class LRParser {
 			}
 		}
 	}
-	
+
 	/** under hashing, this could be a negative number. */
 	static int perceptNum(String perceptName) {
 		if ( ! LRParser.useHashing) {
@@ -334,9 +349,9 @@ public class LRParser {
 		public void add(String featname, double value) {
 			int perceptnum = perceptNum(featname);
 			if (perceptnum==-1) return;
-			
+
 			ns.add(i,j, perceptnum, value);
-			
+
 			if (verboseFeatures) {
 				U.pf("WORDS %s:%d -> %s:%d\tGOLD %s\tEDGEFEAT %s %s\n", is.sentence[i], i, is.sentence[j], j,
 						goldEdgeMatrix!=null ? model.labelVocab.name(goldEdgeMatrix[i][j]) : null, featname, value);
@@ -355,7 +370,7 @@ public class LRParser {
 		TokenFeatAdder tokenAdder = new TokenFeatAdder();
 		EdgeFeatAdder edgeAdder = new EdgeFeatAdder();
 		tokenAdder.ns=edgeAdder.ns=ns;
-		
+
 		// only for verbose feature extraction reporting
 		tokenAdder.is = edgeAdder.is=is;
 		edgeAdder.goldEdgeMatrix = goldEdgeMatrix;
@@ -366,9 +381,9 @@ public class LRParser {
 			fe.initializeAtStartup();
 			fe.setupSentence(is);
 		}
-		
+
 		for (edgeAdder.i=0; edgeAdder.i<ns.T; edgeAdder.i++) {
-			
+
 			tokenAdder.i = edgeAdder.i;
 			for (FE.FeatureExtractor fe : featureExtractors) {
 				if (fe instanceof FE.TokenFE) {
@@ -378,10 +393,10 @@ public class LRParser {
 			for (edgeAdder.j=0; edgeAdder.j<ns.T; edgeAdder.j++) {
 				if (badPair(is, edgeAdder.i,edgeAdder.j)) continue;
 				numPairs++;
-				
+
 				// bias term
 				ns.add(edgeAdder.i, edgeAdder.j, biasIdx, 1.0);
-				
+
 				// edge features
 				for (FE.FeatureExtractor fe : featureExtractors) {
 					if (fe instanceof FE.EdgeFE) {
@@ -392,7 +407,7 @@ public class LRParser {
 		}
 		return ns;
 	}
-	
+
 	static NumberizedSentence extractFeatures(Model model, int snum) {
 		return extractFeatures(model, inputSentences[snum], graphMatrices !=null ? graphMatrices.get(snum) : null);
 	}
@@ -476,7 +491,7 @@ public class LRParser {
 	//      print it to the diskrrrr
 	private static void generateExamplesFromSentence(NumberizedSentence ns,
 			PrintWriter out, int snum, int[][] edgeMatrix) {
-		String[][][] examples = new String[edgeMatrix.length][edgeMatrix.length][model.perceptVocab.size() + 1ho];
+		String[][][] examples = new String[edgeMatrix.length][edgeMatrix.length][model.perceptVocab.size() + 1];
 		// to initialize the examples
 		for (int i = 0; i < edgeMatrix.length; i++){
 			for (int j = 0; j < edgeMatrix.length; j++){
@@ -529,7 +544,7 @@ public class LRParser {
     	model.labelFeatureVocab.lock();
 		model.calculateLabelHashes();
     }
-	
+
     /** From the new gradient value, update this feature's learning rate and return it. */
     static double adagradStoreRate(int featnum, double g) {
         ssGrad[featnum] += g*g;
@@ -600,8 +615,8 @@ public class LRParser {
 		final int noEdgeIdx = model.labelVocab.num(NO_EDGE);
 		double ll = 0;
 
-		double[][][] probs = model.inferEdgeProbs(sentence, isent);
 		
+		double[][][] probs = model.inferEdgeProbs(sentence, isent);
 		for (int kk = 0; kk < sentence.nnz; kk++) {
 		    int i = sentence.i(kk);
 			int j = sentence.j(kk);
@@ -621,7 +636,7 @@ public class LRParser {
 				}
 		    }
 		}
-		
+
 		// loglik is completely unnecessary for optimization, just nice for diagnosis.
 		for (int i=0;i<sentence.T;i++) {
 		    for (int j=0; j<sentence.T;j++) {
@@ -632,7 +647,7 @@ public class LRParser {
 		}
 		return ll;
 	}
-	
+
 	public static MyGraph decodeToGraph(InputAnnotatedSentence sent, NumberizedSentence ns) {
 	    MyGraph g = MyGraph.decodeEdgeProbsToGraph(
 	    		sent, model.inferEdgeProbs(ns,sent), model.labelVocab, true);
@@ -691,16 +706,15 @@ public class LRParser {
     
 
 	///////////////////////////////////////////////////////////
-	
+
 	static List<FE.FeatureExtractor> initializeFeatureExtractors() {
 		final List<FE.FeatureExtractor> allFE = new ArrayList<>();
 //		allFE.add(new BasicFeatures());
 //		allFE.add(new LinearOrderFeatures());
 		allFE.add(new CoarseDependencyFeatures());
-//		allFE.add(new DependencyPathv1());
-//		allFE.add(new SubcatSequenceFE());
-//		allFE.add(new UnlabeledDepFE());
-		
+		allFE.add(new DependencyPathv1());
+		allFE.add(new SubcatSequenceFE());
+		allFE.add(new WordVectors(wordToVector));
 //		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
 	}

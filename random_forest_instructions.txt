@@ -1,12 +1,14 @@
-first:
+To run the random forest in R, first:
 install.packages("randomForest")
+
+next, when you open R:
 library(randomForest)
 load in the data into a data frame
+split into train and test
 semdp.rf <- randomForest(V2 ~., data=train, proximity=FALSE)
 semdp.pred <- predict(semdp.rf, test)
 
-
-loading from disk:
+example loading from disk:
 fullData = readLines("featsForRF.100")
 // will probably have to concatenate datasets here
 num <- nrow(fullData)
