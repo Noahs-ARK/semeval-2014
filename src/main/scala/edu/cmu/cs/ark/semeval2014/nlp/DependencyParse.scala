@@ -2,15 +2,28 @@ package edu.cmu.cs.ark.semeval2014.nlp
 
 import edu.cmu.cs.ark.semeval2014.common.SyntacticDependency
 import java.lang.Math._
-import scala.Some
+import scala.{collection, Some}
 import DependencyParse._
-import scala.collection.immutable.IndexedSeq
+import collection.immutable.IndexedSeq
+import edu.cmu.cs.ark.semeval2014.utils.Memoized
 
 case class DependencyParse(deps: Array[SyntacticDependency]) {
   lazy val heads: Map[Int, Int] = Map() ++ deps.map(dep => dep.dependent -> dep.head)
+  lazy val children: Map[Int, List[Int]] = {
+    deps.map(dep => dep.head -> dep.dependent).
+      groupBy(_._1).
+      mapValues(_.map(_._2).toList.sorted).view.force
+  }
   lazy val relations: Map[(Int, Int), String] = Map() ++ deps.map(dep => (dep.head, dep.dependent) -> dep.relation)
   lazy val rootDependencyPaths: IndexedSeq[Option[List[Int]]] = deps.indices.map(rootDependencyPath(_))
   lazy val depths: IndexedSeq[Option[Int]] = rootDependencyPaths.map(_.map(_.size))
+
+  lazy val spans: Int => (Int, Int) = Memoized { node =>
+    val kids = children.getOrElse(node, Nil)
+    val left = (node :: kids.take(1).map(leftChild => spans(leftChild)._1)).min
+    val right = (node :: kids.reverse.take(1).map(rightChild => spans(rightChild)._2)).max
+    (left, right)
+  }
 
   /**
    * Returns path to root (integers) as a list in reverse order
