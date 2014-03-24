@@ -17,12 +17,13 @@ test_file="data/splits/sec20.${formalism}.sdp"
 test_deps="${test_file}.dependencies"
 
 pred_file="${model_file}.pred.${formalism}.sdp"
+outputFeatsToFile="featsForRF"
 
 set -x
 ./java.sh lr.LRParser -mode train \
   -formalism $formalism \
-  -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts}
-./java.sh lr.LRParser -mode test \
-  -formalism $formalism \
-  -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts}
+  -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts} -outputFeatsToFile ${outputFeatsToFile}
+#./java.sh lr.LRParser -mode test \
+#  -formalism $formalism \
+#  -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts}
 scripts/eval.sh ${test_file} ${pred_file}

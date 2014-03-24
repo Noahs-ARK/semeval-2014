@@ -114,6 +114,8 @@ public class LRParser {
     static String sdpFile;
     @Parameter(names="-depInput", required=true)
 	static String depFile;
+    @Parameter(names="-outputFeatsToFile", description="specify a file for the dataset to be output to a file. format: one possible edge per line.")
+	static String outputFeatsToDiskForRF = "";
     
     static long numPairs = 0, numTokens = 0, numTokenPrunes = 0, numCorrectTokenPrunes = 0; // purely for diagnosis
 
@@ -216,6 +218,8 @@ public class LRParser {
 			Files.delete(Paths.get(featureCacheFile));
 		return model;
 	}
+	
+
 
 	private static Pair<Vocabulary, List<int[]>> extractAllLabelFeatures(
 			Vocabulary labelVocab,
@@ -414,6 +418,13 @@ public class LRParser {
     		assert false : "bad option combination";
     	}
 		
+		
+		if (!outputFeatsToDiskForRF.equals("")){
+			resetCacheReader();
+			printDataset();
+			return;
+		}
+    	
     	for (int outer=0; outer<numIters; outer++) {
     		U.pf("iter %3d ", outer);  System.out.flush();
     		double t0 = System.currentTimeMillis();
@@ -429,8 +440,81 @@ public class LRParser {
     		
     	}
     }
+    
+	private static void printDataset() throws IOException{
+		// loop over the numberized sentences
+		// to dump each example to disk:
+		U.pf("Saving each percept as an example to disk...\n");
+		int numExamples = 100;
+		PrintWriter out = new PrintWriter(new FileWriter("edge_example_dataset/" + outputFeatsToDiskForRF + "." + numExamples));
+		int sentenceCounter = 0;
+    	for (int snum : sentenceIndexOrder) {
+        	if (sentenceCounter > 100 && sentenceCounter % 100==0) {
+        		U.pf(".");
+        		numExamples+= 100;
+        		out.close();
+        		out = new PrintWriter(new FileWriter("edge_example_dataset/" + outputFeatsToDiskForRF + "." + numExamples));
+        		sentenceCounter++;
+        	}
+            
+            NumberizedSentence ns = getNextExample(snum);
+    		int[][] edgeMatrix = graphMatrices.get(snum);
+    		
+    		generateExamplesFromSentence(ns, out, snum, edgeMatrix);
+        }
+    	out.close();
 
-    static void allocateCoefs() {
+	}
+
+	// PSEUDOCODE:
+	// loop over the numberized sentences
+	// for each numberized sentence:
+	//   for each feature in nnz:
+	//      grab the feature from ns
+	//      grab the label from graph matrix
+	//      grab the value of the feature from ns
+	//      print it to the diskrrrr
+	private static void generateExamplesFromSentence(NumberizedSentence ns,
+			PrintWriter out, int snum, int[][] edgeMatrix) {
+		String[][][] examples = new String[edgeMatrix.length][edgeMatrix.length][model.perceptVocab.size() + 1ho];
+		// to initialize the examples
+		for (int i = 0; i < edgeMatrix.length; i++){
+			for (int j = 0; j < edgeMatrix.length; j++){
+				if (badDistance(i,j)) continue;
+				examples[i][j][0] = "FEATINFO " + 
+						labelVocab.name(edgeMatrix[i][j]) + 
+						" snum:" + snum + " head:" + i + " child:" + j;
+			}
+		}
+		for (int kk= 0; kk< ns.nnz; kk++){
+			//String perceptName = model.perceptVocab.name(ns.perceptnum(kk));
+			examples[ns.i(kk)][ns.j(kk)][ns.perceptnum(kk) + 1] = "" + ns.value(kk);
+		}
+		printExamplesToDisk(out, examples);
+	}
+
+	// to print the set of examples to disk:
+    private static void printExamplesToDisk(PrintWriter out, String[][][] examples) {
+		for (int i = 0; i < examples.length; i++){
+			for (int j = 0; j < examples[i].length; j++){
+				if (badDistance(i,j)) continue;
+				//out.write(examples[i][j] + "\n");
+				
+				String outString = "";
+				for (int k = 0; k < examples[i][j].length; k++){
+					if (examples[i][j][k] == null){
+						outString += " 0";
+					} else
+						outString += " " + examples[i][j][k];
+				}
+				out.write(outString + "\n");
+				
+			}
+		}
+		
+	}
+
+	static void allocateCoefs() {
     	int len = -1;
     	if (useHashing) {
     		len = (int) numHashBuckets;
@@ -492,6 +576,8 @@ public class LRParser {
 		assert model.labelFeatureVocab.isLocked() : "since we have autolabelconj, can't tolerate label vocab expanding during a training pass.";
 
 		double ll = 0;
+		
+		
     	for (int snum : sentenceIndexOrder) {
 
         	if (snum % 100==0) U.pf(".");
@@ -608,12 +694,12 @@ public class LRParser {
 	
 	static List<FE.FeatureExtractor> initializeFeatureExtractors() {
 		final List<FE.FeatureExtractor> allFE = new ArrayList<>();
-		allFE.add(new BasicFeatures());
-		allFE.add(new LinearOrderFeatures());
+//		allFE.add(new BasicFeatures());
+//		allFE.add(new LinearOrderFeatures());
 		allFE.add(new CoarseDependencyFeatures());
-		allFE.add(new DependencyPathv1());
-		allFE.add(new SubcatSequenceFE());
-		allFE.add(new UnlabeledDepFE());
+//		allFE.add(new DependencyPathv1());
+//		allFE.add(new SubcatSequenceFE());
+//		allFE.add(new UnlabeledDepFE());
 		
 //		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
