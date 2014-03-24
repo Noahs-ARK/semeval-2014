@@ -19,19 +19,21 @@ import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 class SSGD extends Optimizer {
-    def learnParameters(gradient: (Int, Int) => FeatureVector,
-                        weights: FeatureVector,
+    def learnParameters(gradient: (Int, Int, FeatureVector) => FeatureVector,
+                        initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
                         stepsize: Double,
                         l2reg: Double,
                         noreg: List[String],
-                        trainingObserver: Int => Boolean,
+                        trainingObserver: (Int, FeatureVector) => Boolean,
                         avg: Boolean) : FeatureVector = {
+        val weights = FeatureVector(initialWeights.labelset)
+        weights += initialWeights
         var avg_weights = FeatureVector(weights.labelset)
         var i = 0
         var scaling_trick = 1.0
-        while (i < passes && trainingObserver(i)) {
+        while (i < passes && trainingObserver(i,weights)) {
             logger(0,"Pass "+(i+1).toString)
             for (t <- Random.shuffle(Range(0, trainingSize).toList)) {
                 // Usual update:
@@ -42,7 +44,7 @@ class SSGD extends Optimizer {
                 /************** Scaling trick ***************/
                 //  true weights are scaling_trick * weights
                 /********************************************/
-                weights -= (stepsize / ((1.0-2.0*stepsize*l2reg)*scaling_trick)) * gradient(i, t)
+                weights -= (stepsize / ((1.0-2.0*stepsize*l2reg)*scaling_trick)) * gradient(i, t, weights)
                 for (feature <- noreg if weights.fmap.contains(feature)) {
                     val values = weights.fmap(feature)
                     values.unconjoined /= (1.0 - 2.0 * stepsize * l2reg)  // so that value * scaling_trick = true weights after scaling_trick gets updated ( = value * scaling_trick(t) / scaling_trick(t+1) )

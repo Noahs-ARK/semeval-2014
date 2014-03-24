@@ -21,10 +21,10 @@ import edu.cmu.cs.ark.semeval2014.utils._
 
 abstract class TrainObj(options: Map[Symbol, String])  {
 
-    def decode(i: Int) : FeatureVector
-    def oracle(i: Int) : FeatureVector
-    def costAugmented(i: Int) : FeatureVector
-    val weights : FeatureVector
+    def decode(i: Int, weights: FeatureVector) : FeatureVector
+    def oracle(i: Int, weights: FeatureVector) : FeatureVector
+    def costAugmented(i: Int, weights: FeatureVector) : FeatureVector
+    def train : Unit
 
     ////////////////// Training Setup ////////////////
 
@@ -46,7 +46,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     val oracleGraphs = Input.loadSDPGraphs(options, oracle = true)
     assert(inputAnnotatedSentences.size == inputGraphs.size && inputGraphs.size == oracleGraphs.size, "sdp and dep file lengths do not match")
 
-    Runtime.getRuntime().addShutdownHook(new Thread() {
+/*  Runtime.getRuntime().addShutdownHook(new Thread() {
         override def run() {
             System.err.print("Writing out weights... ")
             val file = new java.io.PrintWriter(new java.io.File(options('model)), "UTF-8")
@@ -54,18 +54,18 @@ abstract class TrainObj(options: Map[Symbol, String])  {
             finally { file.close }
             System.err.println("done")
         }
-    })
+    }) */
 
     /////////////////////////////////////////////////
 
-    def gradient(i: Int) : FeatureVector = {
+    def gradient(i: Int, weights: FeatureVector) : FeatureVector = {
         if (loss == "Perceptron") {
-            val grad = decode(i)
-            grad -= oracle(i)
+            val grad = decode(i, weights)
+            grad -= oracle(i, weights)
             grad
         } else if (loss == "SVM") {
-            val grad = costAugmented(i)
-            grad -= oracle(i)
+            val grad = costAugmented(i, weights)
+            grad -= oracle(i, weights)
             grad
         } else {
             System.err.println("Error: unknown training loss " + loss); sys.exit(1)
@@ -73,7 +73,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
         }
     }
 
-    def trainingObserver(pass: Int) : Boolean = {
+    def trainingObserver(pass: Int, weights: FeatureVector) : Boolean = {
         if (options.contains('trainingSaveInterval) && pass % options('trainingSaveInterval).toInt == 0 && pass > 0) {
             val file = new java.io.PrintWriter(new java.io.File(options('model) + ".iter" + pass.toString), "UTF-8")
             try { file.print(weights.toString) }
@@ -82,10 +82,10 @@ abstract class TrainObj(options: Map[Symbol, String])  {
         return true
     }
 
-    def train() {
-        optimizer.learnParameters(
-            i => gradient(i),
-            weights,
+    def train(initialWeights: FeatureVector) {
+        val weights = optimizer.learnParameters(
+            (i,w) => gradient(i,w),
+            initialWeights,
             inputGraphs.size,
             passes,
             stepsize,
@@ -93,6 +93,11 @@ abstract class TrainObj(options: Map[Symbol, String])  {
             List("Bias"),   // don't regularize the bias terms
             trainingObserver,
             avg = false)
+        System.err.print("Writing out weights... ")
+        val file = new java.io.PrintWriter(new java.io.File(options('model)), "UTF-8")
+        try { file.print(weights.toString) }
+        finally { file.close }
+        System.err.println("done")
     }
 }
 

@@ -19,24 +19,26 @@ import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 class Adagrad extends Optimizer {
-    def learnParameters(gradient: (Int, Int) => FeatureVector,
-                        weights: FeatureVector,
+    def learnParameters(gradient: (Int, Int, FeatureVector) => FeatureVector,
+                        initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
                         stepsize: Double,
                         l2strength: Double,
                         noreg: List[String],
-                        trainingObserver: Int => Boolean,
+                        trainingObserver: (Int, FeatureVector) => Boolean,
                         avg: Boolean) : FeatureVector = {
+        val weights = FeatureVector(initialWeights.labelset)
+        weights += initialWeights
         var avg_weights = FeatureVector(weights.labelset)
         var sumSq = FeatureVector(weights.labelset)         // G_{i,i}
         var pass = 0
-        while (pass < passes && trainingObserver(pass)) {
+        while (pass < passes && trainingObserver(pass,weights)) {
             logger(0,"Pass "+(pass+1).toString)
             for (t <- Random.shuffle(Range(0, trainingSize).toList)) {
                 // normally we would do weights -= stepsize * gradient(t)
                 // but instead we do this: (see equation 8 in SocherBauerManningNg_ACL2013.pdf)
-                val grad = gradient(pass, t)
+                val grad = gradient(pass, t, weights)
                 sumSq.update(grad, (feat, label, x , y) => x + y * y)
                 weights.update(grad, (feat, label, x, y) => {
                     val sq = sumSq(feat, label)

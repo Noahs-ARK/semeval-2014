@@ -20,39 +20,39 @@ import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 abstract class Optimizer {
-    def learnParameters(gradient: Int => FeatureVector,
-                        weights: FeatureVector,
+    def learnParameters(gradient: (Int, FeatureVector) => FeatureVector,
+                        initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
                         stepsize: Double,
                         l2reg: Double,
                         noreg: List[String],
                         avg: Boolean) : FeatureVector = {
-        val myGrad : (Int, Int) => FeatureVector = (pass, i) => gradient(i)
-        return learnParameters(myGrad, weights, trainingSize, passes, stepsize, l2reg, noreg, (x: Int) => true, avg)
+        val myGrad : (Int, Int, FeatureVector) => FeatureVector = (pass, i, w) => gradient(i,w)
+        return learnParameters(myGrad, initialWeights, trainingSize, passes, stepsize, l2reg, noreg, (x: Int, w: FeatureVector) => true, avg)
     }
 
-    def learnParameters(gradient: Int => FeatureVector,
-                        weights: FeatureVector,
+    def learnParameters(gradient: (Int, FeatureVector) => FeatureVector,
+                        initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
                         stepsize: Double,
                         l2reg: Double,
                         noreg: List[String],
-                        trainingObserver: Int => Boolean,
+                        trainingObserver: (Int, FeatureVector) => Boolean,
                         avg: Boolean) : FeatureVector = {
-        val myGrad : (Int, Int) => FeatureVector = (pass, i) => gradient(i)
-        return learnParameters(myGrad, weights, trainingSize, passes, stepsize, l2reg, noreg, trainingObserver, avg)
+        val myGrad : (Int, Int, FeatureVector) => FeatureVector = (pass, i, w) => gradient(i,w)
+        return learnParameters(myGrad, initialWeights, trainingSize, passes, stepsize, l2reg, noreg, trainingObserver, avg)
     }
 
-    def learnParameters(gradient: (Int, Int) => FeatureVector, // Input: (pass, i) Output: gradient
-                        weights: FeatureVector,
+    def learnParameters(gradient: (Int, Int, FeatureVector) => FeatureVector,              // Input: (pass, i) Output: gradient
+                        initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
                         stepsize: Double,
                         l2reg: Double,
                         noreg: List[String],
-                        trainingObserver: Int => Boolean,    // Input: pass  Output: true stops training loop
+                        trainingObserver: (Int, FeatureVector) => Boolean,  // Input: pass, weights  Output: true stops training loop
                         avg: Boolean) : FeatureVector
 
 }

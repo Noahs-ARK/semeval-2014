@@ -24,22 +24,24 @@ class TrainObj(val options : Map[Symbol, String]) extends edu.cmu.cs.ark.semeval
     val decoder = Decoder(options)
     val oracle = new Oracle(getFeatures(options), decoder.features.weights.labelset)
     val costAug = new CostAugmented(Decoder(options), options.getOrElse('trainingCostScale,"1.0").toDouble)
-    val weights = decoder.features.weights
-    oracle.features.weights = weights
-    costAug.features.weights = weights
 
-    val outputFormat = options.getOrElse('outputFormat,"triples").split(",").toList
-
-    def decode(i: Int) : FeatureVector = {
+    def decode(i: Int, weights: FeatureVector) : FeatureVector = {
+        decoder.features.weights = weights
         return decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).features
     }
 
-    def oracle(i: Int) : FeatureVector = {
+    def oracle(i: Int, weights: FeatureVector) : FeatureVector = {
+        oracle.features.weights = weights
         return oracle.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i))).features
     }
 
-    def costAugmented(i: Int) : FeatureVector = {
+    def costAugmented(i: Int, weights: FeatureVector) : FeatureVector = {
+        costAug.features.weights = weights
         return costAug.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i))).features
+    }
+
+    def train {
+        train(FeatureVector(decoder.features.weights.labelset))
     }
 }
 
