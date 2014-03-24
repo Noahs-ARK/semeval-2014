@@ -19,7 +19,7 @@ import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 class SSGD extends Optimizer {
-    def learnParameters(gradient: (Int, Int, FeatureVector) => FeatureVector,
+    def learnParameters(gradient: (Option[Int], Int, FeatureVector) => FeatureVector,
                         initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
@@ -44,7 +44,7 @@ class SSGD extends Optimizer {
                 /************** Scaling trick ***************/
                 //  true weights are scaling_trick * weights
                 /********************************************/
-                weights -= (stepsize / ((1.0-2.0*stepsize*l2reg)*scaling_trick)) * gradient(i, t, weights)
+                weights -= (stepsize / ((1.0-2.0*stepsize*l2reg)*scaling_trick)) * gradient(Some(i), t, weights)
                 for (feature <- noreg if weights.fmap.contains(feature)) {
                     val values = weights.fmap(feature)
                     values.unconjoined /= (1.0 - 2.0 * stepsize * l2reg)  // so that value * scaling_trick = true weights after scaling_trick gets updated ( = value * scaling_trick(t) / scaling_trick(t+1) )

@@ -19,18 +19,16 @@ import edu.cmu.cs.ark.semeval2014.amr._
 import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
-class HOLS(splitSize: Int, countPercepts: (Int, Int) => FeatureVector) extends Optimizer {
-    def learnParameters(gradient: (Int, Int, FeatureVector) => FeatureVector,
+class HOLS(splitSize: Int, countPercepts: (Option[Int], Int) => FeatureVector) extends Optimizer {
+    def learnParameters(gradient: (Option[Int], Int, FeatureVector) => FeatureVector,
                         initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
                         stepsize: Double,
                         l2reg: Double,
                         noreg: List[String],
-                        trainingObserver: Int => Boolean,
+                        trainingObserver: (Int, FeatureVector) => Boolean,
                         avg: Boolean) : FeatureVector = {
-        val fullWeights = FeatureVector(initialWeights.labelset)
-        fullWeights += initialWeights
         val numSplits : Int = ceil(trainingSize.toDouble / splitSize.toDouble).toInt
         val labelset = initialWeights.labelset
         val splits : Array[Array[Int]] = Array.fill(ceil(trainingSize.toDouble / splitSize.toDouble).toInt)(Array())
@@ -41,35 +39,38 @@ class HOLS(splitSize: Int, countPercepts: (Int, Int) => FeatureVector) extends O
         val getSplit : Array[Int] = (0 until trainingSize).map(x => x/splitSize).toArray
         var pass = 0
         val alphas : Array[Double] = Array.fill(passes)(0.0)
-        val gradients : Array[Array[FeatureVector]] = Array.fill(passes)(weights.map(x => FeatureVector(labelset)))
+        val gradients : Array[Array[FeatureVector]] = Array.fill(passes)(splits.map(x => FeatureVector(labelset)))
         val totalGradients : Array[FeatureVector] = Array.fill(passes)(FeatureVector(labelset))
         val percepts : Array[FeatureVector] = splits.map(x => FeatureVector(labelset))
         for (t <- 0 until trainingSize) {
-            percepts(getSplit(t)) += countPercepts(0, t) // TODO: make pass = 0 not randomized
+            percepts(getSplit(t)) += countPercepts(None, t) // TODO: make pass = 0 not randomized
         }
-        while (pass < passes && trainingObserver(i)) {
+        val counts = FeatureVector(labelset)
+        percepts.map(x => counts += x)
+        while (pass < passes && trainingObserver(pass, fullWeights)) {
             logger(0,"Pass "+(pass+1).toString)
 
-            def computeMyWeights(split: Int) : FeatureVector = {
-                val myW = FeatureVector(labelSet)
-                myW.plusEqFilter(initialWeights, percepts(split).fmap.keys)
+            def computeMyWeights(split: Int, myPercepts: FeatureVector) : FeatureVector = {
+                val myW = FeatureVector(labelset)
+                myW.plusEqFilter(initialWeights, myPercepts.fmap.keysIterator)
                 for (i <- 0 to pass) {
-                    myW.plusEqFilter(alphas(pass) * totalGradients(pass), percepts(split).fmap.keys)
+                    myW.plusEqFilter(alphas(pass) * totalGradients(pass), myPercepts.fmap.keysIterator)
                     myW -= alphas(pass) * gradients(i)(split)   // no need to filter since gradients(i) is only supported where the percepts are
                 }
+                return myW
             }
 
             // Compute gradients in splits
             var t = 0
             for (i <- 0 until splits.size) {
-                val myWeights = computeMyWeights(i)
+                val myWeights = computeMyWeights(i, percepts(i))
                 for (j <- 0 until splits(i).size) {
-                    gradients(pass)(i) += gradient(0, t, myWeights)
+                    gradients(pass)(i) += gradient(None, t, myWeights)
                     t += 1
                 }
-                // TODO: divide by percept count
+                gradients(pass)(i).dotDivide(counts)    // divide by percept count
             }
-            splits.map(j => totalGradients(pass) += gradients(j))
+            (0 until numSplits).map(j => totalGradients(pass) += gradients(pass)(j))
 
             // Do the line search
             for (t <- Random.shuffle(Range(0, trainingSize).toList)) {
@@ -77,8 +78,8 @@ class HOLS(splitSize: Int, countPercepts: (Int, Int) => FeatureVector) extends O
                 for (p <- 0 to pass) {
                     totalGradients(p) -= gradients(p)(split)
                 }
-                val myGradient = gradient(0, t, computeMyWeights(split))
-                // TODO: divide by percept count
+                val myGradient = gradient(None, t, computeMyWeights(split, countPercepts(None,t)))
+                myGradient.dotDivide(counts)            // divide by percept count
                 for (p <- 0 to pass) {
                     alphas(p) += stepsize * totalGradients(p).dot(myGradient) / sqrt(t)
                 }
@@ -90,11 +91,15 @@ class HOLS(splitSize: Int, countPercepts: (Int, Int) => FeatureVector) extends O
             pass += 1
         }
 
-        val fullWeights = FeatureVector(initialWeights.labelset)
-        fullWeights += initialWeights
-        for (i <- 0 until passes) {
-            fullWeights += alphas(i) * totalGradients(i)
+        def fullWeights : FeatureVector = {
+            val fullW = FeatureVector(initialWeights.labelset)
+            fullW += initialWeights
+            for (i <- 0 until passes) {
+                fullW += alphas(i) * totalGradients(i)
+            }
+            return fullW
         }
+
         return fullWeights
     }
 }

@@ -28,7 +28,7 @@ abstract class Optimizer {
                         l2reg: Double,
                         noreg: List[String],
                         avg: Boolean) : FeatureVector = {
-        val myGrad : (Int, Int, FeatureVector) => FeatureVector = (pass, i, w) => gradient(i,w)
+        val myGrad : (Option[Int], Int, FeatureVector) => FeatureVector = (pass, i, w) => gradient(i,w)
         return learnParameters(myGrad, initialWeights, trainingSize, passes, stepsize, l2reg, noreg, (x: Int, w: FeatureVector) => true, avg)
     }
 
@@ -41,11 +41,11 @@ abstract class Optimizer {
                         noreg: List[String],
                         trainingObserver: (Int, FeatureVector) => Boolean,
                         avg: Boolean) : FeatureVector = {
-        val myGrad : (Int, Int, FeatureVector) => FeatureVector = (pass, i, w) => gradient(i,w)
+        val myGrad : (Option[Int], Int, FeatureVector) => FeatureVector = (pass, i, w) => gradient(i,w)
         return learnParameters(myGrad, initialWeights, trainingSize, passes, stepsize, l2reg, noreg, trainingObserver, avg)
     }
 
-    def learnParameters(gradient: (Int, Int, FeatureVector) => FeatureVector,              // Input: (pass, i, weights) Output: gradient
+    def learnParameters(gradient: (Option[Int], Int, FeatureVector) => FeatureVector,              // Input: (pass, i, weights) Output: gradient
                         initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,

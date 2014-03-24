@@ -21,8 +21,8 @@ case class Conjoined(labelIndex: Int, value: Double)
 case class ValuesList(var unconjoined: Double, var conjoined: List[Conjoined])
 case class ValuesMap(var unconjoined: Double, var conjoined: Map[Int, Double])
 object ValuesMap {
-    def apply() : ValuesMap {
-        ValuesMap(0.0, Map())
+    def apply() : ValuesMap = {
+        return ValuesMap(0.0, Map())
     }
 }
 case class Value(unconjoined: Double, conjoined: Double)
@@ -95,8 +95,21 @@ case class FeatureVector(labelset : Array[String],
     }
     def += (v: FeatureVector) = update(v, (feat, label, x, y) => x + y)
     def -= (v: FeatureVector) = update(v, (feat, label, x, y) => x - y)
+    def updateAll(v: FeatureVector, f: (String, Option[Int], Double, Double) => Double) { // TODO: maybe this should be f: (String, ValuesMap, ValuesMap) => ValuesMap.  And also have + and - for ValuesMap objects
+        for ((feature, myValues) <- fmap) {
+            val values = v.fmap.getOrElse(feature, ValuesMap())
+            myValues.unconjoined = f(feature, None, myValues.unconjoined, values.unconjoined)
+            for (conjoined <- myValues.conjoined) {
+                myValues.conjoined(conjoined._1) = f(feature,
+                                                   Some(conjoined._1),
+                                                   conjoined._2,
+                                                   values.conjoined.getOrElse(conjoined._1, 0.0))
+            }
+        }
+    }
+    def dotDivide(v: FeatureVector) = updateAll(v, (feat, label, x, y) => { assert(y!=0.0);  x / y } )
     def updateWithFilter(v: FeatureVector, featNames: Iterator[String], f: (String, Option[Int], Double, Double) => Double) {
-        for ((feature, values) <- featNames) {
+        for (feature <- featNames) {
             val values = v.fmap.getOrElse(feature, ValuesMap())
             val myValues : ValuesMap = fmap.getOrElseUpdate(feature, ValuesMap())
             myValues.unconjoined = f(feature, None, myValues.unconjoined, values.unconjoined)
@@ -136,8 +149,8 @@ case class FeatureVector(labelset : Array[String],
     def -= (m: fastmul) = updateList(m.v, (feat, label, x, y) => x - m.scale * y)
     def += (m: fastmul2) = update(m.v, (feat, label, x, y) => x + m.scale * y)
     def -= (m: fastmul2) = update(m.v, (feat, label, x, y) => x - m.scale * y)
-    def plusEqFilter(m: fastmul2, featNames: Iterator[String]) = updateWithFilter(m.v, filter, (feat, label, x, y) => x + m.scale * y)
-    def minusEqFilter(m: fastmul2, featNames: Iterator[String]) = updateWithFilter(m.v, filter, (feat, label, x, y) => x - m.scale * y)
+    def plusEqFilter(m: fastmul2, featNames: Iterator[String]) = updateWithFilter(m.v, featNames, (feat, label, x, y) => x + m.scale * y)
+    def minusEqFilter(m: fastmul2, featNames: Iterator[String]) = updateWithFilter(m.v, featNames, (feat, label, x, y) => x - m.scale * y)
     /*def nonzero : Boolean = {
         var result = false
         for ((feat, value) <- fmap) {
