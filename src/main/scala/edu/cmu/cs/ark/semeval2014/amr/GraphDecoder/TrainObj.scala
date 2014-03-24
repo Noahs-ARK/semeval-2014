@@ -24,6 +24,7 @@ class TrainObj(val options : Map[Symbol, String]) extends edu.cmu.cs.ark.semeval
     val decoder = Decoder(options)
     val oracle = new Oracle(getFeatures(options), decoder.features.weights.labelset)
     val costAug = new CostAugmented(Decoder(options), options.getOrElse('trainingCostScale,"1.0").toDouble)
+    val countPer = new CountPercepts(getFeatures(options), decoder.features.weights.labelset)
 
     def decode(i: Int, weights: FeatureVector) : FeatureVector = {
         decoder.features.weights = weights
@@ -38,6 +39,10 @@ class TrainObj(val options : Map[Symbol, String]) extends edu.cmu.cs.ark.semeval
     def costAugmented(i: Int, weights: FeatureVector) : FeatureVector = {
         costAug.features.weights = weights
         return costAug.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i))).features
+    }
+
+    def countPercepts(i: Int) : FeatureVector = {
+        return countPer.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).features
     }
 
     def train {

@@ -24,6 +24,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     def decode(i: Int, weights: FeatureVector) : FeatureVector
     def oracle(i: Int, weights: FeatureVector) : FeatureVector
     def costAugmented(i: Int, weights: FeatureVector) : FeatureVector
+    def countPercepts(i: Int) : FeatureVector
     def train : Unit
 
     ////////////////// Training Setup ////////////////
@@ -36,8 +37,9 @@ abstract class TrainObj(options: Map[Symbol, String])  {
         System.err.println("Error: No model filename specified"); sys.exit(1)
     }
     val optimizer: Optimizer = options.getOrElse('trainingOptimizer, "Adagrad") match {
-        case "SSGD" => new SSGD()
         case "Adagrad" => new Adagrad()
+        case "HOLS" => new HOLS(100, (x,y) => countPercepts(y))
+        case "SSGD" => new SSGD()
         case x => { System.err.println("Error: unknown training optimizer " + x); sys.exit(1) }
     }
 
