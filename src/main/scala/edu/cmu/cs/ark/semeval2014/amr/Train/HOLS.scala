@@ -100,10 +100,10 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                 val myGradient = gradient(None, t, computeMyWeights(split, countPercepts(None,t)))
                 myGradient.dotDivide(counts)            // divide by percept count
                 for (p <- 0 to pass) {
-                    alphas(p) -= stepsize * totalGradients(p).dot(myGradient) / sqrt(t+1.0)
+                    alphas(p) -= stepsize * totalGradients(p).dot(myGradient) / sqrt(ex+1.0)
                 }
                 val denseGradient = myGradient.filter(x => x.startsWith("Bias"))
-                denseWeights -= (stepsize / sqrt(t+1.0)) * denseGradient
+                denseWeights -= (stepsize / sqrt(ex+1.0)) * denseGradient
                 for (p <- 0 to pass) {
                     totalGradients(p) += gradients(p)(split)
                 }
