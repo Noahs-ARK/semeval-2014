@@ -611,6 +611,7 @@ public class LRParser {
 		allFE.add(new BasicFeatures());
 		allFE.add(new LinearOrderFeatures());
 		allFE.add(new CoarseDependencyFeatures());
+		allFE.add(new LinearContextFeatures());
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
 		allFE.add(new UnlabeledDepFE());
