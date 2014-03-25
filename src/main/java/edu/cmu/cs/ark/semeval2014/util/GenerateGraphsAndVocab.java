@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
-import edu.cmu.cs.ark.semeval2014.lr.LRParser;
-
 import sdp.graph.Edge;
 import sdp.graph.Graph;
 import sdp.io.GraphReader;
+import sdp.io.GraphWriter;
 import util.Vocabulary;
+import edu.cmu.cs.ark.semeval2014.lr.LRParser;
+import edu.cmu.cs.ark.semeval2014.prune.PcedtPruner;
 
 public class GenerateGraphsAndVocab {
 	private final List<int[][]> graphMatrices;
@@ -19,6 +19,11 @@ public class GenerateGraphsAndVocab {
 	
 	public GenerateGraphsAndVocab(String sdpFile) throws IOException {
 		List<Graph> graphs = readGraphs(sdpFile);
+        GraphWriter gw = new GraphWriter("pcedt_form.test");
+        for (Graph g : graphs) {
+            Graph ng = PcedtPruner.modifyGraph(g);
+            gw.writeGraph(ng);
+        }
 		labelVocab = generateLabelVocab(graphs);
 		graphMatrices = convertGraphsToAdjacencyMatrices(graphs);
 	}

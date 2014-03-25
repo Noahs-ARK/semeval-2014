@@ -1,33 +1,44 @@
 package edu.cmu.cs.ark.semeval2014.lr;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import util.U;
+import util.Vocabulary;
+import util.misc.Pair;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+
 import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
-import edu.cmu.cs.ark.semeval2014.lr.fe.*;
+import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
+import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.DmFe;
+import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PasFe;
+import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PassThroughFe;
+import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PcedtFE;
+import edu.cmu.cs.ark.semeval2014.lr.fe.CoarseDependencyFeatures;
+import edu.cmu.cs.ark.semeval2014.lr.fe.DependencyPathv1;
+import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
+import edu.cmu.cs.ark.semeval2014.lr.fe.InMemoryNumberizedFeatureAdder;
+import edu.cmu.cs.ark.semeval2014.lr.fe.LinearOrderFeatures;
+import edu.cmu.cs.ark.semeval2014.lr.fe.SubcatSequenceFE;
+import edu.cmu.cs.ark.semeval2014.lr.fe.UnlabeledDepFE;
 import edu.cmu.cs.ark.semeval2014.prune.Prune;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
 import edu.cmu.cs.ark.semeval2014.util.GenerateGraphsAndVocab;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
-import sdp.graph.Edge;
-import sdp.graph.Graph;
-import sdp.io.GraphReader;
-import util.U;
-import util.Vocabulary;
-import util.misc.Pair;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
 
 /*
  * Dimensionality strategies.
@@ -184,7 +195,7 @@ public class LRParser {
 		graphMatrices = generateGAndV.getGraphMatrices();
 		labelVocab = generateGAndV.getLabelVocab();
 		
-		assert graphMatrices.size() == inputSentences.length;
+        assert graphMatrices.size() == inputSentences.length;
 		
 		// Preprocessor training & prediction ... its predictions will be used as semparser features.
 		// Note that its predictions are stored in the inputSentences.
