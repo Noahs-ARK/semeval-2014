@@ -186,6 +186,11 @@ case class FeatureVector(labelset : Array[String],
         val iterator = Source.fromFile(filename).getLines()
         read(iterator)
     }
+    def toFile(filename: String) {
+        val file = new java.io.PrintWriter(new java.io.File(filename), "UTF-8")
+        try { file.print(this.toString) }
+        finally { file.close }
+    }
     override def toString() : String = {
         var strings : List[String] = List()
         for ((feature, values) <- fmap) {

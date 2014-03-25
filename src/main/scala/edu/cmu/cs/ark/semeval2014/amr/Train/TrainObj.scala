@@ -38,7 +38,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     }
     val optimizer: Optimizer = options.getOrElse('trainingOptimizer, "Adagrad") match {
         case "Adagrad" => new Adagrad()
-        case "HOLS" => new HOLS(100, (x,y) => countPercepts(y))
+        case "HOLS" => new HOLS(options, (x,y) => countPercepts(y))
         case "SSGD" => new SSGD()
         case x => { System.err.println("Error: unknown training optimizer " + x); sys.exit(1) }
     }
