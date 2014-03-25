@@ -29,7 +29,7 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                         noreg: List[String],
                         trainingObserver: (Int, FeatureVector) => Boolean,
                         avg: Boolean) : FeatureVector = {
-        val splitSize = 10
+        val splitSize = 100
         val numSplits : Int = ceil(trainingSize.toDouble / splitSize.toDouble).toInt
         val labelset = initialWeights.labelset
         val splits : Array[Array[Int]] = Array.fill(ceil(trainingSize.toDouble / splitSize.toDouble).toInt)(Array())
@@ -52,12 +52,14 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
         val counts = FeatureVector(labelset)
         percepts.map(x => counts += x)
         //counts.toFile(options('model) + ".perceptCounts")
+        val denseWeights = FeatureVector(labelset)
+        denseWeights += initialWeights
         while (pass < passes && trainingObserver(pass, fullWeights)) {
             logger(0,"Pass "+(pass+1).toString)
 
             def computeMyWeights(split: Int, myPercepts: FeatureVector) : FeatureVector = {
                 val myW = FeatureVector(labelset)
-                myW.plusEqFilter(initialWeights, myPercepts.fmap.keysIterator)
+                myW.plusEqFilter(denseWeights, myPercepts.fmap.keysIterator)
                 for (i <- 0 to pass) {
                     myW.plusEqFilter(alphas(i) * totalGradients(i), myPercepts.fmap.keysIterator)
                     myW -= alphas(i) * gradients(i)(split)   // no need to filter since gradients(i) is only supported where the percepts are
@@ -92,8 +94,10 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                 val myGradient = gradient(None, t, computeMyWeights(split, countPercepts(None,t)))
                 myGradient.dotDivide(counts)            // divide by percept count
                 for (p <- 0 to pass) {
-                    alphas(p) -= stepsize * totalGradients(p).dot(myGradient) / sqrt(t+1)
+                    alphas(p) -= stepsize * totalGradients(p).dot(myGradient) / sqrt(t+1.0)
                 }
+                val denseGradient = myGradient.filter(x => x.startsWith("Bias"))
+                denseWeights -= (stepsize / sqrt(t+1.0)) * denseGradient
                 for (p <- 0 to pass) {
                     totalGradients(p) += gradients(p)(split)
                 }
@@ -104,8 +108,8 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
         }
 
         def fullWeights : FeatureVector = {
-            val fullW = FeatureVector(initialWeights.labelset)
-            fullW += initialWeights
+            val fullW = FeatureVector(labelset)
+            fullW += denseWeights
             for (i <- 0 until passes) {
                 fullW += alphas(i) * totalGradients(i)
             }
