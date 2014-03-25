@@ -24,6 +24,7 @@ public class GenerateGraphsAndVocab {
             Graph ng = PcedtPruner.modifyGraph(g);
             gw.writeGraph(ng);
         }
+        gw.close();
 		labelVocab = generateLabelVocab(graphs);
 		graphMatrices = convertGraphsToAdjacencyMatrices(graphs);
 	}

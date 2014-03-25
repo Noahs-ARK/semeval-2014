@@ -21,7 +21,7 @@ public class PcedtPruner {
     }
 
     /**
-     * Preprocessing step on graphMatrices - converts pcedt formalism into tree
+     * Pre-processing step on graphMatrices - converts pcedt formalism into tree
      */
     public void modifyGraphMatrices() {
 
@@ -91,7 +91,14 @@ public class PcedtPruner {
 
     public static Graph modifyGraph(Graph g) {
         Graph newGraph = new Graph(g.id);
+
+        // map between andparent and its children
         Map<Integer, List<Integer>> problemNodes = new HashMap<Integer, List<Integer>>();
+
+        List<Integer> topNodes = new ArrayList<Integer>(); // children of and
+                                                           // which are also
+                                                           // tops
+        int newTopNode = -100; // and parent which should now be the top instead
 
         // find the children of and
         for (Node child : g.getNodes()) {
@@ -105,7 +112,24 @@ public class PcedtPruner {
                     }
                     andChildren.add(child.id);
                     problemNodes.put(incoming.source, andChildren);
+
+                    if (child.isTop == true) {
+                        newTopNode = incoming.source;
+                        topNodes.add(child.id);
+                    }
                 }
+            }
+        }
+
+        // add all nodes to the new graph
+        // node id matters because we are going to add corresponding edges
+        for (Node n : g.getNodes()) {
+            if (topNodes.contains(n.id)) {
+                newGraph.addNode(n.form, n.lemma, n.pos, false, n.isPred);
+            } else if (n.id == newTopNode) {
+                newGraph.addNode(n.form, n.lemma, n.pos, true, n.isPred);
+            } else {
+                newGraph.addNode(n.form, n.lemma, n.pos, n.isTop, n.isPred);
             }
         }
 
@@ -140,21 +164,7 @@ public class PcedtPruner {
             Node andParentNode = g.getNode(andParent);
             andParentNode.addIncomingEdge(newEdge); // should I add this back to
                                                     // the graph?
-
-            System.out.println(g.getNodes().size());
-
-            System.out.println(newEdge.source);
-            System.out.println(newEdge.target);
-            // System.out.println(newEdge.label);
-            newGraph.addEdge(newEdge.source, newEdge.target, newEdge.label); // this
-                                                                             // throws
-                                                                             // an
-                                                                             // error,
-                                                                             // why?
-        }
-
-        for (Node n : g.getNodes()) {
-            newGraph.addNode(n.form, n.lemma, n.pos, n.isTop, n.isPred);
+            newGraph.addEdge(newEdge.source, newEdge.target, newEdge.label);
         }
 
         for (Edge e : g.getEdges()) {
