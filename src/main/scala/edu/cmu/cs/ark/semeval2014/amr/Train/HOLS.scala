@@ -77,10 +77,16 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                     gradients(pass)(i) += gradient(None, t, myWeights)
                     t += 1
                 }
-                gradients(pass)(i).dotDivide(counts)    // divide by percept count
+                //gradients(pass)(i).dotDivide(counts)    // divide by percept count
             }
             (0 until numSplits).map(j => totalGradients(pass) += gradients(pass)(j))
             totalGradients(pass).toFile(options('model) + ".iter" + pass.toString + ".gradient")
+
+            for (i <- 0 until splits.size) {
+                gradients(pass)(i).dotDivide(counts)
+            }
+            totalGradients(pass).dotDivide(counts)
+            totalGradients(pass).toFile(options('model) + ".iter" + pass.toString + ".NormGradient")
 
             // Do the line search
             logger(0, "Line search")
