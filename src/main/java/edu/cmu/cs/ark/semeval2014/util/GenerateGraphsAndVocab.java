@@ -19,12 +19,30 @@ public class GenerateGraphsAndVocab {
 	
 	public GenerateGraphsAndVocab(String sdpFile) throws IOException {
 		List<Graph> graphs = readGraphs(sdpFile);
-        GraphWriter gw = new GraphWriter("pcedt_form.test");
+
+        List<Graph> modifiedGraphs = new ArrayList<Graph>();
+        GraphWriter gw = new GraphWriter("pcedt1.conll");
         for (Graph g : graphs) {
             Graph ng = PcedtPruner.modifyGraph(g);
             gw.writeGraph(ng);
+            modifiedGraphs.add(ng);
         }
         gw.close();
+
+        List<Graph> originalGraphs = new ArrayList<Graph>();
+        gw = new GraphWriter("pcedt2.conll");
+        int g = 0;
+        for (Graph ng : modifiedGraphs) {
+            System.out.println(g + "\n------------------");
+            Graph og = PcedtPruner.postProcess(ng);
+            gw.writeGraph(og);
+            originalGraphs.add(og);
+            g += 1;
+        }
+        gw.close();
+
+        System.out.println("done!!!\n");
+        System.exit(0);
 		labelVocab = generateLabelVocab(graphs);
 		graphMatrices = convertGraphsToAdjacencyMatrices(graphs);
 	}
