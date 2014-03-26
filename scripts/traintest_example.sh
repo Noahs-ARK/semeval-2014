@@ -12,7 +12,7 @@ data_dir="lildata/lil"
 train_file="${data_dir}train.${formalism}.sdp"
 train_deps="${train_file}.dependencies"
 
-sexpr_file=/cab1/corpora/LDC2013E167/companion/updated_3_8_postproc/sb.berkeley.cpn.sexpr
+sexpr_file="data/companion/updated_3_8_postproc/sb.berkeley.cpn.sexpr"
 
 # sec20 files are from: /cab1/corpora/LDC2013E167/splits
 test_file="data/splits/sec20.${formalism}.sdp"
