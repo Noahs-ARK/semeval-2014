@@ -19,7 +19,17 @@ import edu.cmu.cs.ark.semeval2014.amr._
 import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
-class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => FeatureVector) extends Optimizer {
+class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => FeatureVector, fullTrainingSize: Int) extends Optimizer {
+    def countPerceptsParallel(t: Int) : FeatureVector = {
+        val miniBatchSize = options.getOrElse('trainingMiniBatchSize,"1").toInt
+        if (miniBatchSize <= 1) {
+            countPercepts(None, t)
+        } else {
+            val par = Range(t*miniBatchSize, min((t+1)*miniBatchSize, fullTrainingSize)).par
+            par.map(x => countPercepts(None, t)).seq.reduce((a, b) => { a += b; a })
+        }
+    }
+
     def learnParameters(gradient: (Option[Int], Int, FeatureVector) => FeatureVector,
                         initialWeights: FeatureVector,
                         trainingSize: Int,
@@ -29,8 +39,9 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                         noreg: List[String],
                         trainingObserver: (Int, FeatureVector) => Boolean,
                         avg: Boolean) : FeatureVector = {
-        val splitSize = 100
+        val splitSize = 5
         val numSplits : Int = ceil(trainingSize.toDouble / splitSize.toDouble).toInt
+        logger(0, "numSplits = " + numSplits.toString)
         val labelset = initialWeights.labelset
         val splits : Array[Array[Int]] = Array.fill(ceil(trainingSize.toDouble / splitSize.toDouble).toInt)(Array())
         for (i <- 0 until splits.size) {
@@ -46,7 +57,7 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
         logger(0, "Computing percepts")
         for (t <- 0 until trainingSize) {
             logger(0, "t="+t.toString)
-            percepts(getSplit(t)) += countPercepts(None, t) // TODO: make pass = 0 not randomized
+            percepts(getSplit(t)) += countPerceptsParallel(t)
         }
         logger(0, "Total percept count")
         val counts = FeatureVector(labelset)
@@ -77,11 +88,11 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                     gradients(pass)(i) += gradient(None, t, myWeights)
                     t += 1
                 }
-                //gradients(pass)(i).dotDivide(counts)    // divide by percept count
             }
             (0 until numSplits).map(j => totalGradients(pass) += gradients(pass)(j))
             totalGradients(pass).toFile(options('model) + ".iter" + pass.toString + ".gradient")
 
+            // Conditioning
             for (i <- 0 until splits.size) {
                 gradients(pass)(i).dotDivide(counts)
             }

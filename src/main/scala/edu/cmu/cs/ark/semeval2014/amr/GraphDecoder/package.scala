@@ -31,24 +31,21 @@ package object GraphDecoder {
         })
     }
 
+    def getLabelset(options: OptionMap) : Array[(String, Int)] = {
+        return loadLabelset( if (options.contains('labelset)) { options('labelset) } else { "scripts/labels." + options('formalism) } )
+    }
+
     def Decoder(options: OptionMap) : GraphDecoder.Decoder = {
         if (!options.contains('formalism)) {
             System.err.println("Error: No formalism specified"); sys.exit(1)
         }
 
-        val labelset: Array[(String, Int)] = loadLabelset(
-            if (options.contains('labelset)) {
-                options('labelset)
-            } else {
-                "scripts/labels." + options('formalism)
-            }
-        )
+        val labelset: Array[(String, Int)] = getLabelset(options)
 
         val features = getFeatures(options)
-        logger(0, "features = " + features)
-
         val connected = !options.contains('stage2NotConnected)
-        logger(0, "connected = " + connected)
+        //logger(0, "features = " + features)
+        //logger(0, "connected = " + connected)
 
         val decoder: Decoder = options.getOrElse('stage2Decoder, "LR") match {
             //case "Alg1" => new Alg1(features, labelset)

@@ -21,32 +21,34 @@ import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 class TrainObj(val options : Map[Symbol, String]) extends edu.cmu.cs.ark.semeval2014.amr.Train.TrainObj(options) {
 
-    val decoder = Decoder(options)
-    val oracle = new Oracle(getFeatures(options), decoder.features.weights.labelset)
-    val costAug = new CostAugmented(Decoder(options), options.getOrElse('trainingCostScale,"1.0").toDouble)
-    val countPer = new CountPercepts(getFeatures(options), decoder.features.weights.labelset)
+    private val labelset : Array[String] = getLabelset(options).map(x => x._1)  // we only need the labels, not determinism constrains
 
     def decode(i: Int, weights: FeatureVector) : FeatureVector = {
+        val decoder = Decoder(options)
         decoder.features.weights = weights
         return decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).features
     }
 
     def oracle(i: Int, weights: FeatureVector) : FeatureVector = {
+        val oracle = new Oracle(getFeatures(options), labelset)
         oracle.features.weights = weights
         return oracle.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i))).features
     }
 
     def costAugmented(i: Int, weights: FeatureVector) : FeatureVector = {
+        val decoder = Decoder(options)
+        val costAug = new CostAugmented(Decoder(options), options.getOrElse('trainingCostScale,"1.0").toDouble)
         costAug.features.weights = weights
         return costAug.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i))).features
     }
 
     def countPercepts(i: Int) : FeatureVector = {
+        val countPer = new CountPercepts(getFeatures(options), labelset)
         return countPer.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).features
     }
 
     def train {
-        train(FeatureVector(decoder.features.weights.labelset))
+        train(FeatureVector(labelset))
     }
 }
 

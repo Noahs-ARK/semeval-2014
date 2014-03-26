@@ -36,17 +36,22 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     if (!options.contains('model)) {
         System.err.println("Error: No model filename specified"); sys.exit(1)
     }
-    val optimizer: Optimizer = options.getOrElse('trainingOptimizer, "Adagrad") match {
-        case "Adagrad" => new Adagrad()
-        case "HOLS" => new HOLS(options, (x,y) => countPercepts(y))
-        case "SSGD" => new SSGD()
-        case x => { System.err.println("Error: unknown training optimizer " + x); sys.exit(1) }
-    }
 
     val inputAnnotatedSentences = Input.loadInputAnnotatedSentences(options)
     val inputGraphs = Input.loadSDPGraphs(options, oracle = false)
     val oracleGraphs = Input.loadSDPGraphs(options, oracle = true)
     assert(inputAnnotatedSentences.size == inputGraphs.size && inputGraphs.size == oracleGraphs.size, "sdp and dep file lengths do not match")
+
+    var optimizer: Optimizer = options.getOrElse('trainingOptimizer, "Adagrad") match {
+        case "Adagrad" => new Adagrad()
+        case "HOLS" => new HOLS(options, (x,y) => countPercepts(y), inputGraphs.size)
+        case "SSGD" => new SSGD()
+        case x => { System.err.println("Error: unknown training optimizer " + x); sys.exit(1) }
+    }
+
+    if (options.getOrElse('trainingMiniBatchSize,"1").toInt > 1) {
+        optimizer = new MiniBatch(optimizer, options.getOrElse('trainingMiniBatchSize,"1").toInt)
+    }
 
 /*  Runtime.getRuntime().addShutdownHook(new Thread() {
         override def run() {
