@@ -19,6 +19,8 @@ import scala.math.sqrt
 import edu.cmu.cs.ark.semeval2014.amr._
 import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
+import scala.collection.parallel._
+import scala.concurrent.forkjoin.ForkJoinPool
 
 class MiniBatch(optimizer: Optimizer, miniBatchSize: Int) extends Optimizer {
     def learnParameters(gradient: (Option[Int], Int, FeatureVector) => FeatureVector,
@@ -35,12 +37,12 @@ class MiniBatch(optimizer: Optimizer, miniBatchSize: Int) extends Optimizer {
         val miniGradient : (Option[Int], Int, FeatureVector) => FeatureVector = (pass, i, weights) => {
             assert(i < numMiniBatches, "MiniBatch optimizer mini-batch index too large")
             val par = Range(i*miniBatchSize, min((i+1)*miniBatchSize, trainingSize)).par
-            val grad = if (pass != None) {
-                par.map(x => gradient(None, trainShuffle(pass.get)(x), weights)).seq // TODO: if FeatureVector was immutable, wouldn't need to do convert to non-parallel collection...
+            par.tasksupport = new ForkJoinTaskSupport(new ForkJoinPool(4))
+            if (pass != None) {
+                par.map(x => gradient(None, trainShuffle(pass.get)(x), weights)).reduce((a, b) => { a += b; a })
             } else {
-                par.map(x => gradient(None, x, weights)).seq    // Don't randomize if pass = None
+                par.map(x => gradient(None, x, weights)).reduce((a, b) => { a += b; a })    // Don't randomize if pass = None
             }
-            grad.reduce((a, b) => { a += b; a })
         }
         return optimizer.learnParameters(miniGradient,
                                          initialWeights,

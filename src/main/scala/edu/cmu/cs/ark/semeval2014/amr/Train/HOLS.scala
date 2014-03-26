@@ -18,6 +18,9 @@ import scala.math.sqrt
 import edu.cmu.cs.ark.semeval2014.amr._
 import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
+import scala.collection.parallel._
+import scala.collection.concurrent.TrieMap
+import scala.concurrent.forkjoin.ForkJoinPool
 
 class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => FeatureVector, fullTrainingSize: Int) extends Optimizer {
     def countPerceptsParallel(t: Int) : FeatureVector = {
@@ -26,7 +29,8 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
             countPercepts(None, t)
         } else {
             val par = Range(t*miniBatchSize, min((t+1)*miniBatchSize, fullTrainingSize)).par
-            par.map(x => countPercepts(None, t)).seq.reduce((a, b) => { a += b; a })
+            //par.tasksupport = new ForkJoinTaskSupport(new ForkJoinPool(4))
+            par.map(x => countPercepts(None, t)).reduce((a, b) => { a += b; a })
         }
     }
 
@@ -53,6 +57,7 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
         val alphas : Array[Double] = Array.fill(passes)(0.0)
         val gradients : Array[Array[FeatureVector]] = Array.fill(passes)(splits.map(x => FeatureVector(labelset)))
         val totalGradients : Array[FeatureVector] = Array.fill(passes)(FeatureVector(labelset))
+        val totalGradientNorm : Array[Option[Double]] = Array.fill(passes)(None)
         val percepts : Array[FeatureVector] = splits.map(x => FeatureVector(labelset))
         logger(0, "Computing percepts")
         for (t <- 0 until trainingSize) {
@@ -85,7 +90,7 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                 logger(0, "Split "+i.toString)
                 val myWeights = computeMyWeights(i, percepts(i))
                 for (j <- 0 until splits(i).size) {
-                    gradients(pass)(i) += gradient(None, t, myWeights)
+                    gradients(pass)(i) += gradient(None, t, myWeights).filter(x => x != "Bias")
                     t += 1
                 }
             }
@@ -98,27 +103,36 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
             }
             totalGradients(pass).dotDivide(counts)
             totalGradients(pass).toFile(options('model) + ".iter" + pass.toString + ".NormGradient")
+            totalGradientNorm(pass) = Some(totalGradients(pass).l2norm)
 
             // Do the line search
             logger(0, "Line search")
             var ex = 0
-            for (t <- Random.shuffle(Range(0, trainingSize).toList)) {
+            for (n <- 0 until 1) {
+              for (t <- Random.shuffle(Range(0, trainingSize).toList)) {
                 logger(0, "example="+ex.toString)
                 val split = getSplit(t)
                 for (p <- 0 to pass) {
                     totalGradients(p) -= gradients(p)(split)
                 }
-                val myGradient = gradient(None, t, computeMyWeights(split, countPercepts(None,t)))
+                var myGradient = gradient(None, t, computeMyWeights(split, countPercepts(None,t)))
+                val denseGradient = FeatureVector(myGradient.labelset, TrieMap("Bias" -> myGradient.fmap("Bias").clone))  // DO THIS BEFORE CONDITIONING
+                myGradient.fmap("Bias") = ValuesMap()
                 myGradient.dotDivide(counts)            // divide by percept count
+                val myNorm = myGradient.l2norm
                 for (p <- 0 to pass) {
-                    alphas(p) -= stepsize * totalGradients(p).dot(myGradient) / sqrt(ex+1.0)
+                    logger(0, "p="+(totalGradients(p).dot(myGradient) / (totalGradientNorm(p).get * myNorm )).toString)
+                    alphas(p) -= stepsize * 1.0 * (totalGradients(p).dot(myGradient)/(totalGradientNorm(p).get)) / sqrt(ex+1.0)
                 }
-                val denseGradient = myGradient.filter(x => x.startsWith("Bias"))
-                denseWeights -= (stepsize / sqrt(ex+1.0)) * denseGradient
+                //denseWeights -= (stepsize * 1000000000.0 /* / sqrt(ex+1.0) */ ) * denseGradient
+                denseWeights -= (stepsize * 1.0 / sqrt(ex+1.0) ) * denseGradient
+                logger(0, "dense:" + denseWeights.toString.split("\n").head)
                 for (p <- 0 to pass) {
                     totalGradients(p) += gradients(p)(split)
                 }
+                logger(0, "alphas="+alphas.toList.toString)
                 ex += 1
+              }
             }
 
             pass += 1
