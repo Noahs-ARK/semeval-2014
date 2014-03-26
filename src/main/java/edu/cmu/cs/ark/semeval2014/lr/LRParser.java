@@ -5,7 +5,6 @@ import com.beust.jcommander.Parameter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-
 import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.ConstitLoader;
 import edu.cmu.cs.ark.semeval2014.common.ConstitTree;
@@ -15,9 +14,6 @@ import edu.cmu.cs.ark.semeval2014.prune.Prune;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
 import edu.cmu.cs.ark.semeval2014.util.GenerateGraphsAndVocab;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
-import sdp.graph.Edge;
-import sdp.graph.Graph;
-import sdp.io.GraphReader;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
@@ -26,7 +22,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -636,7 +631,7 @@ public class LRParser {
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
 		allFE.add(new UnlabeledDepFE());
-		
+		allFE.add(new ConstitFE());
 //		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
 	}
