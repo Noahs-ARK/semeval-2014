@@ -33,19 +33,14 @@ class MiniBatch(optimizer: Optimizer, miniBatchSize: Int) extends Optimizer {
         val numMiniBatches = ceil(trainingSize.toDouble / miniBatchSize.toDouble).toInt
         val trainShuffle : Array[Array[Int]] = Range(0, passes).map(x => Random.shuffle(Range(0, trainingSize).toList).toArray).toArray
         val miniGradient : (Option[Int], Int, FeatureVector) => FeatureVector = (pass, i, weights) => {
-            //var grad = FeatureVector()
             assert(i < numMiniBatches, "MiniBatch optimizer mini-batch index too large")
-            //for (j <- Range(i*miniBatchSize, min((i+1)*miniBatchSize, trainingSize))) {
-            //    grad += gradient(0, trainShuffle(pass)(j))
-            //}
-            //return grad
             val par = Range(i*miniBatchSize, min((i+1)*miniBatchSize, trainingSize)).par
             val grad = if (pass != None) {
                 par.map(x => gradient(None, trainShuffle(pass.get)(x), weights)).seq // TODO: if FeatureVector was immutable, wouldn't need to do convert to non-parallel collection...
             } else {
                 par.map(x => gradient(None, x, weights)).seq    // Don't randomize if pass = None
             }
-            return grad.reduce((a, b) => { a += b; a })
+            grad.reduce((a, b) => { a += b; a })
         }
         return optimizer.learnParameters(miniGradient,
                                          initialWeights,

@@ -10,7 +10,8 @@ import java.lang.Math.min
 import java.lang.Math.max
 import scala.io.Source
 import scala.util.matching.Regex
-import scala.collection.mutable.Map
+//import scala.collection.mutable.Map
+import scala.collection.concurrent.{TrieMap => Map}
 import scala.collection.mutable.Set
 import scala.collection.mutable.ArrayBuffer
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._

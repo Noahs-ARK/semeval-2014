@@ -2,7 +2,8 @@ package edu.cmu.cs.ark.semeval2014.common.FastFeatureVector
 
 import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.amr.doubleToFastMulAssoc
-import scala.collection.mutable.Map
+//import scala.collection.mutable.Map
+import scala.collection.concurrent.{TrieMap => Map}
 import scala.io.Source
 
 case class fastmul(scale: Double, v: List[(String, ValuesList)])
@@ -29,7 +30,8 @@ case class Value(unconjoined: Double, conjoined: Double)
 
 case class FeatureVector(labelset : Array[String],
                          fmap : Map[String, ValuesMap] = Map()) {
-    val labelToIndex : Map[String, Int] = Map() ++ labelset.zipWithIndex
+    val labelToIndex : Map[String, Int] = Map()
+    labelToIndex ++= labelset.zipWithIndex
     //def this() = this(Map[String, Double]())
     def iterateOverLabels(v: List[(String, Value)], f: (Conjoined) => Unit) {
         var unconjoinedTotal : Double = 0.0
