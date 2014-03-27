@@ -34,7 +34,7 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
         }
     }
 
-    def learnParameters(gradient: (Option[Int], Int, FeatureVector) => FeatureVector,
+    def learnParameters(gradient: (Option[Int], Int, FeatureVector) => (FeatureVector, Double),
                         initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
@@ -93,7 +93,7 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                 logger(0, "Split "+i.toString)
                 val myWeights = computeMyWeights(i, percepts(i))
                 for (j <- 0 until splits(i).size) {
-                    gradients(pass)(i) += gradient(None, t, myWeights).filter(x => x != "Bias")
+                    gradients(pass)(i) += gradient(None, t, myWeights)._1.filter(x => x != "Bias")
                     t += 1
                 }
             }
@@ -118,7 +118,7 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                 for (p <- 0 to pass) {
                     totalGradients(p) -= gradients(p)(split)
                 }
-                var myGradient = gradient(None, t, computeMyWeights(split, countPercepts(None,t)))
+                var myGradient = gradient(None, t, computeMyWeights(split, countPercepts(None,t)))._1
                 val denseGradient = FeatureVector(myGradient.labelset, TrieMap("Bias" -> myGradient.fmap("Bias").clone))  // DO THIS BEFORE CONDITIONING
                 myGradient.fmap("Bias") = ValuesMap()
                 myGradient.dotDivide(counts)            // divide by percept count

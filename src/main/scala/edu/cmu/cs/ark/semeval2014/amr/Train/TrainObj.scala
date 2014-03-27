@@ -21,9 +21,9 @@ import edu.cmu.cs.ark.semeval2014.utils._
 
 abstract class TrainObj(options: Map[Symbol, String])  {
 
-    def decode(i: Int, weights: FeatureVector) : FeatureVector
-    def oracle(i: Int, weights: FeatureVector) : FeatureVector
-    def costAugmented(i: Int, weights: FeatureVector) : FeatureVector
+    def decode(i: Int, weights: FeatureVector) : (FeatureVector, Double)
+    def oracle(i: Int, weights: FeatureVector) : (FeatureVector, Double)
+    def costAugmented(i: Int, weights: FeatureVector) : (FeatureVector, Double)
     def countPercepts(i: Int) : FeatureVector
     def train : Unit
 
@@ -65,18 +65,20 @@ abstract class TrainObj(options: Map[Symbol, String])  {
 
     /////////////////////////////////////////////////
 
-    def gradient(i: Int, weights: FeatureVector) : FeatureVector = {
+    def gradient(i: Int, weights: FeatureVector) : (FeatureVector, Double) = {
         if (loss == "Perceptron") {
-            val grad = decode(i, weights)
-            grad -= oracle(i, weights)
-            grad
+            val (grad, score) = decode(i, weights)
+            val o = oracle(i, weights)
+            grad -= o._1
+            (grad, score - o._2)
         } else if (loss == "SVM") {
-            val grad = costAugmented(i, weights)
-            grad -= oracle(i, weights)
-            grad
+            val (grad, score) = costAugmented(i, weights)
+            val o = oracle(i, weights)
+            grad -= o._1
+            (grad, score - o._2)
         } else {
             System.err.println("Error: unknown training loss " + loss); sys.exit(1)
-            FeatureVector(weights.labelset)
+            (FeatureVector(weights.labelset), 0.0)
         }
     }
 

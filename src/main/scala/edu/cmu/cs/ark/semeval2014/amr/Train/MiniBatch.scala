@@ -23,7 +23,7 @@ import scala.collection.parallel._
 import scala.concurrent.forkjoin.ForkJoinPool
 
 class MiniBatch(optimizer: Optimizer, miniBatchSize: Int) extends Optimizer {
-    def learnParameters(gradient: (Option[Int], Int, FeatureVector) => FeatureVector,
+    def learnParameters(gradient: (Option[Int], Int, FeatureVector) => (FeatureVector, Double),
                         initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
@@ -34,14 +34,14 @@ class MiniBatch(optimizer: Optimizer, miniBatchSize: Int) extends Optimizer {
                         avg: Boolean) : FeatureVector = {
         val numMiniBatches = ceil(trainingSize.toDouble / miniBatchSize.toDouble).toInt
         val trainShuffle : Array[Array[Int]] = Range(0, passes).map(x => Random.shuffle(Range(0, trainingSize).toList).toArray).toArray
-        val miniGradient : (Option[Int], Int, FeatureVector) => FeatureVector = (pass, i, weights) => {
+        val miniGradient : (Option[Int], Int, FeatureVector) => (FeatureVector, Double) = (pass, i, weights) => {
             assert(i < numMiniBatches, "MiniBatch optimizer mini-batch index too large")
             val par = Range(i*miniBatchSize, min((i+1)*miniBatchSize, trainingSize)).par
             par.tasksupport = new ForkJoinTaskSupport(new ForkJoinPool(4))
             if (pass != None) {
-                par.map(x => gradient(None, trainShuffle(pass.get)(x), weights)).reduce((a, b) => { a += b; a })
+                par.map(x => gradient(None, trainShuffle(pass.get)(x), weights)).reduce((a, b) => ({ a._1 += b._1; a._1 }, a._2 + b._2))
             } else {
-                par.map(x => gradient(None, x, weights)).reduce((a, b) => { a += b; a })    // Don't randomize if pass = None
+                par.map(x => gradient(None, x, weights)).reduce((a, b) => ({ a._1 += b._1; a._1 }, a._2 + b._2))    // Don't randomize if pass = None
             }
         }
         return optimizer.learnParameters(miniGradient,

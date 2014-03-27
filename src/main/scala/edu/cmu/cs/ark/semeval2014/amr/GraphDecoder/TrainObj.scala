@@ -23,23 +23,26 @@ class TrainObj(val options : Map[Symbol, String]) extends edu.cmu.cs.ark.semeval
 
     private val labelset : Array[String] = getLabelset(options).map(x => x._1)  // we only need the labels, not determinism constrains
 
-    def decode(i: Int, weights: FeatureVector) : FeatureVector = {
+    def decode(i: Int, weights: FeatureVector) : (FeatureVector, Double) = {
         val decoder = Decoder(options)
         decoder.features.weights = weights
-        return decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).features
+        val result = decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i)))
+        return (result.features, result.score)
     }
 
-    def oracle(i: Int, weights: FeatureVector) : FeatureVector = {
+    def oracle(i: Int, weights: FeatureVector) : (FeatureVector, Double) = {
         val oracle = new Oracle(getFeatures(options), labelset)
         oracle.features.weights = weights
-        return oracle.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i))).features
+        val result = oracle.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i)))
+        return (result.features, result.score)
     }
 
-    def costAugmented(i: Int, weights: FeatureVector) : FeatureVector = {
+    def costAugmented(i: Int, weights: FeatureVector) : (FeatureVector, Double) = {
         val decoder = Decoder(options)
         val costAug = new CostAugmented(Decoder(options), options.getOrElse('trainingCostScale,"1.0").toDouble)
         costAug.features.weights = weights
-        return costAug.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i))).features
+        val result = costAug.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i)))
+        return (result.features, result.score)
     }
 
     def countPercepts(i: Int) : FeatureVector = {

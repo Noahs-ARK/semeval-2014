@@ -20,7 +20,7 @@ import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 abstract class Optimizer {
-    def learnParameters(gradient: (Int, FeatureVector) => FeatureVector,
+    def learnParameters(gradient: (Int, FeatureVector) => (FeatureVector, Double),
                         initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
@@ -28,11 +28,11 @@ abstract class Optimizer {
                         l2reg: Double,
                         noreg: List[String],
                         avg: Boolean) : FeatureVector = {
-        val myGrad : (Option[Int], Int, FeatureVector) => FeatureVector = (pass, i, w) => gradient(i,w)
+        val myGrad : (Option[Int], Int, FeatureVector) => (FeatureVector, Double) = (pass, i, w) => gradient(i,w)
         return learnParameters(myGrad, initialWeights, trainingSize, passes, stepsize, l2reg, noreg, (x: Int, w: FeatureVector) => true, avg)
     }
 
-    def learnParameters(gradient: (Int, FeatureVector) => FeatureVector,
+    def learnParameters(gradient: (Int, FeatureVector) => (FeatureVector, Double),
                         initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
@@ -41,11 +41,11 @@ abstract class Optimizer {
                         noreg: List[String],
                         trainingObserver: (Int, FeatureVector) => Boolean,
                         avg: Boolean) : FeatureVector = {
-        val myGrad : (Option[Int], Int, FeatureVector) => FeatureVector = (pass, i, w) => gradient(i,w)
+        val myGrad : (Option[Int], Int, FeatureVector) => (FeatureVector, Double) = (pass, i, w) => gradient(i,w)
         return learnParameters(myGrad, initialWeights, trainingSize, passes, stepsize, l2reg, noreg, trainingObserver, avg)
     }
 
-    def learnParameters(gradient: (Option[Int], Int, FeatureVector) => FeatureVector,              // Input: (pass, i, weights) Output: gradient
+    def learnParameters(gradient: (Option[Int], Int, FeatureVector) => (FeatureVector, Double),              // Input: (pass, i, weights) Output: (gradient, objective value)
                         initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
