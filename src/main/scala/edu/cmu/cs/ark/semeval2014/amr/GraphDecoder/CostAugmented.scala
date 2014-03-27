@@ -32,10 +32,11 @@ class CostAugmented(val decoder: Decoder, costScale: Double) extends Decoder {
         features.weights += costScale * addCost  // add costScale to edge weights that don't match oracle (penalie precision type errors)
         features.weights -= (2*costScale) * oracle.features.filter(x => x.startsWith("CA:")) // subtract costScale from ones that match (penalize recall type errors)
         val result = decoder.decode(Input(input.inputAnnotatedSentence, input.graph.duplicate.clearEdges))
+        val score = features.weights.dot(result.features)
         features.weights -= costScale * addCost  // undo the changes
         features.weights += (2*costScale) * oracle.features.filter(x => x.startsWith("CA:"))
         val feats = result.features.filter(x => !x.startsWith("CA:"))
-        return DecoderResult(result.graph, feats, features.weights.dot(feats))
+        return DecoderResult(result.graph, feats, score)
     }
 }
 
