@@ -66,7 +66,7 @@ class Adagrad extends Optimizer {
                     noregSaveValues.map(x => { weights.fmap(x._1) = x._2 })
                 }
             }
-            logger(0,"Avg objective value lass pass: "+(objective/trainingSize.toDouble).toString)
+            logger(0,"                                   Avg objective value lass pass: "+(objective/trainingSize.toDouble).toString)
             avg_weights += weights
             pass += 1
         }

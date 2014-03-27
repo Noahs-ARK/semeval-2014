@@ -61,7 +61,7 @@ class SSGD extends Optimizer {
             // Undo scaling trick
             weights *= scaling_trick
             scaling_trick = 1.0
-            logger(0,"Avg objective value lass pass: "+(objective/trainingSize.toDouble).toString)
+            logger(0,"                                                Avg objective value lass pass: "+(objective/trainingSize.toDouble).toString)
             avg_weights += weights
             i += 1
         }

@@ -88,17 +88,21 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
 
             // Compute gradients in splits
             logger(0, "Computing gradient")
+            var objective = 0.0
             var t = 0
             for (i <- 0 until splits.size) {
                 logger(0, "Split "+i.toString)
                 val myWeights = computeMyWeights(i, percepts(i))
                 for (j <- 0 until splits(i).size) {
-                    gradients(pass)(i) += gradient(None, t, myWeights)._1.filter(x => x != "Bias")
+                    val (grad, score) = gradient(None, t, myWeights)
+                    gradients(pass)(i) += grad.filter(x => x != "Bias")
+                    objective += score
                     t += 1
                 }
             }
             (0 until numSplits).map(j => totalGradients(pass) += gradients(pass)(j))
             totalGradients(pass).toFile(options('model) + ".iter" + pass.toString + ".gradient")
+            logger(0,"                                                 Current objective value: "+(objective/trainingSize.toDouble).toString)
 
             // Conditioning
             for (i <- 0 until splits.size) {
