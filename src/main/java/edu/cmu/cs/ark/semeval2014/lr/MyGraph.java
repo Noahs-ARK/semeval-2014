@@ -52,10 +52,11 @@ public class MyGraph {
 		
 		Arr.fill(g.isTop, false);
 		
-		int n = g.isPred.length;
+//		int n = g.isPred.length;
+        int n = sent.size();
 		double[] topnesses = new double[n];
 		
-		for (int i=0; i<n; i++) {
+		for (int i = 0; i < n; i++) {
 			if (!g.isPred[i]) {
 				topnesses[i] = -1e6;
 			}

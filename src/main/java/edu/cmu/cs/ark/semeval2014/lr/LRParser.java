@@ -159,6 +159,16 @@ public class LRParser {
 	private static void preprocessInputSentences(){
 		preprocessor.loadModels();
 		preprocessor.predictIntoInputs();
+//        GenerateGraphsAndVocab generateGAndV = null;
+//        try {
+//            generateGAndV = new GenerateGraphsAndVocab(sdpFile, doPcedtTreeProcess);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        graphMatrices = generateGAndV.getGraphMatrices();
+//        labelVocab = generateGAndV.getLabelVocab();
+//        preprocessor.predictAndPrintPrecisionAndRecall(graphMatrices, labelVocab);
+//        System.exit(0);
 		diagnosePruning();
 	}
 	
@@ -191,8 +201,8 @@ public class LRParser {
 		preprocessor.trainModels(labelVocab, graphMatrices);
 		preprocessor.predictIntoInputs();
 		// To print out the precision / recall / F1, place this call:
+
 		//preprocessor.predictAndPrintPrecisionAndRecall(graphMatrices, labelVocab);
-		
 		// build up label feature vocab
 		initializeLabelFeatureExtractors();
 		final Pair<Vocabulary, List<int[]>> vocabAndFeatsByLabel =
@@ -234,7 +244,7 @@ public class LRParser {
 		return Pair.makePair(labelFeatVocab, featsByLabel);
 	}
 
-	private static boolean badDistance(int i, int j) {
+	public static boolean badDistance(int i, int j) {
 		return i==j || Math.abs(i-j) > maxEdgeDistance;
 	}
 	public static boolean badPair(InputAnnotatedSentence sent, int i, int j) {
@@ -554,8 +564,8 @@ public class LRParser {
             g = ChuLiuEdmondsDecoder.decodeEdgeProbsToGraph(sent, edgeProbs, model.labelVocab);
         } else {
             g = MyGraph.decodeEdgeProbsToGraph(sent, edgeProbs, model.labelVocab, true);
+            MyGraph.decideTops(g, sent);
         }
-	    MyGraph.decideTops(g, sent);
 	    return g;
 	}
 
