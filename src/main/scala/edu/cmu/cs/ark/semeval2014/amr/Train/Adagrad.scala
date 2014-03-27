@@ -67,6 +67,7 @@ class Adagrad extends Optimizer {
                 }
             }
             logger(0,"                                   Avg objective value lass pass: "+(objective/trainingSize.toDouble).toString)
+            logger(0,"                                                       objective: "+((0 until trainingSize).map(x => gradient(None, x, weights)._2).sum/trainingSize).toString)
             avg_weights += weights
             pass += 1
         }

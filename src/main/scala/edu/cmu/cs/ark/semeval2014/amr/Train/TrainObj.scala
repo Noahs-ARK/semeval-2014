@@ -50,7 +50,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     }
 
     if (options.getOrElse('trainingMiniBatchSize,"1").toInt > 1) {
-        optimizer = new MiniBatch(optimizer, options.getOrElse('trainingMiniBatchSize,"1").toInt)
+        optimizer = new MiniBatch(optimizer, options('trainingMiniBatchSize).toInt)
     }
 
 /*  Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -126,6 +126,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
             List("Bias"),   // don't regularize the bias terms
             (p, w) => true,
             avg = false)
+        logger(0, "weights l2 = "+weights.l2norm.toString)
         var file = new java.io.PrintWriter(new java.io.File(options('model)+".pretrain"), "UTF-8")
         try { file.print(weights.toString) }
         finally { file.close }
@@ -136,7 +137,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
             inputGraphs.size - preTrainSize,
             passes,
             stepsize,
-            options.getOrElse('trainingL2RegularizerStrength, "0.0").toDouble,
+            0.0,
             List("Bias"),   // don't regularize the bias terms
             trainingObserver,
             avg = false)
