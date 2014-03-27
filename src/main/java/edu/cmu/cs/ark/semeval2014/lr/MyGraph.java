@@ -1,6 +1,8 @@
 package edu.cmu.cs.ark.semeval2014.lr;
 
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
+import sdp.graph.Edge;
+import sdp.graph.Graph;
 import util.Arr;
 import util.Vocabulary;
 import util.misc.Triple;
@@ -17,6 +19,7 @@ public class MyGraph {
 	
 	List< Triple<Integer,Integer,String> > edgelist;
 	String[][] edgeMatrix;
+
 	MyGraph(int sentenceLength, List<Triple<Integer, Integer, String>> _edgelist) {
 		edgelist = _edgelist;
 		isChildOfSomething = new boolean[sentenceLength];
@@ -30,7 +33,15 @@ public class MyGraph {
 			isChildOfSomething[j] = true;
 		}
 	}
-	
+
+    public static MyGraph fromGraph(Graph g) {
+        final List<Triple<Integer, Integer, String>> edgeList = new ArrayList<>();
+        for (Edge e : g.getEdges()) {
+            edgeList.add(new Triple<>(e.source, e.target, e.label));
+        }
+        return new MyGraph(g.getNNodes(), edgeList);
+    }
+
 	public static void decideTopsStupid(MyGraph g, InputAnnotatedSentence sent) {
 		for (int i=0; i<g.isPred.length; i++) {
 			g.isTop[i] = !g.isChildOfSomething[i] && g.isPred[i];

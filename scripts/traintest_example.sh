@@ -2,12 +2,13 @@
 set -eu
 
 model_name="mymodel"
-feature_opts=""
+feature_opts="-doPcedtTreeProcess"
 model_dir="bladir"
 mkdir -p "${model_dir}"
 model_file="${model_dir}/${model_name}"
 
-formalism="pas"
+#formalism="pas"
+formalism="pcedt"
 data_dir="lildata/lil"
 train_file="${data_dir}train.${formalism}.sdp"
 train_deps="${train_file}.dependencies"

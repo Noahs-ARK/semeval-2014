@@ -1,44 +1,31 @@
 package edu.cmu.cs.ark.semeval2014.lr;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import util.U;
-import util.Vocabulary;
-import util.misc.Pair;
-
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-
 import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
-import edu.cmu.cs.ark.semeval2014.lr.fe.BasicFeatures;
+import edu.cmu.cs.ark.semeval2014.lr.fe.*;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.DmFe;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PasFe;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PassThroughFe;
 import edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.PcedtFE;
-import edu.cmu.cs.ark.semeval2014.lr.fe.CoarseDependencyFeatures;
-import edu.cmu.cs.ark.semeval2014.lr.fe.DependencyPathv1;
-import edu.cmu.cs.ark.semeval2014.lr.fe.FE;
-import edu.cmu.cs.ark.semeval2014.lr.fe.InMemoryNumberizedFeatureAdder;
-import edu.cmu.cs.ark.semeval2014.lr.fe.LinearOrderFeatures;
-import edu.cmu.cs.ark.semeval2014.lr.fe.SubcatSequenceFE;
-import edu.cmu.cs.ark.semeval2014.lr.fe.UnlabeledDepFE;
 import edu.cmu.cs.ark.semeval2014.prune.Prune;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
 import edu.cmu.cs.ark.semeval2014.util.GenerateGraphsAndVocab;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
+import util.U;
+import util.Vocabulary;
+import util.misc.Pair;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /*
  * Dimensionality strategies.
@@ -103,7 +90,9 @@ public class LRParser {
 	static int numIters = 30;
     @Parameter(names="-shuffle", description="Randomly shuffle the training data -- note that with feature cache, it will use same order every iter.")
     static boolean shuffle=false;
-    
+    @Parameter(names="-doPcedtTreeProcess",
+            description="before training, preprocess PCEDT graphs to be deterministic trees. after prediction, postprocess them back.")
+    static boolean doPcedtTreeProcess = false;
     @Parameter(names="-useHashing", description="only specify this when training. at testtime, whether it's a hash-based model is detected from the model file.")
     static boolean useHashing = false;
     @Parameter(names="-numHashBuckets", description="only specify this when training. at testtime, this is read from the model file.  ---  Note mem usage is 4 times higher than this, so maybe use 1e9 on a server?")
@@ -191,7 +180,7 @@ public class LRParser {
 		
 		U.pf("Reading graphs from %s\n", sdpFile);
 		
-		GenerateGraphsAndVocab generateGAndV = new GenerateGraphsAndVocab(sdpFile);
+		GenerateGraphsAndVocab generateGAndV = new GenerateGraphsAndVocab(sdpFile, doPcedtTreeProcess);
 		graphMatrices = generateGAndV.getGraphMatrices();
 		labelVocab = generateGAndV.getLabelVocab();
 		
@@ -559,10 +548,14 @@ public class LRParser {
 	}
 	
 	public static MyGraph decodeToGraph(InputAnnotatedSentence sent, NumberizedSentence ns) {
-	    MyGraph g = MyGraph.decodeEdgeProbsToGraph(
-	    		sent, model.inferEdgeProbs(ns,sent), model.labelVocab, true);
+        final double[][][] edgeProbs = model.inferEdgeProbs(ns, sent);
+        MyGraph g;
+        if (doPcedtTreeProcess) {
+            g = ChuLiuEdmondsDecoder.decodeEdgeProbsToGraph(sent, edgeProbs, model.labelVocab);
+        } else {
+            g = MyGraph.decodeEdgeProbsToGraph(sent, edgeProbs, model.labelVocab, true);
+        }
 	    MyGraph.decideTops(g, sent);
-//	    MyGraph.decideTopsStupid(g, sent);
 	    return g;
 	}
 
