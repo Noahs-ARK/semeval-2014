@@ -59,6 +59,9 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
         val totalGradients : Array[FeatureVector] = Array.fill(passes)(FeatureVector(labelset))
         val totalGradientNorm : Array[Option[Double]] = Array.fill(passes)(None)
         val percepts : Array[FeatureVector] = splits.map(x => FeatureVector(labelset))
+        if (initialWeights.l2norm != 0.0) {
+            initialWeights *= (1000. / initialWeights.l2norm)
+        }
         logger(0, "Computing percepts")
         for (t <- 0 until trainingSize) {
             logger(0, "t="+t.toString)
@@ -122,7 +125,7 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                 val myNorm = myGradient.l2norm
                 for (p <- 0 to pass) {
                     logger(0, "p="+(totalGradients(p).dot(myGradient) / (totalGradientNorm(p).get * myNorm )).toString)
-                    alphas(p) -= stepsize * 1.0 * (totalGradients(p).dot(myGradient)/(totalGradientNorm(p).get)) / sqrt(ex+1.0)
+                    alphas(p) -= stepsize * 10.0 * (totalGradients(p).dot(myGradient)/(totalGradientNorm(p).get)) / sqrt(ex+1.0)
                 }
                 //denseWeights -= (stepsize * 1000000000.0 /* / sqrt(ex+1.0) */ ) * denseGradient
                 denseWeights -= (stepsize * 1.0 / sqrt(ex+1.0) ) * denseGradient

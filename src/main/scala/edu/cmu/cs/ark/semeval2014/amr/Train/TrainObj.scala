@@ -90,10 +90,48 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     }
 
     def train(initialWeights: FeatureVector) {
-        val weights = optimizer.learnParameters(
-            (i,w) => gradient(i,w),
-            initialWeights,
-            inputGraphs.size,
+        if (options.getOrElse('trainingOptimizer, "Adagrad") == "HOLS") {
+            trainHOLS(initialWeights, 100)
+        } else {
+            val weights = optimizer.learnParameters(
+                (i,w) => gradient(i,w),
+                initialWeights,
+                inputGraphs.size,
+                passes,
+                stepsize,
+                options.getOrElse('trainingL2RegularizerStrength, "0.0").toDouble,
+                List("Bias"),   // don't regularize the bias terms
+                trainingObserver,
+                avg = false)
+            System.err.print("Writing out weights... ")
+            val file = new java.io.PrintWriter(new java.io.File(options('model)), "UTF-8")
+            try { file.print(weights.toString) }
+            finally { file.close }
+            System.err.println("done")
+        }
+    }
+
+    def trainHOLS(initialWeights: FeatureVector, preTrainSize: Int) {
+        var weights = initialWeights
+        logger(0, "*********** HOLS pre-training with Adagrad ************")
+        weights = (new Adagrad()).learnParameters(
+            (i, w) => gradient(i, w),
+            weights,
+            preTrainSize,
+            10,
+            stepsize,
+            0.0,
+            List("Bias"),   // don't regularize the bias terms
+            (p, w) => true,
+            avg = false)
+        var file = new java.io.PrintWriter(new java.io.File(options('model)+".pretrain"), "UTF-8")
+        try { file.print(weights.toString) }
+        finally { file.close }
+
+        weights = optimizer.learnParameters(
+            (i, w) => gradient(i + preTrainSize, w),
+            weights,
+            inputGraphs.size - preTrainSize,
             passes,
             stepsize,
             options.getOrElse('trainingL2RegularizerStrength, "0.0").toDouble,
@@ -101,7 +139,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
             trainingObserver,
             avg = false)
         System.err.print("Writing out weights... ")
-        val file = new java.io.PrintWriter(new java.io.File(options('model)), "UTF-8")
+        file = new java.io.PrintWriter(new java.io.File(options('model)), "UTF-8")
         try { file.print(weights.toString) }
         finally { file.close }
         System.err.println("done")
