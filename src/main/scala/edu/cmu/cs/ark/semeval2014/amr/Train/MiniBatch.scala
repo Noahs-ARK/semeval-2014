@@ -37,7 +37,7 @@ class MiniBatch(optimizer: Optimizer, miniBatchSize: Int) extends Optimizer {
         val miniGradient : (Option[Int], Int, FeatureVector) => (FeatureVector, Double) = (pass, i, weights) => {
             assert(i < numMiniBatches, "MiniBatch optimizer mini-batch index too large")
             val par = Range(i*miniBatchSize, min((i+1)*miniBatchSize, trainingSize)).par
-            par.tasksupport = new ForkJoinTaskSupport(new ForkJoinPool(4))
+            par.tasksupport = new ForkJoinTaskSupport(new ForkJoinPool(20))
             if (pass != None) {
                 par.map(x => gradient(None, trainShuffle(pass.get)(x), weights)).reduce((a, b) => ({ a._1 += b._1; a._1 }, a._2 + b._2))
             } else {

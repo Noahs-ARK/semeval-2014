@@ -129,5 +129,13 @@ object SDPGraph {
         }
         return SDPGraph(nodeArray.filter(_ != None).map(_.get))
     }
+
+    def evaluate(graph: SDPGraph, goldGraph: SDPGraph) : (Double, Double, Double) = {
+        val goldEdges : scala.collection.immutable.Set[(String, String, String)] = (goldGraph.nodes :\ List[(String, String, String)]())((x : Node, xs : List[(String, String, String)]) => (x.relations.map(y => (x.id, y._1, y._2.id)) ::: xs)).toSet
+        val num_correct = graph.nodes.map(x => x.relations.count(e => goldEdges.contains((x.id, e._1, e._2.id)))).sum.toDouble
+        val num_predicted = graph.nodes.map(x => x.relations.size).sum.toDouble
+        val num_gold = goldGraph.nodes.map(x => x.relations.size).sum.toDouble
+        return (num_correct, num_predicted, num_gold)
+    }
 }
 

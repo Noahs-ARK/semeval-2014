@@ -29,6 +29,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     def costAugmented(i: Int, weights: FeatureVector, scale: Double) : (FeatureVector, Double)
     def countPercepts(i: Int) : FeatureVector
     def train : Unit
+    def f1SufficientStatistics(i: Int, weights: FeatureVector) : (Double, Double, Double)
 
     ////////////////// Training Setup ////////////////
 
@@ -45,9 +46,11 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     var oracleGraphs = Input.loadSDPGraphs(options, oracle = true)
     assert(inputAnnotatedSentences.size == inputGraphs.size && inputGraphs.size == oracleGraphs.size, "sdp and dep file lengths do not match")
 
+    val HOLSPreTrainSize = 100
+
     var optimizer: Optimizer = options.getOrElse('trainingOptimizer, "Adagrad") match {
         case "Adagrad" => new Adagrad()
-        case "HOLS" => new HOLS(options, (x,y) => countPercepts(y), inputGraphs.size)
+        case "HOLS" => new HOLS(options, (x,y) => countPercepts(y), (i, w) => f1SufficientStatistics(i+HOLSPreTrainSize,w), inputGraphs.size-HOLSPreTrainSize)
         case "SSGD" => new SSGD()
         case x => { System.err.println("Error: unknown training optimizer " + x); sys.exit(1) }
     }
@@ -135,7 +138,7 @@ abstract class TrainObj(options: Map[Symbol, String])  {
 
     def train(initialWeights: FeatureVector) {
         if (options.getOrElse('trainingOptimizer, "Adagrad") == "HOLS") {
-            trainHOLS(initialWeights, 100)
+            trainHOLS(initialWeights, HOLSPreTrainSize)
         } else {
             val weights = optimizer.learnParameters(
                 (i,w) => gradient(i,w),

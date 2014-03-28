@@ -16,6 +16,7 @@ import scala.collection.mutable.Set
 import scala.collection.mutable.ArrayBuffer
 import scala.util.parsing.combinator._
 import edu.cmu.cs.ark.semeval2014.amr._
+import edu.cmu.cs.ark.semeval2014.amr.graph._
 import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
@@ -52,6 +53,19 @@ class TrainObj(val options : Map[Symbol, String]) extends edu.cmu.cs.ark.semeval
 
     def train {
         train(FeatureVector(labelset))
+    }
+
+    def f1SufficientStatistics(i: Int, weights: FeatureVector) : (Double, Double, Double) = {
+        // returns (num_correct, num_predicted, num_gold)
+        val decoder = Decoder(options)
+        decoder.features.weights = weights
+        val result = decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i)))
+        
+        val oracle = new Oracle(getFeatures(options), labelset)
+        oracle.features.weights = weights
+        val oracleResult = oracle.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i)))
+
+        return SDPGraph.evaluate(result.graph.asInstanceOf[SDPGraph], oracleResult.graph.asInstanceOf[SDPGraph])
     }
 }
 

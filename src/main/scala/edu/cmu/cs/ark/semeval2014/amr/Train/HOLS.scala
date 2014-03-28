@@ -22,7 +22,11 @@ import scala.collection.parallel._
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.forkjoin.ForkJoinPool
 
-class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => FeatureVector, fullTrainingSize: Int) extends Optimizer {
+class HOLS(options: Map[Symbol, String],
+           countPercepts: (Option[Int], Int) => FeatureVector,
+           f1SufficientStatistics: (Int, FeatureVector) => (Double, Double, Double),
+           fullTrainingSize: Int) extends Optimizer {
+
     def countPerceptsParallel(t: Int) : FeatureVector = {
         val miniBatchSize = options.getOrElse('trainingMiniBatchSize,"1").toInt
         if (miniBatchSize <= 1) {
@@ -32,6 +36,22 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
             //par.tasksupport = new ForkJoinTaskSupport(new ForkJoinPool(4))
             par.map(x => countPercepts(None, t)).reduce((a, b) => { a += b; a })
         }
+    }
+
+    def eval(t: Int, w: FeatureVector) : (Double, Double, Double) = {
+        val miniBatchSize = options.getOrElse('trainingMiniBatchSize,"1").toInt
+        val (c,pr,g) = if (miniBatchSize <= 1) {
+            f1SufficientStatistics(t, w)
+        } else {
+            val par = Range(t*miniBatchSize, min((t+1)*miniBatchSize, fullTrainingSize)).par
+            //par.tasksupport = new ForkJoinTaskSupport(new ForkJoinPool(4))
+            par.map(x => f1SufficientStatistics(x,w)).reduce((a, b) => { (a._1+b._1, a._2+b._2, a._3+b._3) })
+        }
+        val prec = c/pr
+        val recall = c/g
+        //logger(0, "prec = "+prec.toString)
+        //logger(0, "recall = "+recall.toString)
+        return (prec, recall, 2.0*prec*recall/(prec+recall))
     }
 
     def learnParameters(gradient: (Option[Int], Int, FeatureVector) => (FeatureVector, Double),
@@ -130,19 +150,39 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                     totalGradients(p) -= gradients(p)(split)
                 }
                 var myGradient = gradient(None, t, computeMyWeights(split, countPercepts(None,t)))._1
+                logger(0, "F1 = "+eval(t, computeMyWeights(split, countPercepts(None,t)))._3.toString)
                 val denseGradient = FeatureVector(myGradient.labelset, TrieMap("Bias" -> myGradient.fmap("Bias").clone))  // DO THIS BEFORE CONDITIONING
                 myGradient.fmap("Bias") = ValuesMap()
 //                myGradient.dotDivide(counts)            // divide by percept count
                 val myNorm = myGradient.l2norm
+
+                def finiteDifferencesGrad(delta: Double) : Array[Double] = {
+                    var grad = Array.fill(alphas.size)(0.0)
+                    val f0 = eval(t, computeMyWeights(split, countPercepts(None,t)))._3
+                    for (i <- 0 to pass) {
+                        alphas(i) -= delta
+                        val f1 = eval(t, computeMyWeights(split, countPercepts(None,t)))._3
+                        grad(i) = (f1-f0)/(-delta)
+                        alphas(i) += delta
+                        logger(0, "difference = " + (f1-f0).toString) // TODO: adjust stepsize if diff too small
+                    }
+                    logger(0, "                                 grad = "+grad.toList.toString)
+                    grad
+                }
+
+                val finiteGrad = finiteDifferencesGrad(.01)
+
                 for (p <- 0 to pass) {
-                    logger(0, "p="+(totalGradients(p).dot(myGradient) / (totalGradientNorm(p).get * myNorm )).toString)
+//                    logger(0, "p="+(totalGradients(p).dot(myGradient) / (totalGradientNorm(p).get * myNorm )).toString)
 //                    alphas(p) -= stepsize * 0.01 * (totalGradients(p).dot(myGradient)/(totalGradientNorm(p).get)) / sqrt(ex+1.0)  // worked for Perceptron
-                    alphas(p) -= stepsize * 10.0 * (totalGradients(p).dot(myGradient)/(totalGradientNorm(p).get)) / sqrt(ex+1.0)
+                    //alphas(p) -= stepsize * 10.0 * (totalGradients(p).dot(myGradient)/(totalGradientNorm(p).get)) / sqrt(ex+1.0)
+                    alphas(p) += stepsize * 1.0 * finiteGrad(p) / sqrt(ex+1.0)  // + b.c. we want to maximize
+                    //alphas(p) += stepsize * .01 * finiteGrad(p) // sqrt(ex+1.0)  // + b.c. we want to maximize
                 }
                 //denseWeights -= (stepsize * 1000000000.0 /* / sqrt(ex+1.0) */ ) * denseGradient
                 //denseWeights -= (stepsize * 1. / sqrt(ex+1.0) ) * denseGradient  // worked for Perceptron
-                denseWeights -= (stepsize * 100. / sqrt(ex+1.0) ) * denseGradient
-                logger(0, "dense:" + denseWeights.toString.split("\n").head)
+                //denseWeights -= (stepsize * 10. / sqrt(ex+1.0) ) * denseGradient // ramp losses
+//                logger(0, "dense:" + denseWeights.toString.split("\n").head)
                 for (p <- 0 to pass) {
                     totalGradients(p) += gradients(p)(split)
                 }
