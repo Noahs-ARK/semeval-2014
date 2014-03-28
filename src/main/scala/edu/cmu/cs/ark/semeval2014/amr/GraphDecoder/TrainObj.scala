@@ -37,7 +37,7 @@ class TrainObj(val options : Map[Symbol, String]) extends edu.cmu.cs.ark.semeval
         return (result.features, result.score)
     }
 
-    def costAugmented(i: Int, weights: FeatureVector) : (FeatureVector, Double) = {
+    def costAugmented(i: Int, weights: FeatureVector, scale: Double) : (FeatureVector, Double) = {
         val decoder = Decoder(options)
         val costAug = new CostAugmented(Decoder(options), options.getOrElse('trainingCostScale,"1.0").toDouble)
         costAug.features.weights = weights

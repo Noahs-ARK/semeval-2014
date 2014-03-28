@@ -15,15 +15,18 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.Set
 import scala.collection.mutable.ArrayBuffer
 import edu.cmu.cs.ark.semeval2014.amr._
+import edu.cmu.cs.ark.semeval2014.amr.graph._
 import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 import edu.cmu.cs.ark.semeval2014.utils._
+import scala.concurrent.forkjoin.ForkJoinPool
+import scala.collection.parallel._
 
 abstract class TrainObj(options: Map[Symbol, String])  {
 
     def decode(i: Int, weights: FeatureVector) : (FeatureVector, Double)
     def oracle(i: Int, weights: FeatureVector) : (FeatureVector, Double)
-    def costAugmented(i: Int, weights: FeatureVector) : (FeatureVector, Double)
+    def costAugmented(i: Int, weights: FeatureVector, scale: Double) : (FeatureVector, Double)
     def countPercepts(i: Int) : FeatureVector
     def train : Unit
 
@@ -32,14 +35,14 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     val passes = options.getOrElse('trainingPasses, "30").toInt
     val stepsize = options.getOrElse('trainingStepsize, "1.0").toDouble
     val regularizerStrength = options.getOrElse('trainingRegularizerStrength, "0.0").toDouble
-    val loss = options.getOrElse('trainingLoss, "SVM")
+    var loss = options.getOrElse('trainingLoss, "SVM")
     if (!options.contains('model)) {
         System.err.println("Error: No model filename specified"); sys.exit(1)
     }
 
-    val inputAnnotatedSentences = Input.loadInputAnnotatedSentences(options)
-    val inputGraphs = Input.loadSDPGraphs(options, oracle = false)
-    val oracleGraphs = Input.loadSDPGraphs(options, oracle = true)
+    var inputAnnotatedSentences = Input.loadInputAnnotatedSentences(options)
+    var inputGraphs = Input.loadSDPGraphs(options, oracle = false)
+    var oracleGraphs = Input.loadSDPGraphs(options, oracle = true)
     assert(inputAnnotatedSentences.size == inputGraphs.size && inputGraphs.size == oracleGraphs.size, "sdp and dep file lengths do not match")
 
     var optimizer: Optimizer = options.getOrElse('trainingOptimizer, "Adagrad") match {
@@ -66,14 +69,30 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     /////////////////////////////////////////////////
 
     def gradient(i: Int, weights: FeatureVector) : (FeatureVector, Double) = {
+        val scale = options.getOrElse('trainingCostScale,"1.0").toDouble
         if (loss == "Perceptron") {
             val (grad, score) = decode(i, weights)
             val o = oracle(i, weights)
             grad -= o._1
             (grad, score - o._2)
         } else if (loss == "SVM") {
-            val (grad, score) = costAugmented(i, weights)
+            val (grad, score) = costAugmented(i, weights, scale)
             val o = oracle(i, weights)
+            grad -= o._1
+            (grad, score - o._2)
+        } else if (loss == "Ramp1") {
+            val (grad, score) = costAugmented(i, weights, scale)
+            val o = decode(i, weights)
+            grad -= o._1
+            (grad, score - o._2)
+        } else if (loss == "Ramp2") {
+            val (grad, score) = decode(i, weights)
+            val o = costAugmented(i, weights, -1.0 * scale)
+            grad -= o._1
+            (grad, score - o._2)
+        } else if (loss == "Ramp3") {
+            val (grad, score) = costAugmented(i, weights, scale)
+            val o = costAugmented(i, weights, -1.0 * scale)
             grad -= o._1
             (grad, score - o._2)
         } else {
@@ -88,7 +107,30 @@ abstract class TrainObj(options: Map[Symbol, String])  {
             try { file.print(weights.toString) }
             finally { file.close }
         }
+        evalDev(weights)
         return true
+    }
+
+    def evalDev(weights: FeatureVector) {   // TODO: doesn't account for regularizer
+        val devfile = "data/splits/sec20.pcedt.sdp"
+        val (iASSave, iGSave, oGSave) = (inputAnnotatedSentences, inputGraphs, oracleGraphs)
+        inputAnnotatedSentences = Corpus.getInputAnnotatedSentences(devfile+".dependencies")
+        inputGraphs = Corpus.splitOnNewline(fromFile(devfile, "utf-8").getLines).map(
+            x => SDPGraph.fromGold(x.split("\n"), true)).toArray
+        oracleGraphs = Corpus.splitOnNewline(fromFile(devfile, "utf-8").getLines).map(
+            x => SDPGraph.fromGold(x.split("\n"), false)).toArray
+        assert(inputAnnotatedSentences.size == inputGraphs.size && inputGraphs.size == oracleGraphs.size, "sdp and dep file lengths do not match")
+
+        //val numThreads = options.getOrElse('numThreads,"1").toInt
+        val par = Range(0, inputAnnotatedSentences.size).par
+        par.tasksupport = new ForkJoinTaskSupport(new ForkJoinPool(20)) // TODO: use numThread option
+        val loss = par.map(i => gradient(i, weights)).reduce((a, b) => ({ a._1 += b._1; a._1 }, a._2 + b._2))._2 / inputAnnotatedSentences.size.toDouble
+    
+        logger(0, "Dev loss: " + loss.toString)
+
+        inputAnnotatedSentences = iASSave
+        inputGraphs = iGSave
+        oracleGraphs = oGSave
     }
 
     def train(initialWeights: FeatureVector) {
@@ -116,6 +158,8 @@ abstract class TrainObj(options: Map[Symbol, String])  {
     def trainHOLS(initialWeights: FeatureVector, preTrainSize: Int) {
         var weights = initialWeights
         logger(0, "*********** HOLS pre-training with Adagrad ************")
+        val lossSave = loss
+        loss = "Perceptron"
         weights = (new Adagrad()).learnParameters(
             (i, w) => gradient(i, w),
             weights,
@@ -130,6 +174,9 @@ abstract class TrainObj(options: Map[Symbol, String])  {
         var file = new java.io.PrintWriter(new java.io.File(options('model)+".pretrain"), "UTF-8")
         try { file.print(weights.toString) }
         finally { file.close }
+        loss = lossSave
+
+        evalDev(weights)
 
         weights = optimizer.learnParameters(
             (i, w) => gradient(i + preTrainSize, w),

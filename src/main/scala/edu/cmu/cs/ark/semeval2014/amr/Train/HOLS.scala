@@ -43,10 +43,9 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
                         noreg: List[String],
                         trainingObserver: (Int, FeatureVector) => Boolean,
                         avg: Boolean) : FeatureVector = {
-        logger(0, "weights l2 = "+initialWeights.l2norm.toString)
-        logger(0, "initialObjective = "+((0 until trainingSize).map(x => gradient(None, x, initialWeights)._2).sum / (trainingSize.toDouble*options.getOrElse('trainingMiniBatchSize,"1").toDouble)).toString)
+        //logger(0, "weights l2 = "+initialWeights.l2norm.toString)
+        //logger(0, "initialObjective = "+((0 until trainingSize).map(x => gradient(None, x, initialWeights)._2).sum / (trainingSize.toDouble*options.getOrElse('trainingMiniBatchSize,"1").toDouble)).toString)
         val splitSize = 5
-        val stepsize = .00001
         val numSplits : Int = ceil(trainingSize.toDouble / splitSize.toDouble).toInt
         logger(0, "numSplits = " + numSplits.toString)
         val labelset = initialWeights.labelset
@@ -65,13 +64,13 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
         if (initialWeights.l2norm != 0.0) {
             initialWeights *= (1000. / initialWeights.l2norm)
         }
-        logger(0, "weights re-adjusted to l2 = "+initialWeights.l2norm.toString)
-        logger(0, "initialObjective = "+((0 until trainingSize).map(x => gradient(None, x, initialWeights)._2).sum / (trainingSize.toDouble*options.getOrElse('trainingMiniBatchSize,"1").toDouble)).toString)
-        logger(0, "Computing percepts")
+        //logger(0, "weights re-adjusted to l2 = "+initialWeights.l2norm.toString)
+        //logger(0, "initialObjective = "+((0 until trainingSize).map(x => gradient(None, x, initialWeights)._2).sum / (trainingSize.toDouble*options.getOrElse('trainingMiniBatchSize,"1").toDouble)).toString)
+/*        logger(0, "Computing percepts")
         for (t <- 0 until trainingSize) {
 //            logger(0, "t="+t.toString)
             percepts(getSplit(t)) += countPerceptsParallel(t)
-        }
+        } */
         logger(0, "Total percept count")
         val counts = FeatureVector(labelset)
         percepts.map(x => counts += x)
@@ -125,7 +124,7 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
             var ex = 0
             for (n <- 0 until 1) {
               for (t <- Random.shuffle(Range(0, trainingSize).toList)) {
-//                logger(0, "example="+ex.toString)
+                logger(0, "example="+ex.toString)
                 val split = getSplit(t)
                 for (p <- 0 to pass) {
                     totalGradients(p) -= gradients(p)(split)
@@ -136,16 +135,18 @@ class HOLS(options: Map[Symbol, String], countPercepts: (Option[Int], Int) => Fe
 //                myGradient.dotDivide(counts)            // divide by percept count
                 val myNorm = myGradient.l2norm
                 for (p <- 0 to pass) {
-//                    logger(0, "p="+(totalGradients(p).dot(myGradient) / (totalGradientNorm(p).get * myNorm )).toString)
+                    logger(0, "p="+(totalGradients(p).dot(myGradient) / (totalGradientNorm(p).get * myNorm )).toString)
+//                    alphas(p) -= stepsize * 0.01 * (totalGradients(p).dot(myGradient)/(totalGradientNorm(p).get)) / sqrt(ex+1.0)  // worked for Perceptron
                     alphas(p) -= stepsize * 10.0 * (totalGradients(p).dot(myGradient)/(totalGradientNorm(p).get)) / sqrt(ex+1.0)
                 }
                 //denseWeights -= (stepsize * 1000000000.0 /* / sqrt(ex+1.0) */ ) * denseGradient
-                denseWeights -= (stepsize * 1.0 / sqrt(ex+1.0) ) * denseGradient
-//                logger(0, "dense:" + denseWeights.toString.split("\n").head)
+                //denseWeights -= (stepsize * 1. / sqrt(ex+1.0) ) * denseGradient  // worked for Perceptron
+                denseWeights -= (stepsize * 100. / sqrt(ex+1.0) ) * denseGradient
+                logger(0, "dense:" + denseWeights.toString.split("\n").head)
                 for (p <- 0 to pass) {
                     totalGradients(p) += gradients(p)(split)
                 }
-//                logger(0, "alphas="+alphas.toList.toString)
+                logger(0, "alphas="+alphas.toList.toString)
                 ex += 1
               }
             }
