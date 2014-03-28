@@ -13,11 +13,12 @@ mkdir -p "${reports_dir}"
 (cd $(dirname $reports_dir) && ln -sf $(basename $reports_dir) reports)
 echo "REPORTS DIR: ${reports_dir}"
 word_vectors="resources/word_vectors_norm.txt"
+outputFeatsToFile="featsForRF"
 
 
 archive_dir=/cab0/brendano/www/semeval/reports
 
-for formalism in "pas" "dm" "pcedt"
+for formalism in "pas" #"dm" "pcedt"
 do
     model_name="${formalism}_med_model"
     model_file="${model_dir}/${model_name}"
@@ -31,18 +32,20 @@ do
 
     pred_file="${model_file}.pred.${formalism}.sdp"
     trainpred_file="${model_file}.trainpred.${formalism}.sdp"
+    randomForestTrainPredsLoc="edge_example_dataset/${formalism}.medtrain.train.output"
+    randomForestTestPredsLoc="edge_example_dataset/${formalism}.medtrain.test.output"
 
     set -x
     (
-    ./java.sh lr.LRParser -mode train -saveEvery -1 \
-      -formalism $formalism \
-      -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts} -wordVectors ${word_vectors}
+#	    ./java.sh lr.LRParser -mode train -saveEvery -1 \
+#      -formalism $formalism \
+#      -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts} -wordVectors ${word_vectors} -numIters 1 -randomForestPredsLoc ${randomForestTrainPredsLoc}
+#    ./java.sh lr.LRParser -mode test \
+#      -formalism $formalism \
+#      -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts} -wordVectors ${word_vectors} -randomForestPredsLoc ${randomForestTestPredsLoc}
     ./java.sh lr.LRParser -mode test \
       -formalism $formalism \
-      -model ${model_file} -sdpOutput ${pred_file} -depInput ${test_deps} ${feature_opts} -wordVectors ${word_vectors}
-    ./java.sh lr.LRParser -mode test \
-      -formalism $formalism \
-      -model ${model_file} -sdpOutput ${trainpred_file} -depInput ${train_deps} ${feature_opts} -wordVectors ${word_vectors}
+      -model ${model_file} -sdpOutput ${trainpred_file} -depInput ${train_deps} ${feature_opts} -wordVectors ${word_vectors} -randomForestPredsLoc ${randomForestTrainPredsLoc}
     ./scripts/eval.sh "${test_file}" "${pred_file}" | tee "${reports_dir}/${model_name}.eval.log"
     ./scripts/eval.sh "${train_file}" "${trainpred_file}" | tee "${reports_dir}/${model_name}.train.eval.log"
     ./scripts/eval_to_csv.py < "${reports_dir}/${model_name}.eval.log" > "${reports_dir}/${model_name}.eval.csv"

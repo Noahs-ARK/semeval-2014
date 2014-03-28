@@ -9,6 +9,7 @@ import edu.cmu.cs.ark.semeval2014.ParallelParser;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.*;
 import edu.cmu.cs.ark.semeval2014.prune.Prune;
+import edu.cmu.cs.ark.semeval2014.prune.RandomForestPredictions;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
 import edu.cmu.cs.ark.semeval2014.util.GenerateGraphsAndVocab;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
@@ -123,6 +124,8 @@ public class LRParser {
 	static String outputFeatsToDiskForRF = "";
     @Parameter(names="-wordVectors", required=true)
 	static String wordVecFile;
+    @Parameter(names="-randomForestPredsLoc", required=false)
+	static String randomForestPredsLoc = "";
     
 
     
@@ -150,6 +153,9 @@ public class LRParser {
 		
 		wordToVector = WordVectors.loadWordVectors(wordVecFile);
 		preprocessor = new Prune(inputSentences, modelFile);
+		
+		if (!randomForestPredsLoc.equals(""))
+			RandomForestPredictions.add(inputSentences,randomForestPredsLoc);
 
 		if (mode.equals("train")) {
 			topClassifier.train(depFile, modelFile + ".topmodel");
@@ -159,6 +165,9 @@ public class LRParser {
 			topClassifier.loadModel(modelFile + ".topmodel");
 			model = Model.load(modelFile);
 			preprocessInputSentences();
+			if (!outputFeatsToDiskForRF.equals(""))
+				printDataset();
+		//	System.exit(1);
 			U.pf("Writing predictions to %s\n", sdpFile);
 			double t0, dur;
 			t0 = System.currentTimeMillis();
@@ -455,29 +464,36 @@ public class LRParser {
     		
     	}
     }
-    
+   
 	private static void printDataset() throws IOException{
 		// loop over the numberized sentences
 		// to dump each example to disk:
+		System.out.println();
 		U.pf("Saving each percept as an example to disk...\n");
-		int numExamples = 100;
-		PrintWriter out = new PrintWriter(new FileWriter("edge_example_dataset/" + outputFeatsToDiskForRF + "." + numExamples));
+		System.out.println("Size of dataset to be saved: " + sentenceIndexOrder.size());
+		PrintWriter out = new PrintWriter(new FileWriter("edge_example_dataset/" + outputFeatsToDiskForRF + "." + mode));
 		int sentenceCounter = 0;
+		int totalExampleCounter = 0;
     	for (int snum : sentenceIndexOrder) {
-        	if (sentenceCounter > 100 && sentenceCounter % 100==0) {
-        		U.pf(".");
-        		numExamples+= 100;
-        		out.close();
-        		out = new PrintWriter(new FileWriter("edge_example_dataset/" + outputFeatsToDiskForRF + "." + numExamples));
-        		sentenceCounter++;
+    		if (sentenceCounter > 1 && sentenceCounter % 100==0) {
+        		U.pf("\n" + sentenceCounter);
         	}
+    		U.pf(".");
+        	sentenceCounter++;
             
             NumberizedSentence ns = getNextExample(snum);
-    		int[][] edgeMatrix = graphMatrices.get(snum);
+            totalExampleCounter += ns.nnz;
+            int[][] edgeMatrix;
+    		if (mode.equals("train"))
+    			edgeMatrix = graphMatrices.get(snum);
+    		else
+    			edgeMatrix = null;
     		
     		generateExamplesFromSentence(ns, out, snum, edgeMatrix);
         }
     	out.close();
+    	System.out.println("Save " + totalExampleCounter + " examples to disk, from " + sentenceIndexOrder.size() + " sentences!");
+    	System.out.println();
 
 	}
 
@@ -491,14 +507,18 @@ public class LRParser {
 	//      print it to the diskrrrr
 	private static void generateExamplesFromSentence(NumberizedSentence ns,
 			PrintWriter out, int snum, int[][] edgeMatrix) {
-		String[][][] examples = new String[edgeMatrix.length][edgeMatrix.length][model.perceptVocab.size() + 1];
+		String[][][] examples = new String[ns.T][ns.T][model.perceptVocab.size() + 1];
 		// to initialize the examples
-		for (int i = 0; i < edgeMatrix.length; i++){
-			for (int j = 0; j < edgeMatrix.length; j++){
+		for (int i = 0; i < ns.T; i++){
+			for (int j = 0; j < ns.T; j++){
 				if (badDistance(i,j)) continue;
-				examples[i][j][0] = "FEATINFO " + 
-						labelVocab.name(edgeMatrix[i][j]) + 
-						" snum:" + snum + " head:" + i + " child:" + j;
+				if (mode.equals("train"))
+					examples[i][j][0] = "FEATINFO " + 
+							labelVocab.name(edgeMatrix[i][j]) + 
+							" snum:" + snum + " head:" + i + " child:" + j;
+				else if (mode.equals("test"))
+					examples[i][j][0] = "FEATINFO " + "null" + 
+							" snum:" + snum + " head:" + i + " child:" + j;
 			}
 		}
 		for (int kk= 0; kk< ns.nnz; kk++){
@@ -709,13 +729,15 @@ public class LRParser {
 
 	static List<FE.FeatureExtractor> initializeFeatureExtractors() {
 		final List<FE.FeatureExtractor> allFE = new ArrayList<>();
-//		allFE.add(new BasicFeatures());
-//		allFE.add(new LinearOrderFeatures());
+		allFE.add(new BasicFeatures());
+		allFE.add(new LinearOrderFeatures());
 		allFE.add(new CoarseDependencyFeatures());
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
-		allFE.add(new WordVectors(wordToVector));
+//		allFE.add(new WordVectors(wordToVector));
+//		allFE.add(new DistanceAndPosition());
 //		allFE.add(new PruneFeatsForSemparser());
+		allFE.add(new RandomForestProbs());
 		return allFE;
 	}
 

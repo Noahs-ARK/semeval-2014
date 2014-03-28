@@ -1,15 +1,6 @@
-To run the random forest in R, first:
-install.packages("randomForest")
-
-next, when you open R:
-library(randomForest)
-load in the data into a data frame
-split into train and test
-semdp.rf <- randomForest(V2 ~., data=train, proximity=FALSE)
-semdp.pred <- predict(semdp.rf, test)
 
 example loading from disk:
-fullData = readLines("featsForRF.100")
+fullData = read.table("featsForRF.100")
 // will probably have to concatenate datasets here
 num <- nrow(fullData)
 trainNum <- 1:(num-num/10)
@@ -18,3 +9,25 @@ data <- fullData[,c(-1,-3,-4,-5)]
 train <- data[trainNum,]
 test <- data[testNum,]
 
+testFull <- read.table("trainTestExample.test")
+test <- testFull[,c(-1,-2,-3,-4,-5)]
+
+
+
+To run the random forest in R, first:
+install.packages("randomForest")
+
+next, when you open R:
+library(randomForest)
+load in the data into a data frame (as above)
+
+split into train and test
+semdp.rf <- randomForest(x = train[,-1], y=train[,1], proximity=FALSE)
+semdp.pred <- predict(semdp.rf, test, type="prob")
+
+outputFull <- data.frame(testFull[,c(3,4,5)],semdp.pred)
+write.table(outputFull, file = "medtrain.test.output", sep = " ")
+
+// to test on the training
+outputFull <- data.frame(fullData[,c(3,4,5)],semdp.pred)
+write.table(outputFull, file = "medtrain.train.output", sep = " ")

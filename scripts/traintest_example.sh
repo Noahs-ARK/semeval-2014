@@ -7,7 +7,7 @@ model_dir="bladir"
 mkdir -p "${model_dir}"
 model_file="${model_dir}/${model_name}"
 
-formalism="pcedt"
+formalism="pas"
 data_dir="lildata/lil"
 train_file="${data_dir}train.${formalism}.sdp"
 train_deps="${train_file}.dependencies"
@@ -22,10 +22,10 @@ outputFeatsToFile="featsForRF"
 word_vectors="resources/word_vectors_norm.txt"
 
 set -x
-./java.sh lr.LRParser -mode train \
-  -formalism $formalism \
-  -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts} -wordVectors ${word_vectors} -outputFeatsToFile ${outputFeatsToFile}
+#./java.sh lr.LRParser -mode train \
+#  -formalism $formalism \
+#  -model ${model_file} -sdpInput ${train_file} -depInput ${train_deps} ${feature_opts} -wordVectors ${word_vectors} -numIters 1 #-outputFeatsToFile ${outputFeatsToFile}
 ./java.sh lr.LRParser -mode test \
   -formalism $formalism \
-  -model ${model_file} -sdpInput ${test_file} -depInput ${test_deps} ${feature_opts} -wordVectors ${word_vectors}
+  -model ${model_file} -sdpInput ${test_file} -depInput ${test_deps} ${feature_opts} -wordVectors ${word_vectors} -outputFeatsToFile ${outputFeatsToFile}
 scripts/eval.sh ${test_file} ${pred_file}
