@@ -12,9 +12,6 @@ import edu.cmu.cs.ark.semeval2014.prune.Prune;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
 import edu.cmu.cs.ark.semeval2014.util.GenerateGraphsAndVocab;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
-import sdp.graph.Edge;
-import sdp.graph.Graph;
-import sdp.io.GraphReader;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
@@ -23,7 +20,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,7 +63,7 @@ public class LRParser {
     static Prune preprocessor;
     
     // the threshold for pruning the singletons from the logistic regression model in Prune
-	public static double singletonPruneThresh = 0.99;
+    public static double singletonPruneThresh;
 
 	@Parameter(names="-learningRate")
 	static double learningRate = .1;
@@ -128,7 +124,7 @@ public class LRParser {
 		new JCommander(new LRParser(), args);  // seems to write to the static members.
 		validateParameters();
 		setDefaultNoedgeWeights();
-
+		singletonPruneThresh = formalism.equals("pas") ? 0.6 : 0.99;
 		// Data loading
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
