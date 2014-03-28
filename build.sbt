@@ -10,6 +10,8 @@ organization := "edu.cmu.cs.ark"
 
 scalaVersion := "2.10.2"
 
+scalacOptions += "-optimize"
+
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "1.9.2",
   "edu.washington.cs.knowitall" % "morpha-stemmer" % "1.0.4",

@@ -3,15 +3,12 @@ package edu.cmu.cs.ark.semeval2014.amr.GraphDecoder
 
 import scala.collection.mutable.Set
 import edu.cmu.cs.ark.semeval2014.amr.graph.{Node, Graph}
-import edu.cmu.cs.ark.semeval2014.common.{FeatureVector, logger}
+import edu.cmu.cs.ark.semeval2014.common.logger
+import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
-case class GraphObj(graph: Graph,
-                    nodes: Array[Node], // usually 'nodes' is graph.nodes.filter(_.name != None).toArray
-                    features: Features,
-                    var set: Array[Int],
-                    var setArray: Array[Set[Int]],
-                    var score: Double = 0.0,
-                    var feats: FeatureVector = new FeatureVector()) {
+class GraphObj(val graph: Graph,
+               val nodes: Array[Node], // usually 'nodes' is graph.nodes.filter(_.name != None).toArray
+               val features: Features) {
 
     // GraphObj is an object to keep track of the connectivity of the graph as edges are added to the graph.
     // It is code that was factored out of Alg2.  It is now also used in Alg1.
@@ -25,7 +22,13 @@ case class GraphObj(graph: Graph,
     // 'set' contains the index of the set that each node is assigned to
     // At the start each node is in its own set
 
-    def this(graph: Graph, nodes: Array[Node], features: Features) = this(graph, nodes, features, nodes.zipWithIndex.map(_._2).toArray, nodes.zipWithIndex.map(x => Set(x._2)).toArray)
+    var set: Array[Int] = nodes.zipWithIndex.map(_._2).toArray
+    var setArray: Array[Set[Int]] = nodes.zipWithIndex.map(x => Set(x._2)).toArray
+    var score: Double = 0.0
+    var feats: FeatureVector = FeatureVector(features.weights.labelset)
+    val edgeWeights : Array[Array[Array[(String, Double)]]] = computeWeightMatrix
+
+    //def this(graph: Graph, nodes: Array[Node], features: Features) = this(graph, nodes, features, nodes.zipWithIndex.map(_._2).toArray, nodes.zipWithIndex.map(x => Set(x._2)).toArray, 0.0, FeatureVector(features.weights.labelset), Array())
 
     def getSet(nodeIndex : Int) : Set[Int] = { setArray(set(nodeIndex)) }
 
@@ -37,6 +40,7 @@ case class GraphObj(graph: Graph,
             if (addRelation) {
                 node1.relations = (label, node2) :: node1.relations
             }
+            features.setupNodes(node1, node2)
             feats += features.localFeatures(node1, node2, label)
             score += weight
         }
@@ -57,6 +61,29 @@ case class GraphObj(graph: Graph,
         //logger(1, "setArray = " + setArray.toList)
     }
 
+    def localScore(nodeIndex1: Int, nodeIndex2: Int, label: Int) : Double = {
+        return edgeWeights(nodeIndex1)(nodeIndex2)(label)._2
+    }
+
+    private def computeWeightMatrix : Array[Array[Array[(String, Double)]]] = {
+        val edgeWeights : Array[Array[Array[(String, Double)]]] = nodes.map(x => Array.fill(0)(Array.fill(0)("",0.0)))
+        for (i <- 0 until nodes.size) {
+            edgeWeights(i) = nodes.map(x => Array.fill(0)(("",0.0)))
+            for (j <- 0 until nodes.size) {
+                if (i == j) {
+                    edgeWeights(i)(j) = Array((":self", 0.0)) // we won't add this to the queue anyway, so it's ok
+                } else {
+                    edgeWeights(i)(j) = Array.fill(features.weights.labelset.size)(("", 0.0))
+                    features.setupNodes(nodes(i), nodes(j))
+                    val feats = features.localFeatures(nodes(i), nodes(j))
+                    features.weights.iterateOverLabels(feats,
+                        x => edgeWeights(i)(j)(x.labelIndex) = (features.weights.labelset(x.labelIndex), x.value))
+                }
+            }
+        }
+        return edgeWeights
+    }
+
     def log {
         logger(1, "set = " + set.toList)
         logger(1, "nodes = " + nodes.map(x => x.concept).toList)
@@ -69,12 +96,13 @@ case class GraphObj(graph: Graph,
           (label, node2) <- node1.relations } {
         if (nodeIds.indexWhere(_ == node2.id) != -1) {
             val index2 = nodeIds.indexWhere(_ == node2.id)
+            features.setupNodes(node1, node2)
             addEdge(node1, index1, node2, index2, label, features.localScore(node1, node2, label), addRelation=false)
         } else {
+            features.setupNodes(node1, node2)
             feats += features.localFeatures(node1, node2, label)
             score += features.localScore(node1, node2, label)
         }
     }
-
 }
 
