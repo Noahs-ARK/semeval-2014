@@ -48,7 +48,7 @@ package object GraphDecoder {
         //logger(0, "connected = " + connected)
 
         val decoder: Decoder = options.getOrElse('stage2Decoder, "LR") match {
-            //case "Alg1" => new Alg1(features, labelset)
+            case "Alg1" => new Alg1(features, labelset)
             //case "Alg1a" => new Alg1(features, labelset, connectedConstraint = "and")
             case "Alg2" => new Alg2(features, labelset, connected)
             case "LR" => new LagrangianRelaxation(features, labelset, 1, 500)
