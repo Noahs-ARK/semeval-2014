@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
 
@@ -108,13 +110,17 @@ public class LRParser {
 	
 	@Parameter(names="-mode", required=true)
 	static String mode;
-    @Parameter(names="-model",required=true)
+        @Parameter(names="-model",required=true)
 	static String modelFile;
-    @Parameter(names={"-sdpInput","-sdpOutput"}, required=true)
-    static String sdpFile;
-    @Parameter(names="-depInput", required=true)
+        @Parameter(names={"-sdpInput","-sdpOutput"}, required=true)
+        static String sdpFile;
+        @Parameter(names="-depInput", required=true)
 	static String depFile;
     
+        @Parameter(names="-brownFile", required=false)
+        static String brownFile = "data/resources/clusters.brown";
+        static Map<String, String> brownMap;
+
     static long numPairs = 0, numTokens = 0, numTokenPrunes = 0, numCorrectTokenPrunes = 0; // purely for diagnosis
 
     static void validateParameters() {
@@ -134,6 +140,7 @@ public class LRParser {
 		U.pf("%d input sentences\n", inputSentences.length);
 		setSentenceIndexOrder();
 
+                brownMap = BrownFeatures.load(brownFile);
 		preprocessor = new Prune(inputSentences, modelFile);
 		
 		if (mode.equals("train")) {
@@ -615,7 +622,7 @@ public class LRParser {
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
 		allFE.add(new UnlabeledDepFE());
-		
+                allFE.add(new BrownFeatures(brownMap));		
 //		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
 	}
