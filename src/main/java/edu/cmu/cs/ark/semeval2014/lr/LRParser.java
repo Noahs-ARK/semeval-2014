@@ -612,9 +612,11 @@ public class LRParser {
 		allFE.add(new LinearOrderFeatures());
 		allFE.add(new CoarseDependencyFeatures());
 		allFE.add(new LinearContextFeatures());
-		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
 		allFE.add(new UnlabeledDepFE());
+        allFE.add(new DistanceThresholds());
+        allFE.add(new DependencyPathv2());
+        allFE.add(new POSPathv4());
 		
 //		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
