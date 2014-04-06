@@ -4,7 +4,6 @@ import scala.collection.mutable.Map
 import edu.cmu.cs.ark.semeval2014.nlp.DependencyParse
 import scala.Array.canBuildFrom
 
-
 object InputAnnotatedSentenceParser {
 
 // fromString loads an annotated sentence from a sentence in this format:
@@ -40,15 +39,15 @@ object InputAnnotatedSentenceParser {
 				sent.syntacticDependencies.deps(i) = SyntacticDependency.fromSemEval8(field("DEPS").mkString("\t"))
 			}
         }
-        return sent
+        sent
     }
 
     def splitLine(line: String) : Map[String, Array[String]] = {
         val map : Map[String, Array[String]] = Map()
         for (split <- line.split("""\t###\t""")) {
-            map(split.split("\t")(0)) = split.split("\t").tail
+            val fields = split.split("\t")
+            map(fields.head) = fields.tail
         }
-        return map
+        map
     }
 }
-

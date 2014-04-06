@@ -129,6 +129,7 @@ object SDPGraph {
         }
         return SDPGraph(nodeArray.filter(_ != None).map(_.get))
     }
+
 /*
     def fromGold(sdpInput: Array[String], clearRelations: Boolean) : SDPGraph = {
         // 1  Pierre  Pierre  NNP -    +     _   _   _   _   _   _   _   _   _   _   _
