@@ -15,38 +15,51 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.Set
 import scala.collection.mutable.ArrayBuffer
 import edu.cmu.cs.ark.semeval2014.amr._
+import edu.cmu.cs.ark.semeval2014.amr.graph._
 import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 import edu.cmu.cs.ark.semeval2014.utils._
+import scala.concurrent.forkjoin.ForkJoinPool
+import scala.collection.parallel._
+import scala.sys.process._
 
 abstract class TrainObj(options: Map[Symbol, String])  {
 
-    def decode(i: Int, weights: FeatureVector) : FeatureVector
-    def oracle(i: Int, weights: FeatureVector) : FeatureVector
-    def costAugmented(i: Int, weights: FeatureVector) : FeatureVector
+    def decode(i: Int, weights: FeatureVector) : (FeatureVector, Double, String)
+    def oracle(i: Int, weights: FeatureVector) : (FeatureVector, Double)
+    def costAugmented(i: Int, weights: FeatureVector, scale: Double) : (FeatureVector, Double)
     def countPercepts(i: Int) : FeatureVector
     def train : Unit
+    def f1SufficientStatistics(i: Int, weights: FeatureVector) : (Double, Double, Double)
 
     ////////////////// Training Setup ////////////////
 
     val passes = options.getOrElse('trainingPasses, "30").toInt
     val stepsize = options.getOrElse('trainingStepsize, "1.0").toDouble
     val regularizerStrength = options.getOrElse('trainingRegularizerStrength, "0.0").toDouble
-    val loss = options.getOrElse('trainingLoss, "SVM")
+    var loss = options.getOrElse('trainingLoss, "SVM")
     if (!options.contains('model)) {
         System.err.println("Error: No model filename specified"); sys.exit(1)
     }
-    val optimizer: Optimizer = options.getOrElse('trainingOptimizer, "Adagrad") match {
+
+    var inputAnnotatedSentences = Input.loadInputAnnotatedSentences(options)
+    var inputGraphs = Input.loadSDPGraphs(options, oracle = false)
+    var oracleGraphs = Input.loadSDPGraphs(options, oracle = true)
+    assert(inputAnnotatedSentences.size == inputGraphs.size && inputGraphs.size == oracleGraphs.size, "sdp and dep file lengths do not match")
+
+    val HOLSPreTrainSize = 100
+
+    var optimizer: Optimizer = options.getOrElse('trainingOptimizer, "Adagrad") match {
         case "Adagrad" => new Adagrad()
-        case "HOLS" => new HOLS(100, (x,y) => countPercepts(y))
+        case "HOLS" => new HOLS(options, (x,y) => countPercepts(y), (i, w) => f1SufficientStatistics(i+HOLSPreTrainSize,w), inputGraphs.size-HOLSPreTrainSize)
         case "SSGD" => new SSGD()
         case x => { System.err.println("Error: unknown training optimizer " + x); sys.exit(1) }
     }
 
-    val inputAnnotatedSentences = Input.loadInputAnnotatedSentences(options)
-    val inputGraphs = Input.loadSDPGraphs(options, oracle = false)
-    val oracleGraphs = Input.loadSDPGraphs(options, oracle = true)
-    assert(inputAnnotatedSentences.size == inputGraphs.size && inputGraphs.size == oracleGraphs.size, "sdp and dep file lengths do not match")
+    val numThreads = options.getOrElse('numThreads,"4").toInt
+    if (options.getOrElse('trainingMiniBatchSize,"1").toInt > 1) {
+        optimizer = new MiniBatch(optimizer, options('trainingMiniBatchSize).toInt, numThreads)
+    }
 
 /*  Runtime.getRuntime().addShutdownHook(new Thread() {
         override def run() {
@@ -60,18 +73,36 @@ abstract class TrainObj(options: Map[Symbol, String])  {
 
     /////////////////////////////////////////////////
 
-    def gradient(i: Int, weights: FeatureVector) : FeatureVector = {
+    def gradient(i: Int, weights: FeatureVector) : (FeatureVector, Double) = {
+        val scale = options.getOrElse('trainingCostScale,"1.0").toDouble
         if (loss == "Perceptron") {
-            val grad = decode(i, weights)
-            grad -= oracle(i, weights)
-            grad
+            val (grad, score, _) = decode(i, weights)
+            val o = oracle(i, weights)
+            grad -= o._1
+            (grad, score - o._2)
         } else if (loss == "SVM") {
-            val grad = costAugmented(i, weights)
-            grad -= oracle(i, weights)
-            grad
+            val (grad, score) = costAugmented(i, weights, scale)
+            val o = oracle(i, weights)
+            grad -= o._1
+            (grad, score - o._2)
+        } else if (loss == "Ramp1") {
+            val (grad, score) = costAugmented(i, weights, scale)
+            val o = decode(i, weights)
+            grad -= o._1
+            (grad, score - o._2)
+        } else if (loss == "Ramp2") {
+            val (grad, score, _) = decode(i, weights)
+            val o = costAugmented(i, weights, -1.0 * scale)
+            grad -= o._1
+            (grad, score - o._2)
+        } else if (loss == "Ramp3") {
+            val (grad, score) = costAugmented(i, weights, scale)
+            val o = costAugmented(i, weights, -1.0 * scale)
+            grad -= o._1
+            (grad, score - o._2)
         } else {
             System.err.println("Error: unknown training loss " + loss); sys.exit(1)
-            FeatureVector(weights.labelset)
+            (FeatureVector(weights.labelset), 0.0)
         }
     }
 
@@ -81,22 +112,105 @@ abstract class TrainObj(options: Map[Symbol, String])  {
             try { file.print(weights.toString) }
             finally { file.close }
         }
+        evalDev(pass, weights)
         return true
     }
 
+    def evalDev(pass: Int, weights: FeatureVector) {   // TODO: doesn't account for regularizer
+        val formalism = options('formalism)
+        val devfile = "data/splits/sec20."+formalism+".sdp"
+        val (iASSave, iGSave, oGSave) = (inputAnnotatedSentences, inputGraphs, oracleGraphs)
+        inputAnnotatedSentences = Corpus.getInputAnnotatedSentences(devfile+".dependencies")
+        inputGraphs = Corpus.splitOnNewline(fromFile(devfile, "utf-8").getLines).map(
+            x => SDPGraph.fromGold(x.split("\n"), true)).toArray
+        oracleGraphs = Corpus.splitOnNewline(fromFile(devfile, "utf-8").getLines).map(
+            x => SDPGraph.fromGold(x.split("\n"), false)).toArray
+        assert(inputAnnotatedSentences.size == inputGraphs.size && inputGraphs.size == oracleGraphs.size, "sdp and dep file lengths do not match")
+
+        //val numThreads = options.getOrElse('numThreads,"1").toInt
+        val par = Range(0, inputAnnotatedSentences.size).par
+        par.tasksupport = new ForkJoinTaskSupport(new ForkJoinPool(numThreads)) // TODO: use numThread option
+        val loss = par.map(i => gradient(i, weights)).reduce((a, b) => ({ a._1 += b._1; a._1 }, a._2 + b._2))._2 / inputAnnotatedSentences.size.toDouble
+        logger(0, "Dev loss: " + loss.toString)
+
+        val predictions : String = par.map(i => decode(i, weights)._3).seq.mkString("\n\n")
+        val file = new java.io.PrintWriter(new java.io.File(options('model) + ".iter" + pass.toString+".preds"), "UTF-8")
+        try { file.print(predictions) }
+        finally { file.close }
+        //logger(0, "Command: /home/jmflanig/work/semeval-2014_HOLS/scripts/eval.sh data/splits/sec20."+formalism+".sdp " + options('model) + ".iter" + pass.toString+".preds")
+        try {
+        val externalEval = stringToProcess("/home/jmflanig/work/semeval-2014_feats/scripts/eval.sh data/splits/sec20."+formalism+".sdp " + options('model) + ".iter" + pass.toString+".preds").lines.toList
+        if (externalEval.size == 46) {
+            logger(0, "--- Performance on Dev ---\n" + externalEval.slice(14,18).mkString("\n") + "\n")
+        } else {
+            logger(0, "--- Performance on Dev ---\n" + externalEval.mkString("\n") + "\n")
+        }
+        } catch {
+            case _ : Throwable => 
+        }
+
+        inputAnnotatedSentences = iASSave
+        inputGraphs = iGSave
+        oracleGraphs = oGSave
+    }
+
     def train(initialWeights: FeatureVector) {
-        val weights = optimizer.learnParameters(
-            (i,w) => gradient(i,w),
-            initialWeights,
-            inputGraphs.size,
+        if (options.getOrElse('trainingOptimizer, "Adagrad") == "HOLS") {
+            trainHOLS(initialWeights, HOLSPreTrainSize)
+        } else {
+            val weights = optimizer.learnParameters(
+                (i,w) => gradient(i,w),
+                initialWeights,
+                inputGraphs.size,
+                passes,
+                stepsize,
+                options.getOrElse('trainingL2RegularizerStrength, "0.0").toDouble,
+                List("Bias"),   // don't regularize the bias terms
+                trainingObserver,
+                avg = true)
+            System.err.print("Writing out weights... ")
+            val file = new java.io.PrintWriter(new java.io.File(options('model)), "UTF-8")
+            try { file.print(weights.toString) }
+            finally { file.close }
+            System.err.println("done")
+        }
+    }
+
+    def trainHOLS(initialWeights: FeatureVector, preTrainSize: Int) {
+        var weights = initialWeights
+        logger(0, "*********** HOLS pre-training with Adagrad ************")
+        val lossSave = loss
+        loss = "Perceptron"
+        weights = (new Adagrad()).learnParameters(
+            (i, w) => gradient(i, w),
+            weights,
+            preTrainSize,
+            10,
+            stepsize,
+            0.0,
+            List("Bias"),   // don't regularize the bias terms
+            (p, w) => true,
+            avg = false)
+        logger(0, "weights l2 = "+weights.l2norm.toString)
+        var file = new java.io.PrintWriter(new java.io.File(options('model)+".pretrain"), "UTF-8")
+        try { file.print(weights.toString) }
+        finally { file.close }
+        loss = lossSave
+
+        evalDev(0, weights)
+
+        weights = optimizer.learnParameters(
+            (i, w) => gradient(i + preTrainSize, w),
+            weights,
+            inputGraphs.size - preTrainSize,
             passes,
             stepsize,
-            options.getOrElse('trainingL2RegularizerStrength, "0.0").toDouble,
+            0.0,
             List("Bias"),   // don't regularize the bias terms
             trainingObserver,
             avg = false)
         System.err.print("Writing out weights... ")
-        val file = new java.io.PrintWriter(new java.io.File(options('model)), "UTF-8")
+        file = new java.io.PrintWriter(new java.io.File(options('model)), "UTF-8")
         try { file.print(weights.toString) }
         finally { file.close }
         System.err.println("done")

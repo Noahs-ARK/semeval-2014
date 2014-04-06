@@ -1,8 +1,10 @@
 package edu.cmu.cs.ark.semeval2014.common.FastFeatureVector
 
+import scala.math.sqrt
 import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.amr.doubleToFastMulAssoc
-import scala.collection.mutable.Map
+//import scala.collection.mutable.Map
+import scala.collection.concurrent.{TrieMap => Map}
 import scala.io.Source
 
 case class fastmul(scale: Double, v: List[(String, ValuesList)])
@@ -19,7 +21,9 @@ case class FastMul2Assoc(x: Double) { def * (v: FeatureVector) = fastmul2(x, v) 
 case class Conjoined(labelIndex: Int, value: Double)
 
 case class ValuesList(var unconjoined: Double, var conjoined: List[Conjoined])
-case class ValuesMap(var unconjoined: Double, var conjoined: Map[Int, Double])
+case class ValuesMap(var unconjoined: Double, var conjoined: Map[Int, Double]) {
+    override def clone : ValuesMap = { ValuesMap(unconjoined, conjoined.clone) }
+}
 object ValuesMap {
     def apply() : ValuesMap = {
         return ValuesMap(0.0, Map())
@@ -29,8 +33,8 @@ case class Value(unconjoined: Double, conjoined: Double)
 
 case class FeatureVector(labelset : Array[String],
                          fmap : Map[String, ValuesMap] = Map()) {
-    val labelToIndex : Map[String, Int] = Map() ++ labelset.zipWithIndex
-    //def this() = this(Map[String, Double]())
+    val labelToIndex : Map[String, Int] = Map()
+    labelToIndex ++= labelset.zipWithIndex
     def iterateOverLabels(v: List[(String, Value)], f: (Conjoined) => Unit) {
         var unconjoinedTotal : Double = 0.0
         val conjoinedTotal : Array[Double] = labelset.map(x => 0.0)
@@ -107,7 +111,7 @@ case class FeatureVector(labelset : Array[String],
             }
         }
     }
-    def dotDivide(v: FeatureVector) = updateAll(v, (feat, label, x, y) => { assert(y!=0.0);  x / y } )
+    def dotDivide(v: FeatureVector) = updateAll(v, (feat, label, x, y) => { if ( y==0.0 ) { x } else {  x / y } } )
     def updateWithFilter(v: FeatureVector, featNames: Iterator[String], f: (String, Option[Int], Double, Double) => Double) {
         for (feature <- featNames) {
             val values = v.fmap.getOrElse(feature, ValuesMap())
@@ -145,6 +149,7 @@ case class FeatureVector(labelset : Array[String],
         }
         return total
     }
+    def l2norm : Double = sqrt(this.dot(this))
     def += (m: fastmul) = updateList(m.v, (feat, label, x, y) => x + m.scale * y)
     def -= (m: fastmul) = updateList(m.v, (feat, label, x, y) => x - m.scale * y)
     def += (m: fastmul2) = update(m.v, (feat, label, x, y) => x + m.scale * y)
@@ -186,6 +191,11 @@ case class FeatureVector(labelset : Array[String],
         val iterator = Source.fromFile(filename).getLines()
         read(iterator)
     }
+    def toFile(filename: String) {
+        val file = new java.io.PrintWriter(new java.io.File(filename), "UTF-8")
+        try { file.print(this.toString) }
+        finally { file.close }
+    }
     override def toString() : String = {
         var strings : List[String] = List()
         for ((feature, values) <- fmap) {
@@ -224,7 +234,7 @@ case class FeatureVector(labelset : Array[String],
     def filter(f: (String) => Boolean) : FeatureVector = {
         val newvec = FeatureVector(labelset)
         for ((feature, value) <- fmap if f(feature)) {
-            newvec.fmap(feature) = value
+            newvec.fmap(feature) = value.clone
         }
         return newvec
     }

@@ -61,8 +61,8 @@ class GraphObj(val graph: Graph,
         //logger(1, "setArray = " + setArray.toList)
     }
 
-    def localScore(nodeIndex1: Int, nodeIndex2: Int, label: String) : Double = {
-        return edgeWeights(nodeIndex1)(nodeIndex2)(features.weights.labelToIndex(label))._2
+    def localScore(nodeIndex1: Int, nodeIndex2: Int, label: Int) : Double = {
+        return edgeWeights(nodeIndex1)(nodeIndex2)(label)._2
     }
 
     private def computeWeightMatrix : Array[Array[Array[(String, Double)]]] = {

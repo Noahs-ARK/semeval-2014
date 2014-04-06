@@ -114,11 +114,11 @@ object SDPGraph {
         val len = sdp.size
         var singleton : Array[Boolean] = {
             sdp.map(x => x.matches("""[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t-\t.(\t_)*"""))   // . . . . . - . _ _ _ ... is a singleton
-        }
+         }
         //logger(0, sdp.mkString("\n"))
         val nodeArray = (0 until len).map(i => if(!singleton(i)) { Some(Node(fields(i)(0), fields(i)(1), List(), i)) } else { None } ).toArray
-        val predicates = (0 until len).filter(i => fields(i)(5) == "+").map(i => nodeArray(i).get).toList
         if (!clearRelations) {
+            val predicates = (0 until len).filter(i => fields(i)(5) == "+").map(i => nodeArray(i).get).toList
             for ((dependent, i) <- nodeArray.zipWithIndex if dependent != None) {
                 for ((relation, j) <- fields(i).drop(6).zipWithIndex) {
                     if (relation != "_") {
@@ -128,6 +128,40 @@ object SDPGraph {
             }
         }
         return SDPGraph(nodeArray.filter(_ != None).map(_.get))
+    }
+/*
+    def fromGold(sdpInput: Array[String], clearRelations: Boolean) : SDPGraph = {
+        // 1  Pierre  Pierre  NNP -    +     _   _   _   _   _   _   _   _   _   _   _
+        // id form    lemma   pos top pred arg1 arg2
+        // spd strings should have no trailing \n or whitespace
+        var sdp = sdpInput.filter(!_.matches("^#.*"))
+        var fields = sdp.map(x => x.split("\t"))
+        val len = sdp.size
+        //var singleton : Array[Boolean] = {
+        //    sdp.map(x => x.matches("""[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t-\t.(\t_)*"""))   // . . . . . - . _ _ _ ... is a singleton
+        // }
+        //logger(0, sdp.mkString("\n"))
+        //val nodeArray = (0 until len).map(i => if(!singleton(i)) { Some(Node(fields(i)(0), fields(i)(1), List(), i)) } else { None } ).toArray
+        val nodeArray = (0 until len).map(i => Some(Node(fields(i)(0), fields(i)(1), List(), i))).toArray
+        if (!clearRelations) {
+            val predicates = (0 until len).filter(i => fields(i)(5) == "+").map(i => nodeArray(i).get).toList
+            for ((dependent, i) <- nodeArray.zipWithIndex if dependent != None) {
+                for ((relation, j) <- fields(i).drop(6).zipWithIndex) {
+                    if (relation != "_") {
+                        predicates(j).relations = (relation, dependent.get) :: predicates(j).relations
+                    }
+                }
+            }
+        }
+        return SDPGraph(nodeArray.filter(_ != None).map(_.get))
+    } */
+
+    def evaluate(graph: SDPGraph, goldGraph: SDPGraph) : (Double, Double, Double) = {
+        val goldEdges : scala.collection.immutable.Set[(String, String, String)] = (goldGraph.nodes :\ List[(String, String, String)]())((x : Node, xs : List[(String, String, String)]) => (x.relations.map(y => (x.id, y._1, y._2.id)) ::: xs)).toSet
+        val num_correct = graph.nodes.map(x => x.relations.count(e => goldEdges.contains((x.id, e._1, e._2.id)))).sum.toDouble
+        val num_predicted = graph.nodes.map(x => x.relations.size).sum.toDouble
+        val num_gold = goldGraph.nodes.map(x => x.relations.size).sum.toDouble
+        return (num_correct, num_predicted, num_gold)
     }
 }
 

@@ -16,37 +16,61 @@ import scala.collection.mutable.Set
 import scala.collection.mutable.ArrayBuffer
 import scala.util.parsing.combinator._
 import edu.cmu.cs.ark.semeval2014.amr._
+import edu.cmu.cs.ark.semeval2014.amr.graph._
 import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 class TrainObj(val options : Map[Symbol, String]) extends edu.cmu.cs.ark.semeval2014.amr.Train.TrainObj(options) {
 
-    val decoder = Decoder(options)
-    val oracle = new Oracle(getFeatures(options), decoder.features.weights.labelset)
-    val costAug = new CostAugmented(Decoder(options), options.getOrElse('trainingCostScale,"1.0").toDouble)
-    val countPer = new CountPercepts(getFeatures(options), decoder.features.weights.labelset)
+    private val labelset : Array[String] = getLabelset(options).map(x => x._1)  // we only need the labels, not determinism constrains
 
-    def decode(i: Int, weights: FeatureVector) : FeatureVector = {
+    //val decoder = Decoder(options)
+    //val oracle = new Oracle(getFeatures(options), labelset)
+    //val costAug = new CostAugmented(Decoder(options), options.getOrElse('trainingCostScale,"1.0").toDouble, options.getOrElse('precRecallTradeoff,"0.5").toDouble)
+    //val countPer = new CountPercepts(getFeatures(options), labelset)
+
+    def decode(i: Int, weights: FeatureVector) : (FeatureVector, Double, String) = {
+        val decoder = Decoder(options)
         decoder.features.weights = weights
-        return decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).features
+        val result = decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i)))
+        return (result.features, result.score, result.graph.toConll(inputAnnotatedSentences(i)))
     }
 
-    def oracle(i: Int, weights: FeatureVector) : FeatureVector = {
+    def oracle(i: Int, weights: FeatureVector) : (FeatureVector, Double) = {
+        val oracle = new Oracle(getFeatures(options), labelset)
         oracle.features.weights = weights
-        return oracle.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i))).features
+        val result = oracle.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i)))
+        return (result.features, result.score)
     }
 
-    def costAugmented(i: Int, weights: FeatureVector) : FeatureVector = {
+    def costAugmented(i: Int, weights: FeatureVector, scale: Double) : (FeatureVector, Double) = {
+        val decoder = Decoder(options)
+        val costAug = new CostAugmented(Decoder(options), options.getOrElse('trainingCostScale,"1.0").toDouble, options.getOrElse('precRecallTradeoff,"0.5").toDouble)
         costAug.features.weights = weights
-        return costAug.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i))).features
+        val result = costAug.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i)))
+        return (result.features, result.score)
     }
 
     def countPercepts(i: Int) : FeatureVector = {
+        val countPer = new CountPercepts(getFeatures(options), labelset)
         return countPer.decode(Input(inputAnnotatedSentences(i), inputGraphs(i))).features
     }
 
     def train {
-        train(FeatureVector(decoder.features.weights.labelset))
+        train(FeatureVector(labelset))
+    }
+
+    def f1SufficientStatistics(i: Int, weights: FeatureVector) : (Double, Double, Double) = {
+        // returns (num_correct, num_predicted, num_gold)
+        val decoder = Decoder(options)
+        decoder.features.weights = weights
+        val result = decoder.decode(Input(inputAnnotatedSentences(i), inputGraphs(i)))
+        
+        val oracle = new Oracle(getFeatures(options), labelset)
+        oracle.features.weights = weights
+        val oracleResult = oracle.decode(Input(inputAnnotatedSentences(i), oracleGraphs(i)))
+
+        return SDPGraph.evaluate(result.graph.asInstanceOf[SDPGraph], oracleResult.graph.asInstanceOf[SDPGraph])
     }
 }
 

@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
 
@@ -115,6 +117,10 @@ public class LRParser {
     @Parameter(names="-depInput", required=true)
 	static String depFile;
     
+    @Parameter(names="-brownFile", required=false)
+    public static String brownFile = "data/resources/clusters.brown";
+    public static Map<String, String> brownMap;
+
     static long numPairs = 0, numTokens = 0, numTokenPrunes = 0, numCorrectTokenPrunes = 0; // purely for diagnosis
 
     static void validateParameters() {
@@ -134,6 +140,7 @@ public class LRParser {
 		U.pf("%d input sentences\n", inputSentences.length);
 		setSentenceIndexOrder();
 
+        brownMap = BrownFeatures.load(brownFile);
 		preprocessor = new Prune(inputSentences, modelFile);
 		
 		if (mode.equals("train")) {
@@ -611,9 +618,15 @@ public class LRParser {
 		allFE.add(new BasicFeatures());
 		allFE.add(new LinearOrderFeatures());
 		allFE.add(new CoarseDependencyFeatures());
+        allFE.add(new LinearContextFeatures());
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
 		allFE.add(new UnlabeledDepFE());
+        //allFE.add(new POSPathv3());
+        allFE.add(new DistanceThresholds());
+		allFE.add(new DependencyPathv2());
+        allFE.add(new POSPathv4());
+        allFE.add(new BrownFeatures(brownMap));
 		
 //		allFE.add(new PruneFeatsForSemparser());
 		return allFE;

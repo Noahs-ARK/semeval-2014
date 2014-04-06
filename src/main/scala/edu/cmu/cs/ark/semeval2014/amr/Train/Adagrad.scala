@@ -19,7 +19,7 @@ import edu.cmu.cs.ark.semeval2014.common.logger
 import edu.cmu.cs.ark.semeval2014.common.FastFeatureVector._
 
 class Adagrad extends Optimizer {
-    def learnParameters(gradient: (Option[Int], Int, FeatureVector) => FeatureVector,
+    def learnParameters(gradient: (Option[Int], Int, FeatureVector) => (FeatureVector, Double),
                         initialWeights: FeatureVector,
                         trainingSize: Int,
                         passes: Int,
@@ -33,12 +33,13 @@ class Adagrad extends Optimizer {
         var avg_weights = FeatureVector(weights.labelset)
         var sumSq = FeatureVector(weights.labelset)         // G_{i,i}
         var pass = 0
-        while (pass < passes && trainingObserver(pass,weights)) {
+        while (pass < passes && trainingObserver(pass,avg_weights)) {
             logger(0,"Pass "+(pass+1).toString)
+            var objective = 0.0 // objective is 1/N \sum_i=1^N Loss(i) + 1/2 * \lambda * ||weights||^2 (var objective is N times this)
             for (t <- Random.shuffle(Range(0, trainingSize).toList)) {
-                // normally we would do weights -= stepsize * gradient(t)
+                // normally we would do weights -= stepsize * gradient(t)._1
                 // but instead we do this: (see equation 8 in SocherBauerManningNg_ACL2013.pdf)
-                val grad = gradient(Some(pass), t, weights)
+                val (grad, score) = gradient(Some(pass), t, weights)
                 sumSq.update(grad, (feat, label, x , y) => x + y * y)
                 weights.update(grad, (feat, label, x, y) => {
                     val sq = sumSq(feat, label)
@@ -48,9 +49,11 @@ class Adagrad extends Optimizer {
                         x
                     }
                 })
+                objective += score
                 if (l2strength != 0.0) {
-                    val values = noreg.map(feat => (feat, weights.fmap(feat)))
+                    val noregSaveValues = noreg.map(feat => (feat, weights.fmap(feat)))
                     noreg.map(feat => weights.fmap.remove(feat))
+                    objective += weights.l2norm / 2.0   // don't count the unregularized features in the regularizer
                     sumSq.update(weights, (feat, label, x , y) => x + l2strength * l2strength * y * y)
                     weights.update(weights, (feat, label, x, y) => {
                         val sq = sumSq(feat, label)
@@ -60,9 +63,11 @@ class Adagrad extends Optimizer {
                             x
                         }
                     })
-                    values.map(x => { weights.fmap(x._1) = x._2 })
+                    noregSaveValues.map(x => { weights.fmap(x._1) = x._2 })
                 }
             }
+            logger(0,"                                   Avg objective value lass pass: "+(objective/trainingSize.toDouble).toString)
+//            logger(0,"                                                       objective: "+((0 until trainingSize).map(x => gradient(None, x, weights)._2).sum/trainingSize).toString)
             avg_weights += weights
             pass += 1
         }

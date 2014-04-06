@@ -20,6 +20,8 @@ import edu.cmu.cs.ark.semeval2014.common._
 import edu.cmu.cs.ark.semeval2014.utils._
 import edu.cmu.cs.ark.semeval2014.prune.Prune
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier
+import edu.cmu.cs.ark.semeval2014.lr.LRParser
+import edu.cmu.cs.ark.semeval2014.lr.fe.BrownFeatures
 
 object SemanticParser {
 
@@ -45,10 +47,13 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
             case "-goldSingletons" :: tail =>            parseOptions(map + ('goldSingletons -> "true"), tail)
             case "-goldTops" :: tail =>                  parseOptions(map + ('goldTops -> "true"), tail)
             case "-numIters" :: value :: l =>            parseOptions(map + ('trainingPasses -> value), l)
+            case "-threads" :: value :: l =>             parseOptions(map + ('numThreads -> value), l)
             case "-saveEvery" :: value :: l =>           parseOptions(map + ('trainingSaveInterval -> value), l)
             case "-learningRate" :: value :: l =>        parseOptions(map + ('trainingStepsize -> value), l)
             case "-trainingLoss" :: value :: l =>        parseOptions(map + ('trainingLoss -> value), l)
             case "-trainingOptimizer" :: value :: l =>   parseOptions(map + ('trainingOptimizer -> value), l)
+            case "-precRecallTradeoff" :: value :: l =>  parseOptions(map + ('precRecallTradeoff -> value), l)
+            case "-miniBatchSize" :: value :: l =>       parseOptions(map + ('trainingMiniBatchSize -> value), l)
             case "-trainingCostScale" :: value :: l =>   parseOptions(map + ('trainingCostScale -> value), l)
             case "-l2reg" :: value :: l =>               parseOptions(map + ('trainingL2RegularizerStrength -> value), l)
             case "-v" :: value :: tail =>                parseOptions(map ++ Map('verbosity -> value), tail)
@@ -77,6 +82,8 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
                 System.err.println("Error: please specify either -mode train or -mode test")
                 sys.exit(1)
         }
+
+        LRParser.brownMap = BrownFeatures.load(LRParser.brownFile);
 
         if (options('mode) == "train") {
 
@@ -118,7 +125,9 @@ scala -classpath . edu.cmu.lti.nlp.amr.AMRParser --stage2-decode -w weights -l l
             assert(inputAnnotatedSentences.size == inputGraphs.size, "Input sdp and dependency files not the same line count")
 
             val topClassifier = new TopClassifier()
-            topClassifier.loadModel(options('model)+".topmodel")
+            //topClassifier.loadModel(options('model)+".topmodel")
+            logger(0, "/home/jmflanig/work/semeval-2014-dryrun/experiments/"+options('formalism)+"_model.topmodel")
+            topClassifier.loadModel("/home/jmflanig/work/semeval-2014-dryrun/experiments/"+options('formalism)+"_model.topmodel")
 
             val file = new java.io.PrintWriter(new java.io.File(options('sdpOutput)), "UTF-8")
             try {

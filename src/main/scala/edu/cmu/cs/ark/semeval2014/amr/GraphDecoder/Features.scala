@@ -131,7 +131,12 @@ class Features(var featureNames: List[String], labelSet: Array[String]) {
     }
 
     def localFeatures(node1: Node, node2: Node, label: String) : List[(String, ValuesList)] = {
-        return localFeatures(node1, node2, weights.labelToIndex(label))
+        if(weights.labelToIndex.contains(label)) {
+            localFeatures(node1, node2, weights.labelToIndex(label))
+        } else {
+            logger(0, "************* WARNING: Cannot find label = "+label+" in the labelset")
+            localFeatures(node1, node2).map(x => (x._1, ValuesList(x._2.unconjoined, List())))
+        }
     }
 
     def localScore(node1: Node, node2: Node, label: String) : Double = {
