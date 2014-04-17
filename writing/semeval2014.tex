@@ -38,6 +38,17 @@
 \newcommand{\filename}{semeval2014}
 \newcommand{\contact}{pnakov qf.org.qa}
 
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[usenames,dvipsnames]{color}
+\definecolor{myblue}{rgb}{0,0.1,0.6}
+\definecolor{mygreen}{rgb}{0,0.3,0.1}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=mygreen,urlcolor=myblue]{hyperref}
+\newcommand{\transpose}{^\mathsf{T}}
+
+\newcommand{\bocomment}[1]{\textcolor{Bittersweet}{[#1 -BTO]}}
+
 \title{SemEval-2014 Task 8: Broad-Coverage Semantic Dependency Parsing}
 
 \author{First Author \\
@@ -73,11 +84,47 @@
 
 
 \section{Models}
+\newcommand{\logitedge}{\textsc{LogitEdge}}
 
-\begin{itemize}
-\item LR parser
-\item Graph-based parser
-\end{itemize}
+We used the same set of (first-order) features
+in two different models: a faster-to-train
+logistic regression model (\logitedge, \ref{s:logitedge}),
+and a structured graph prediction model (\ref{s:graphparser}).
+
+
+\subsection{\logitedge parser} \label{s:logitedge}
+
+This model treats every pair of words as a multiclass logistic regression,
+either to be an edge with one of the formalism's labels, or a null
+\textsc{NoEdge} decision.  
+
+
+The model considers all token pairs $(i,j)$ within distance 10 of each other. \bocomment{TODO insert oracle recall note}  Both directions are considered.  If the gold standard has an edge in the direction $i \rightarrow j$, the direction $j\rightarrow i$ is considered a \textsc{NoEdge}.
+
+Feature extractors are defined to extract features both for individual tokens (graph nodes), and for pairs of tokens, which are conjoined against all possible output labels.
+For candidate head $i$ and child $j$, the model defines a distribution over
+$y_{ij} \in \{\text{edge labels}\} \cup \{\textsc{NoEdge}\}$, using weights $\beta$,
+
+\begin{align*} 
+  P(y_{ij}=k; \beta) & \propto 
+  \exp \big( \\
+  &
+  \beta^{\text{(node as head)}}_k \cdot f^{(node)}(i)
+  \ \ + \\ 
+  &
+  \beta^{\text{(node as child)}}_k \cdot f^{(node)}(j)
+  \ \ + \\
+  &
+  \beta^{\text{(pair)}}_k \cdot f^{(pair)}(i,j)
+    \big)
+\end{align*}
+
+Training minimizes total negative log-likelihood of the above,
+plus L2 regularization.  Adagrad is used for optimization (which seemed to achieve better solutions than L-BFGS, at least for earlier iterations).
+
+
+\subsection{Graph-based parser} \label{s:graphparser}
+
 
 \section{Features}
 
