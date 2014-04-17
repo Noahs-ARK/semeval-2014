@@ -22,6 +22,10 @@
 \usepackage{url}
 \usepackage{latexsym}
 
+\usepackage{enumitem}
+\setitemize{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
+\setenumerate{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
+
 %\setlength\titlebox{5cm}
 
 % You can expand the titlebox if you need extra space
@@ -59,9 +63,40 @@
 
 \section{Introduction}
 
-\section{Model}
+
+
+\section{Formalisms}
+
+\begin{itemize}
+\item Quick overview of three formalisms, emphasizing differences between them, consequences for parsing
+\end{itemize}
+
+
+\section{Models}
+
+\begin{itemize}
+\item LR parser
+\item Graph-based parser
+\end{itemize}
 
 \section{Features}
+
+\subsection{all the stuff in our model}
+
+\begin{itemize}
+\item BasicFeatures
+\item LinearOrderFeatures
+\item CoarseDependencyFeatures
+\item LinearContextFeatures
+\item DependencyPathv1
+\item SubcatSequenceFE
+\item UnlabeledDepFE
+\item Brown clusters
+\end{itemize}
+\subsection{feature hashing}
+
+\subsection{all the stuff we tried but didn't work}
+
 
 \section{Evaluation}
 
