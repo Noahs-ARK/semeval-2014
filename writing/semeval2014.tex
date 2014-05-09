@@ -92,7 +92,7 @@ logistic regression model (\logitedge, \ref{s:logitedge}),
 and a structured graph prediction model (\ref{s:graphparser}).
 
 
-\subsection{\logitedge parser} \label{s:logitedge}
+\subsection{\logitedge\ parser} \label{s:logitedge}
 
 This model treats every pair of words as a multiclass logistic regression,
 either to be an edge with one of the formalism's labels, or a null
@@ -120,7 +120,7 @@ $y_{ij} \in \{\text{edge labels}\} \cup \{\textsc{NoEdge}\}$, using weights $\be
 \end{align*}
 
 Training minimizes total negative log-likelihood of the above,
-plus L2 regularization.  Adagrad is used for optimization (which seemed to achieve better solutions than L-BFGS, at least for earlier iterations).
+plus $\ell_2$ regularization.  Adagrad is used for optimization (which seemed to optimize faster than L-BFGS, at least for earlier iterations, though we did no systematic comparison); the regularizer gradient is applied once per epoch.
 
 
 \subsection{Graph-based parser} \label{s:graphparser}
@@ -144,8 +144,12 @@ plus L2 regularization.  Adagrad is used for optimization (which seemed to achie
 
 \subsection{all the stuff we tried but didn't work}
 
+\bocomment{caveat, these were not carefully done.}
+
 
 \section{Evaluation}
+
+\section{Future work}
 
 \section{Conclusion}
 
