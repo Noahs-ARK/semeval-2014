@@ -49,6 +49,9 @@
 
 \newcommand{\bocomment}[1]{\textcolor{Bittersweet}{[#1 -BTO]}}
 
+% turn off for submission, but on for a more tech report-y version.
+\newcommand{\codenote}[1]{\textcolor{PineGreen}{[Code: \emph{#1}]}}
+
 \title{SemEval-2014 Task 8: Broad-Coverage Semantic Dependency Parsing}
 
 \author{First Author \\
@@ -94,33 +97,64 @@ and a structured graph prediction model (\ref{s:graphparser}).
 
 \subsection{\logitedge\ parser} \label{s:logitedge}
 
-This model treats every pair of words as a multiclass logistic regression,
-either to be an edge with one of the formalism's labels, or a null
+\codenote{LRParser.java}
+
+\noindent
+This model treats every pair of tokens as a multiclass logistic regression
+with $K+1$ possible outputs:
+either to be an edge with one of the formalism's $K$ different labels, or a null
 \textsc{NoEdge} decision.  
 
+The model considers all token pairs $(i,j)$ within distance 10 of each other, 
+i.e.~$1\leq|i-j|\leq 10$, \bocomment{and excluding pruning (ref later subsection)}. Among the formalisms, 95\%-97\% of all edges are distance 10 or less.
+Both directions are considered.  If the gold standard has an edge in the direction $i \rightarrow j$, the direction $j\rightarrow i$ is considered a \textsc{NoEdge}.
 
-The model considers all token pairs $(i,j)$ within distance 10 of each other. \bocomment{TODO insert oracle recall note}  Both directions are considered.  If the gold standard has an edge in the direction $i \rightarrow j$, the direction $j\rightarrow i$ is considered a \textsc{NoEdge}.
-
-Feature extractors are defined to extract features both for individual tokens (graph nodes), and for pairs of tokens, which are conjoined against all possible output labels.
+Feature extractors are defined to extract features both for individual tokens ($f^{(\text{node})}(i)$), and also for pairs of tokens ($f^{(\text{edge})}(i,j)$), which are conjoined against all possible output labels.
 For candidate head $i$ and child $j$, the model defines a distribution over
-$y_{ij} \in \{\text{edge labels}\} \cup \{\textsc{NoEdge}\}$, using weights $\beta$,
+$y_{ij} \in \{\text{edge labels}\} \cup \{\textsc{NoEdge}\}$, using $3$ weight matrixes $\beta$,
 
 \begin{align*} 
   P(y_{ij}=k; \beta) & \propto 
   \exp \big( \\
   &
-  \beta^{\text{(node as head)}}_k \cdot f^{(node)}(i)
+  \beta^{\text{(node as head)}}_k \cdot f^{\text{(node)}}(i)
   \ \ + \\ 
   &
-  \beta^{\text{(node as child)}}_k \cdot f^{(node)}(j)
+  \beta^{\text{(node as child)}}_k \cdot f^{\text{(node)}}(j)
   \ \ + \\
   &
-  \beta^{\text{(pair)}}_k \cdot f^{(pair)}(i,j)
+  \beta^{\text{(edge)}}_k \cdot f^{\text{(edge)}}(i,j)
     \big)
 \end{align*}
 
-Training minimizes total negative log-likelihood of the above,
-plus $\ell_2$ regularization.  Adagrad is used for optimization (which seemed to optimize faster than L-BFGS, at least for earlier iterations, though we did no systematic comparison); the regularizer gradient is applied once per epoch.
+\noindent
+In this notation, an $f$ function outputs a real-valued vector, defined as the concatenation of features from all the feature classes (\S\ref{s:features}).
+Training minimizes total negative log-likelihood of the above (with weighting; see below),
+plus $\ell_2$ regularization.  Adagrad \cite{duchi2011adaptive} is used for optimization.
+It seemed to optimize faster than L-BFGS, at least for earlier iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
+
+In the FFF formalism, the training set (\S\ref{s:datasplits})
+contains NNN candidate edges (pairs of tokens with length between 1 and 10 inclusive),
+and NNN actual (non-null) edges.  $F$-score performance was improved by downweighting $\textsc{NoEdge}$ examples through a weighted log-likeihood objective,
+$\sum_{i,j} \sum_k w_k \log P(y_{ij}=k;\beta)$,
+with $w_{\textsc{NoEdge}}=0.3$ and $1$ otherwise.  
+(The weight was chosen by gridsearch on a development set; 
+PAS used a weight of $0.4$ while the others were $0.3$, though the differences at this granularity were small.)
+
+Besides the edge logistic regression system, there were both pre- and post-processing steps.
+
+\textbf{Preprocessing:}
+\bocomment{TODO need to check how much preproc was used for this.  Was singleton pruning turned on?  It looks like we commented out the prune features in LRParser.java.  But singleton pruning might have been turned on.}
+
+\textbf{Decoding and postprocessing:}
+\codenote{decodeEdgeProbsToGraph(), MyGraph.java}
+To predict a graph structure at test-time for a new sentence,
+the most likely edge label was predicted for every candidate $(i,j)$ pair of tokens satisfying the distance restriction.  There were several post-processing steps.
+
+First, if a non-\textsc{NoEdge} edge was predicted for both directions for a single $(i,j)$ pair, only the more likely one was used for the final graph.  This improved devset accuracy, though it is only a primitive constraint on the graph decoding.
+
+Second, the edge-based logistic regression has no facility for the ``top'' or root-like attribute for a graph node.  We trained a separate token-level binary logistic regression to classify whether a token's node had the ``top'' attribute or not.  At decoding time, all nodes in the predicted graph (i.e., tokens where there is either an inbound or outbound edge) are possible candidates to be ``top''; the classifier probabilities are evaluated, and the highest-scoring node is chosen to be ``top''.
+This is suboptimal, since some graphs have multiple tops (and in PCEDT this is more common); but selection rules based on probability thresholds gave worse F-score performance on the devset. \bocomment{I wonder if I documented this on an issue/PR}
 
 
 \subsection{Graph-based parser} \label{s:graphparser}
@@ -129,6 +163,8 @@ plus $\ell_2$ regularization.  Adagrad is used for optimization (which seemed to
 \section{Features}
 
 \subsection{all the stuff in our model}
+
+\label{s:features}
 
 \begin{itemize}
 \item BasicFeatures
@@ -142,12 +178,23 @@ plus $\ell_2$ regularization.  Adagrad is used for optimization (which seemed to
 \end{itemize}
 \subsection{feature hashing}
 
+
+\subsection{Features for subsystem classifiers}
+
+ - Topness classifier
+
+ - Singleton classifier
+
+ - Predicate-ness classifier
+
+
 \subsection{all the stuff we tried but didn't work}
 
 \bocomment{caveat, these were not carefully done.}
 
 
 \section{Evaluation}
+\label{s:datasplits}
 
 \section{Future work}
 
@@ -160,7 +207,7 @@ plus $\ell_2$ regularization.  Adagrad is used for optimization (which seemed to
 \section*{Acknowledgements}
 
 \bibliographystyle{acl}
-\bibliography{semeval8}
+\bibliography{semeval8,morebib}
 
 
 
