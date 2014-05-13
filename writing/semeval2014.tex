@@ -57,7 +57,7 @@
 \newcommand{\noedge}{\textsc{NoEdge}}
 
 
-\title{SemEval-2014 Task 8: Broad-Coverage Semantic Dependency Parsing}
+\title{Broad-Coverage Semantic Dependency Parsing}
 
 \author{First Author \\
   Affiliation / Address line 1 \\
@@ -74,7 +74,11 @@
 
 \begin{document}
 \maketitle
+
 \begin{abstract}
+We present a graph-based approach to semantic dependency parsing for the
+three formalisms in SemEval 2014 Shared Task 8: Broad-Coverage Semantic
+Dependency Parsing.
   
 \end{abstract}
 
@@ -82,8 +86,23 @@
 
 \section{Introduction}
 
-We present a graph-based approach to semantic dependency parsing for SemEval
-2014 Shared Task 8.
+We desire shallow semantic analyzers which can analyze broad-domain text quickly
+and accurately.
+\begin{itemize}
+\item applications of semantic parsing
+\end{itemize}
+
+Syntactic parsing has greatly benefited from the existence of a large standard
+corpus of annotations \sam{cite PTB}.
+Dependency parsing is a popular form of syntactic processing, as it
+is generally faster than constituency parsing, while still capturing much of
+what is needed for downstream applications.
+% allows for a simpler representation
+But while syntactic parsers capture relationships between words in a sentence,
+the relationships they capture are not semantic.
+For instance, in ``The bread baked in the oven.'' and ``I baked the bread in the
+ven.'' ``the bread'' bears the same semantic relationship to ``baked'' but is
+realized in a different syntactic position.
 
 \section{Formalisms}
 
@@ -163,7 +182,7 @@ $\beta$,
 \noindent
 In this notation, an $f$ function outputs a real-valued vector, defined as the concatenation of features from all the feature classes (\S\ref{s:features}).
 Training minimizes total negative log-likelihood of the above (with weighting; see below),
-plus $\ell_2$ regularization.  Adagrad \cite{duchi2011adaptive} is used for optimization.
+plus $\ell_2$ regularization.  Adagrad \cite{duchi_adaptive_2011} is used for optimization.
 It seemed to optimize faster than L-BFGS, at least for earlier iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
 
 In the FFF formalism, the training set (\S\ref{s:datasplits})
