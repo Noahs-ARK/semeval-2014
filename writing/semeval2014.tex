@@ -58,7 +58,8 @@
 \newcommand{\noedge}{\textsc{NoEdge}}
 
 
-\title{Broad-Coverage Semantic Dependency Parsing}
+\title{Broad-Coverage Semantic Dependency Parsing with Rich Edge-Factored
+Features}
 
 \author{First Author \\
   Affiliation / Address line 1 \\
@@ -77,37 +78,74 @@
 \maketitle
 
 \begin{abstract}
-We present a graph-based approach for parsing to the three semantic dependency
-formalisms in SemEval 2014 Shared Task 8: Broad-Coverage Semantic
+We present an edge-factored statistical model for parsing to the three semantic
+dependency formalisms in SemEval 2014 Shared Task 8: Broad-Coverage Semantic
 Dependency Parsing.
-  
+
 \end{abstract}
 
 
 
 \section{Introduction}
 
-We desire shallow semantic analyzers which can analyze broad-domain text quickly
-and accurately.
-\begin{itemize}
-\item applications of semantic parsing
-\end{itemize}
+We present a system that produces semantic dependency parses by extracting
+features for each potential dependency arc and learning a statistical model to
+discriminate between good arcs and bad.
+The organizers of SemEval 2014 Shared Task 8: Broad-Coverage Semantic Dependency
+Parsing \sam{cite} have provided a corpus of English language newswire
+annotated with three different semantic dependency formalisms
+(\S\ref{s:formalisms}).
+We test our system for each of the three formalisms using held out data
+from the provided corpus.
 
-Syntactic parsing has greatly benefited from the existence of a large standard
-corpus of annotations \cite{marcus_building_1993}.
-Dependency parsing is a popular form of syntactic processing, as it
-is generally faster than constituency parsing, while still capturing much of
-what is needed for downstream applications.
+Building shallow semantic analyzers\footnote{By shallow semantic analysis we mean discovering the semantic relationships
+between words or concepts in a sentence.
+This is in contrast to a deeper semantic analysis in which one produces a full
+lambda-calculus logical form, or other representation which can be grounded in a
+model of the world or from which further inferences can be made.
+}
+that can analyze broad-domain text quickly
+and accurately remains an open challenge.
+\begin{itemize}
+\item applications of semantic parsing: information extraction, knowledge base
+population, question answering, etc. \sam{get good cites}
+\end{itemize}
+While semantic parsing remains unsolved, syntactic parsing in general, and
+dependency parsing in particular has gotten very far towards these goals.
+%Syntactic parsing has greatly benefited from the existence of a large corpus of
+%annotations with high inter-annotator agreement: the Penn Treebank
+%\cite{marcus_building_1993}.
+By representing semantic relationships between words as labeled
+directed edges, we can reuse methodologies developed for syntactic dependency
+parsing.
+These methods are noted for their fast inference.
+
+
+%\sam{something about how we're inspired by the success
+%dependency parsing has had, because of PTB, and because loosening up the
+% representation allows fast inference.}
+
+%Dependency parsing is a popular form of syntactic processing, as it
+%is generally faster than constituency parsing, while still capturing much of
+%what is needed for downstream applications.
 % allows for a simpler representation
-But while syntactic parsers capture relationships between words in a sentence,
-the relationships they capture are not semantic.
+
+But while syntactic dependency parsers capture relationships between words in a
+sentence, the relationships they capture are not semantic.
 For instance, in ``The bread baked in the oven.'' and ``I baked the bread in the
 ven.'' ``the bread'' bears the same semantic relationship to ``baked'' but is
 realized in a different syntactic position.
+These types of distinctions become important in downstream applications.
+%Even shallow semantic analysis can be useful in downstream applications.
+
+
+\sam{cite}.
+
+\sam{This paper is organized as follows\ldots}
 
 
 
-\section{Formalisms}
+\section{Formalisms} \label{s:formalisms}
 
 \begin{itemize}
 	\item Quick overview of three formalisms, emphasizing differences between them, consequences for parsing
@@ -431,6 +469,9 @@ Again, we saw no improvement.
 \section{Evaluation}
 \label{s:datasplits}
 
+We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
+labeled whole-sentence match (LM) on the held out test data (see
+Table~\ref{table:perf}).
 
 % DM:
 % LP: 0.844641
