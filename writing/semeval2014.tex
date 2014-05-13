@@ -23,6 +23,10 @@
 \usepackage{latexsym}
 \usepackage{color}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{amssymb}
+\usepackage{graphicx}
 \usepackage{enumitem}
 \setitemize{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
 \setenumerate{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
@@ -39,10 +43,7 @@
 \newcommand{\filename}{semeval2014}
 \newcommand{\contact}{pnakov qf.org.qa}
 
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{graphicx}
-% \usepackage[usenames,dvipsnames]{color}
+
 \definecolor{myblue}{rgb}{0,0.1,0.6}
 \definecolor{mygreen}{rgb}{0,0.3,0.1}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=mygreen,urlcolor=myblue]{hyperref}
@@ -238,36 +239,44 @@ every pair.
 \noindent
 The \logitedge\ model treats every ordered pair of token indices $(i, j)$ as a
 multiclass logistic regression with $K+1$ possible outputs:
-either one of the formalism's $K$ edge labels, or
-the additional label \noedge, which indicates that no edge exists from $i$ to
-$j$.
+the formalism's $K$ edge labels plus the additional label \noedge, which
+indicates that no edge exists from $i$ to $j$.
 
-Feature extractors are defined to extract features both for individual tokens
-($f^{(\text{node})}(i)$), and also for pairs of tokens
-($f^{(\text{edge})}(i,j)$), which are conjoined against all possible output
-labels.
-For candidate head $i$ and child $j$, the model defines a distribution over
-$y_{ij} \in \{\text{edge labels}\} \cup \{\noedge\}$, using $3$ weight matrixes
-$\beta$,
-
+In our implementation, we separate features into two classes:
+those which can be extracted for any one word, $\bm{f}^{(\text{node})}(i)$;
+and those which look at both the parent and the child,
+$\bm{f}^{(\text{edge})}(i, j)$.
+These features are described in \S\ref{s:features}.
+The final binary feature vector is made by conjoining the output label with
+each:
 \begin{align*} 
-  P(y_{ij}=k; \beta) & \propto 
-  \exp \big( \beta^{\text{(bias)}}_k \ \ + \\
-  &
-  \beta^{\text{(node as head)}}_k \cdot f^{\text{(node)}}(i)
-  \ \ + \\ 
-  &
-  \beta^{\text{(node as child)}}_k \cdot f^{\text{(node)}}(j)
-  \ \ + \\
-  &
-  \beta^{\text{(edge)}}_k \cdot f^{\text{(edge)}}(i,j)
-    \big)
+\bm{f}(i, j, \ell) =
+\{ \ell \} \otimes \left( &
+	\{ \text{``bias''} \} \\
+	& \cup \bm{f}^{(\text{edge})}(i, j) \\
+	& \cup \{ \text{``parent''} \} \otimes \bm{f}^{(\text{node})}(i) \\
+	& \cup \{ \text{``child''} \} \otimes \bm{f}^{(\text{node})}(j)
+\right) \\
 \end{align*}
-
 \noindent
-In this notation, an $f$ function outputs a real-valued vector, defined as the concatenation of features from all the feature classes (\S\ref{s:features}).
-Training minimizes total negative log-likelihood of the above (with weighting; see below),
-plus $\ell_2$ regularization.  Adagrad \cite{duchi_adaptive_2011} is used for optimization.
+where  $\otimes$ represents the Cartesian product.
+%Feature extractors are defined to extract
+%features both for individual tokens ($f^{(\text{node})}(i)$), and also for
+% pairs of tokens ($f^{(\text{edge})}(i,j)$), which are conjoined against all possible output
+%labels.
+For candidate parent index $i$ and child index $j$, the model defines a
+distribution over $y_{i,j} \in \{\text{edge labels}\} \cup \{\noedge\}$, using
+a parameter vector $\bm\phi$,
+
+\[
+  Pr(y_{i,j}=\ell; \bm\phi) & \propto e^{\bm\phi^\top \bm{f}(i, j, \ell)}
+\]
+\noindent
+%In this notation, an $f$ function outputs a real-valued vector, defined as the
+% concatenation of features from all the feature classes (\S\ref{s:features}).
+$\bm\phi$ is learned by minimizing total negative log-likelihood of the above
+(with weighting; see below), plus $\ell_2$ regularization.
+Adagrad \cite{duchi_adaptive_2011} is used for optimization.
 It seemed to optimize faster than L-BFGS\sam{cite}, at least for earlier
 iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
 
@@ -275,7 +284,8 @@ In the FFF formalism, the training set (\S\ref{s:datasplits})
 contains NNN candidate edges (pairs of tokens with length between 1 and 10 inclusive),
 and NNN actual (non-null) edges.  $F$-score performance was improved by
 downweighting $\noedge$ examples through a weighted log-likeihood objective,
-$\sum_{i,j} \sum_k w_k \log P(y_{ij}=k;\beta)$, with $w_{\noedge}=0.3$ and $1$ otherwise.  
+$\sum_{i,j} \sum_k w_k \log P(y_{i,j}=\ell; \bm\phi)$, with $w_{\noedge}=0.3$
+and $1$ otherwise.
 (The weight was chosen by gridsearch on a development set; 
 PAS used a weight of $0.4$ while the others were $0.3$, though the differences at this granularity were small.)
 
@@ -380,13 +390,17 @@ let the $i^{th}$ component of $\psi$ be
 \psi_i = \sum_{\text{feat}\in F \text{ s.t. }
 h(\text{feat})=i}{\phi_{\text{feat}}}
 \]
+\sam{mention fact that dot products are approximately preserved with high
+probability.
+mention that should use the sign trick to get an unbiased approximation, but
+we don't happen to.}
 By never explicitly storing the full set of feature names, we can use
 tens of millions of features while keeping a fixed memory overhead.
 The downside is that whenever there is a collision, and two features hash to the
 same value, our model can no longer differentiate between those two features.
 In practice, we choose large enough $k$ such that performance is unaffected by
 collisions.
-
+\sam{which $k$ did we end up using? how many collisions?}
 
 
 \subsection{Top Prediction} \label{s:top_model}
