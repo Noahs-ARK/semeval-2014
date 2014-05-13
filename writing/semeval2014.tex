@@ -28,6 +28,8 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{tabularx}
 \setitemize{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
 \setenumerate{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
 
@@ -153,16 +155,23 @@ These types of distinctions become important in downstream applications.
 	\item Quick overview of three formalisms, emphasizing differences between them, consequences for parsing
 	\item DM:
 	\begin{itemize}
-	  \item ERG \cite{flickinger_deepbank_2012}
+	  \item DM is automatically derived from LinGO English Resource Grammar (ERG)
+	  annotations in DeepBank \cite{flickinger_deepbank_2012}.
 	\end{itemize}
 	\item PAS:
 	\begin{itemize}
-	  \item Enju\ldots \cite{miyao_corpus_oriented_2004}
+	  \item PAS is automatically derived from the Enju HPSG treebank using the
+	  conversion rules of \newcite{miyao_corpus_oriented_2004}.
 	\end{itemize}
 	\item PCEDT:
 	\begin{itemize}
-	  \item Tectogrammatic layer \cite{hajic_building_1998}
+	  \item PCEDT is automatically derived from the tectogrammatic layer of
+	  the Prague Czech--English Dependency Treebank \cite{hajic_building_1998}.
 	\end{itemize}
+	\item All are represented as labeled directed graphs, with words as vertices.
+	\item All have ``top'' annotations 
+	\item Stats about \% multiple roots, \% multiple tops, \% tree, \% acyclic
+	\item Examples? 
 \end{itemize}
 
 
@@ -187,10 +196,10 @@ the one best-scoring ``top'' under the model.
 
 \subsection{Singleton Classification} \label{s:singleton_model}
 
+We call a node in a graph without any parents or children a \emph{singleton}.
 For singleton prediction, we train a simple token-level logistic regression
 classifier.
-A singleton is a node in a graph without any parents or children.
-We train one model for each of the three formalisms, as each of the three
+We train a model for each of the three formalisms, as each of the three
 formalisms follow different conventions determining whether a token would be
 included in the final graph for a sentence.
 The PAS formalism, for example, includes almost all tokens that are not
@@ -220,15 +229,20 @@ For the PAS formalism, we use a structured SVM
 \cite{taskar_max_2003,tsochantaridis_support_2004} that enforces a
 \emph{determinism} constraint -- a word may not have two outgoing edges with the
 same label (\S\ref{s:graphparser}).
+\sam{explain why we use different models for different formalisms}
 
 Both models consider only token index pairs $(i, j)$ where %that are within 10
 % tokens of each other (i.e.~
 $|i-j| \leq 10$, $i \ne j$, and both $i$ and
 $j$ have been predicted to be non-singletons by the first stage.
-Although this prunes some gold edges, among the formalisms, 95\%-97\% of all
-gold edges are between tokens of distance 10 or less.
-Both directions $i \rightarrow j$ and $j \rightarrow i$ are considered between
-every pair.
+In other words, edges with more than 9 tokens between its two endpoints are not
+considered.
+Although this prunes some gold edges, among the formalisms,
+95\%-97\% of all gold edges are between tokens of distance 10 or less.
+We found that pruning long edges increased accuracy overall, in addition to
+speeding up training and prediction.
+Both directions $i \rightarrow j$ and $j \rightarrow
+i$ are considered between every pair.
 
 
 \subsubsection{\logitedge\ parser} \label{s:logitedge}
@@ -236,11 +250,12 @@ every pair.
 
 \codenote{LRParser.java}
 
-\noindent
+%\noindent
 The \logitedge\ model treats every ordered pair of token indices $(i, j)$ as a
 multiclass logistic regression with $K+1$ possible outputs:
-the formalism's $K$ edge labels plus the additional label \noedge, which
-indicates that no edge exists from $i$ to $j$.
+the formalism's original $K$ edge labels plus the additional label \noedge,
+which indicates that no edge exists from $i$ to $j$.
+Let $L$ be the set of possible edge labels.
 
 In our implementation, we separate features into two classes:
 those which can be extracted for any one word, $\bm{f}^{(\text{node})}(i)$;
@@ -256,7 +271,7 @@ each:
 	& \cup \bm{f}^{(\text{edge})}(i, j) \\
 	& \cup \{ \text{``parent''} \} \otimes \bm{f}^{(\text{node})}(i) \\
 	& \cup \{ \text{``child''} \} \otimes \bm{f}^{(\text{node})}(j)
-\right) \\
+\right)) \\
 \end{align*}
 \noindent
 where  $\otimes$ represents the Cartesian product.
@@ -265,12 +280,18 @@ where  $\otimes$ represents the Cartesian product.
 % pairs of tokens ($f^{(\text{edge})}(i,j)$), which are conjoined against all possible output
 %labels.
 For candidate parent index $i$ and child index $j$, the model defines a
-distribution over $y_{i,j} \in \{\text{edge labels}\} \cup \{\noedge\}$, using
-a parameter vector $\bm\phi$,
+distribution over $y_{i,j} \in L$, parametrized by the weight vector $\bm\phi$,
 
-\[
-  Pr(y_{i,j}=\ell; \bm\phi) & \propto e^{\bm\phi^\top \bm{f}(i, j, \ell)}
-\]
+\begin{equation}
+  Pr(y_{i,j}=\ell; \bm\phi) & = \frac{
+  	e^{\bm\phi^\top \bm{f}(i, j, \ell)}
+  } {
+  	\sum_{\ell^\prime \in L} {
+  		e^{\bm\phi^\top \bm{f}(i, j, \ell^\prime)}
+  	}
+  }
+\end{equation}
+
 \noindent
 %In this notation, an $f$ function outputs a real-valued vector, defined as the
 % concatenation of features from all the feature classes (\S\ref{s:features}).
@@ -282,8 +303,8 @@ iterations, though we did no systematic comparison. Stochastic gradient steps ar
 
 In the FFF formalism, the training set (\S\ref{s:datasplits})
 contains NNN candidate edges (pairs of tokens with length between 1 and 10 inclusive),
-and NNN actual (non-null) edges.  $F$-score performance was improved by
-downweighting $\noedge$ examples through a weighted log-likeihood objective,
+and NNN actual (non-null) edges.  $F_1$ performance was improved by
+downweighting $\noedge$ examples through a weighted log-likelihood objective,
 $\sum_{i,j} \sum_k w_k \log P(y_{i,j}=\ell; \bm\phi)$, with $w_{\noedge}=0.3$
 and $1$ otherwise.
 (The weight was chosen by gridsearch on a development set; 
@@ -379,19 +400,23 @@ During our experiments, the number of instantiated features ranged into the tens
 of millions.
 As a memory optimization, we implemented feature hashing
 \cite{weinberger_feature_2009}.
-Let $F$ be the space of all feature names.
-Instead of storing our model parameters as a hashmap %from
-% \texttt{feature\_name} to \texttt{feature\_value},
-or array $\phi$ of size $|F|$, we instead store them in an array $\psi$ of size
-$k$, with $k < |F|$.
-We choose a hash function $h : F \rightarrow \{0, \ldots, k-1\}$, and
-let the $i^{th}$ component of $\psi$ be 
+Let $F$ be the space of all feature names, and let $h$ be a hash function
+$h : F \rightarrow \{0, \ldots, k-1\}$ with $k < |F|$.
+Instead of storing our model parameters as a
+hashmap %from \texttt{feature\_name} to \texttt{feature\_value},
+or array $\bm\phi$ of size $|F|$, we instead store them in an array
+$h(\bm\phi)$ of size $k$, where the $i^{th}$ component of $h(\bm\phi)$ is
+defined to be
 \[
-\psi_i = \sum_{\text{feat}\in F \text{ s.t. }
-h(\text{feat})=i}{\phi_{\text{feat}}}
+h(\bm\phi)_i = \sum_{\substack{\text{feat} \in F \\\text{ s.t. }
+h(\text{feat})=i}}{\phi_{\text{feat}}}
 \]
-\sam{mention fact that dot products are approximately preserved with high
-probability.
+We similarly store our feature vectors as $h(\bm{f}) \in 2^k$ instead of
+$\bm{f} \in 2^{|F|}$.
+Note that the dot product is preserved,
+$h(\bm\phi)^\top h(\bm{f}) = \bm\phi^\top \bm{f}$.
+\sam{mention fact that dot products are approximately
+preserved with high probability.
 mention that should use the sign trick to get an unbiased approximation, but
 we don't happen to.}
 By never explicitly storing the full set of feature names, we can use
@@ -413,8 +438,9 @@ the classifier probabilities are evaluated, and the highest-scoring node is
 chosen to be ``top''.
 This is suboptimal, since some graphs have multiple tops (and in PCEDT this is
 more common);
-but selection rules based on probability thresholds gave worse F-score
-performance on the devset. \bocomment{I wonder if I documented this on an issue/PR}
+but selection rules based on probability thresholds gave worse $F_1$
+performance on the development set. \bocomment{I wonder if I documented this on
+an issue/PR}
 
 
 \subsubsection{Top Features}
@@ -477,7 +503,7 @@ the formalisms.
 One hypothesis as to why was that the vectors had a non-linear relationship
 with the labels.
 To address this, we trained a random forest in
-R\footnote{http://cran.r-project.org/web/packages/randomForest/randomForest.pdf}
+R\footnote{\url{http://cran.r-project.org/web/packages/randomForest/randomForest.pdf}}
 with the word vector features as described above, and used the hard labels
 predicted by the random forests as features in the \logitedge\ parser.
 Again, we saw no improvement.
@@ -492,6 +518,7 @@ We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
 labeled whole-sentence match (LM) on the held out test data (see
 Table~\ref{table:perf}).
 
+% CMU:
 % DM:
 % LP: 0.844641
 % LR: 0.834849
@@ -512,28 +539,58 @@ Table~\ref{table:perf}).
 % LF: 0.736396
 % LM: 0.071217
 
+% Priberam:
+% DM:
+% LP: 0.902322
+% LR: 0.881050
+% LF: 0.891559
+% LM: 0.268546
+% 
+% PAS:
+% LP: 0.925576
+% LR: 0.909676
+% LF: 0.917557
+% LM: 0.378338
+% 
+% PCEDT:
+% LP: 0.801397
+% LR: 0.757900
+% LF: 0.779042
+% LM: 0.106825
 
-\begin{table}
+
+\begin{table*}
 \begin{center}
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular*}{\textwidth}%{.6\textwidth}
+{@{\extracolsep{\fill}}cc|cccc}%|c|c|c|c|c|c|}
+% \hline
+ & System & LP & LR & LF & LM \\
 \hline
-formalism &
-\multicolumn{1}{c}{LP} & \multicolumn{1}{c}{LR} &
-\multicolumn{1}{c}{LF} &
-\multicolumn{1}{c|}{LM} \\
 \hline
-DM & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
+\multirow{2}{*}{\textbf{DM}}
+& CMU & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
+& Prib & 0.9023 & 0.8811 & 0.8916 & 0.2685 \\
 \hline
-PAS & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
+\multirow{2}{*}{\textbf{PAS}}
+& CMU & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
+& Prib & 0.9256 & 0.9097 & 0.9176 & 0.3783 \\
 \hline
-PCEDT & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
+\multirow{2}{*}{\textbf{PCEDT}}
+& CMU & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
+& Prib & 0.8014 & 0.7580 & 0.7790 & 0.1068 \\
 \hline
-\end{tabular}
+\hline
+\multirow{2}{*}{\textbf{Average}}
+& CMU & 0.8402 & 0.8090 & 0.8241 & 0.1397 \\
+& Prib & 0.8764 & 0.8496 & 0.8627 & 0.2512 \\
+\end{tabular*}
 \caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
-whole-sentence match (LM) on the held out test data.}
+whole-sentence match (LM) on the held out test data.
+We show results for our system (CMU) and the winning system (Prib) \sam{how to
+cite?}}
 \label{table:perf}
 \end{center}
-\end{table}
+\end{table*}
 
 
 
