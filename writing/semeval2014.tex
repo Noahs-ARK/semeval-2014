@@ -98,8 +98,9 @@ annotated with three different semantic dependency formalisms
 We test our system for each of the three formalisms using held out data
 from the provided corpus.
 
-Building shallow semantic analyzers\footnote{By shallow semantic analysis we mean discovering the semantic relationships
-between words or concepts in a sentence.
+Building shallow semantic analyzers\footnote{By shallow semantic analysis we
+mean analyzing the semantic relationships between pairs of words or concepts in
+a sentence.
 This is in contrast to a deeper semantic analysis in which one produces a full
 lambda-calculus logical form, or other representation which can be grounded in a
 model of the world or from which further inferences can be made.
@@ -175,8 +176,12 @@ The second stage jointly predicts whether an edge is
 present, and if so, what its label is (\S\ref{s:edge_model}).
 The third stage predicts whether a word is a \emph{top} or not
 (\S\ref{s:top_model}).
-``Top'' annotations roughly correspond to the focus of a
-sentence.
+``Top'' annotations roughly correspond to the semantic focus of a
+sentence, but there is no constraint that the ``top'' must be a root of the
+semantic dependency graph.
+Formalisms sometimes annotate more than one ``top'' per sentence, but we
+found that we achieve the best performance on all formalisms by predicting only
+the one best-scoring ``top'' under the model.
 
 
 \subsection{Singleton Classification} \label{s:singleton_model}
@@ -187,8 +192,8 @@ A singleton is a node in a graph without any parents or children.
 We train one model for each of the three formalisms, as each of the three
 formalisms follow different conventions determining whether a token would be
 included in the final graph for a sentence.
-In the PAS formalism, the rules to determine whether a token was a
-singleton were relatively simple and deterministic, so our model achieved over 99\%
+The PAS formalism, for example, includes almost all tokens that are not
+punctuation or a determiner, and our singleton model achieves over 99\%
 accuracy.
 \jdcomment{I need to find the accuracy for the other two formalisms. Will
 include this in our Results section.}
@@ -206,17 +211,17 @@ For each token $t$, the model considers the following features:
 
 In the second stage of the pipeline, we predict the set of labeled directed
 edges in the graph.
-We use the same set of (first-order) features
-in two different models:
-for the DM and PCEDT formalisms, we use an edge-independent multiclass logistic
+We use the same set of edge-factored features (\S\ref{s:features}) in two
+different models.
+For the DM and PCEDT formalisms, we use an edge-independent multiclass logistic
 regression model (\logitedge, \S\ref{s:logitedge}).
 For the PAS formalism, we use a structured SVM 
 \cite{taskar_max_2003,tsochantaridis_support_2004} that enforces a
 \emph{determinism} constraint -- a word may not have two outgoing edges with the
 same label (\S\ref{s:graphparser}).
 
-Both models consider only tokens pairs $(i, j)$ where %that are within 10 tokens
-%of each other (i.e.~
+Both models consider only token index pairs $(i, j)$ where %that are within 10
+% tokens of each other (i.e.~
 $|i-j| \leq 10$, $i \ne j$, and both $i$ and
 $j$ have been predicted to be non-singletons by the first stage.
 Although this prunes some gold edges, among the formalisms, 95\%-97\% of all
@@ -231,7 +236,7 @@ every pair.
 \codenote{LRParser.java}
 
 \noindent
-The \logitedge\ model treats every ordered pair of tokens $(i, j)$ as a
+The \logitedge\ model treats every ordered pair of token indices $(i, j)$ as a
 multiclass logistic regression with $K+1$ possible outputs:
 either one of the formalism's $K$ edge labels, or
 the additional label \noedge, which indicates that no edge exists from $i$ to
@@ -434,7 +439,7 @@ in this task we did not find benefit from any of them.
 The vectors we used \cite{wordVectors} were trained trained on the WMT-2011
 dataset, using a variation on latent semantic analysis which incorporated
 information from multiple languages.
-The vectors themselves contained 64 dimensions.
+The vectors contained 64 dimensions.
 
 For our edge factored model \logitedge, when considering a potential edge, we
 had a source word $W_1$ with associated word vector $V_1$ and a target word
@@ -499,9 +504,9 @@ Table~\ref{table:perf}).
 \begin{tabular}{|c|c|c|c|c|}
 \hline
 formalism &
-\multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} &
-\multicolumn{1}{c}{$F_1$} &
-\multicolumn{1}{c|}{Whole Sentence} \\
+\multicolumn{1}{c}{LP} & \multicolumn{1}{c}{LR} &
+\multicolumn{1}{c}{LF} &
+\multicolumn{1}{c|}{LM} \\
 \hline
 DM & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
 \hline
@@ -510,7 +515,8 @@ PAS & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
 PCEDT & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
 \hline
 \end{tabular}
-\caption{End-to-end performance.}
+\caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
+whole-sentence match (LM) on the held out test data.}
 \label{table:perf}
 \end{center}
 \end{table}
