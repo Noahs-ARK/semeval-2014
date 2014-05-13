@@ -251,13 +251,14 @@ The final binary feature vector is made by conjoining the output label with
 each:
 \begin{align*} 
 \bm{f}(i, j, \ell) =
-\{ \ell \} \otimes \left( &
-	\{ \text{``bias''} \} \\
-	& \cup \bm{f}^{(\text{edge})}(i, j) \\
-	& \cup \{ \text{``parent''} \} \otimes \bm{f}^{(\text{node})}(i) \\
-	& \cup \{ \text{``child''} \} \otimes \bm{f}^{(\text{node})}(j)
-\right) \\
+\{ \ell \} \otimes %\left(& 
+%	\{ \text{``bias''} \} \\
+%	& \cup \bm{f}^{(\text{edge})}(i, j) \\
+%	& \cup \{ \text{``parent''} \} \otimes \bm{f}^{(\text{node})}(i) \\
+%	& \cup \{ \text{``child''} \} \otimes \bm{f}^{(\text{node})}(j)
+%\right)\\
 \end{align*}
+\jdcomment{I commented out this equation as it wouldn't compile on my machine... sorry!}
 \noindent
 where  $\otimes$ represents the Cartesian product.
 %Feature extractors are defined to extract
@@ -269,9 +270,10 @@ distribution over $y_{i,j} \in \{\text{edge labels}\} \cup \{\noedge\}$, using
 a parameter vector $\bm\phi$,
 
 \[
-  Pr(y_{i,j}=\ell; \bm\phi) & \propto e^{\bm\phi^\top \bm{f}(i, j, \ell)}
+  Pr(y_{i,j}=\ell; \bm\phi)  \propto e^{\bm\phi^\top \bm{f}(i, j, \ell)}
 \]
 \noindent
+\jdcomment{I removed an ampersand from the equation here, as it prevented compilation on my machine. Sorry!}
 %In this notation, an $f$ function outputs a real-valued vector, defined as the
 % concatenation of features from all the feature classes (\S\ref{s:features}).
 $\bm\phi$ is learned by minimizing total negative log-likelihood of the above
@@ -366,10 +368,6 @@ These features were computed over an edge $E$ with source token $S$ and target t
 \begin{itemize}
 \item The unlabeled path through the syntactic dependency tree from $S$ to $S$. 
 \item The unlabeled path through the syntactic dependency tree from $S$ to $T$, annotated with whether the each step through the tree was to the right or left in the sentence.
-\end{itemize}
-\item Brown clusters
-\begin{itemize}
-\item \jdcomment{The word on the street is that these weren't used. Check on that, then consider moving to ``didn't work'' section.}
 \end{itemize}
 \end{itemize}
 
@@ -482,6 +480,16 @@ with the word vector features as described above, and used the hard labels
 predicted by the random forests as features in the \logitedge\ parser.
 Again, we saw no improvement.
 
+\subsection{Active vs. Passive Voice}
+Modeling active voice vs. passive voice contains some information about the semantics in a sentence. We found computing features based on this didn't give any benefit.
+
+\subsection{Alternative Distance Measures}
+Multiple kinds of distance features, including log distance, binned distance (i.e. less than five tokens apart, between five and ten tokens apart, more than ten tokens apart), and thresholded distance (i.e. zero to three tokens apart, zero to five tokens apart, etc.).
+
+\subsection{Brown Clusters}
+Brown cluster features, including the using prefixes of length 2, 4, and 6, didn't help, even when conjoined with PoS tags.
+
+
 \bocomment{caveat, these were not carefully done.}
 
 
@@ -538,17 +546,15 @@ whole-sentence match (LM) on the held out test data.}
 
 
 \section{Future work}
+There are a number of clear extensions to this work that could improve performance. While using an edge factored model allows for efficient inference, there is much to be gained from using higher-order features. Extending the model in this way would require using some kind of approximate inference, but others have shown large gains without a significant decrease in speed. 
 
-\begin{itemize}
-  \item Higher-order features
-  \item Multitask learning
-\end{itemize}
+While each of the three formalisms is different, there is much information shared between them. For example, the head of a sentence is often the same in all three formalisms. Taking advantage of this information in a multi-task learning framework could lead to significant gains. 
 
 
 \section{Conclusion}
+We found that feature rich models performed well on the task of mapping from sentences to semantic dependency parses. Our work has shown the best results when using one model for predicting whether a give token was to be included in the final graph, then using either our \logitedge parser or a graph-based structured SVM parser to predict a graph from the remaining tokens. Each of the three formalisms has different constraints; we found enforcing determinism in the PAS formalisms gave improvements, while enforcing other constraints did not. While our final approach was fairly standard for work in parsing, we tried to use a number of additional features which didn't help, including word embeddings and modeling active vs. passive voice.
 
 \nocite{flanigan-etal:ACL2014}
-
 
 
 \section*{Acknowledgements}
