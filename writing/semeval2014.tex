@@ -70,14 +70,15 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-  abstract
+  
 \end{abstract}
 
 
 
 \section{Introduction}
 
-
+We present a graph-based approach to semantic dependency parsing for SemEval
+2014 Shared Task 8.
 
 \section{Formalisms}
 
@@ -89,13 +90,34 @@
 \section{Models}
 \newcommand{\logitedge}{\textsc{LogitEdge}}
 
+We treat the problem as a three-stage pipeline.
+The first stage predicts whether a word is a \emph{singleton} or not --
+whether it has any incoming or outgoing edges at all
+(\S\ref{s:singleton_model}).
+The second stage jointly predicts whether an edge is present, and if so, what
+its label is (\S\ref{s:edge_model}).
+The third stage predicts whether a word is a \emph{top} or not
+(\S\ref{s:top_model}).
+``Top'' annotations roughly correspond to the focus of a
+sentence.
+
+
+\subsection{Singleton Prediction} \label{s:singleton_model}
+
+We use a logistic regression model, tuned for high precision.
+
+
+\subsection{Edge Prediction} \label{s:edge_model}
+
 We used the same set of (first-order) features
-in two different models: a faster-to-train
-logistic regression model (\logitedge, \ref{s:logitedge}),
-and a structured graph prediction model (\ref{s:graphparser}).
+in two different models: an edge-independent multiclass %a faster-to-train
+logistic regression model (\logitedge, \ref{s:logitedge}) for the DM and PCEDT
+formalisms, and a discriminative structured graph prediction model
+(\ref{s:graphparser}) for the PAS formalism.
 
 
-\subsection{\logitedge\ parser} \label{s:logitedge}
+\subsubsection{\logitedge\ parser} \label{s:logitedge}
+
 
 \codenote{LRParser.java}
 
@@ -153,12 +175,22 @@ the most likely edge label was predicted for every candidate $(i,j)$ pair of tok
 
 First, if a non-\textsc{NoEdge} edge was predicted for both directions for a single $(i,j)$ pair, only the more likely one was used for the final graph.  This improved devset accuracy, though it is only a primitive constraint on the graph decoding.
 
-Second, the edge-based logistic regression has no facility for the ``top'' or root-like attribute for a graph node.  We trained a separate token-level binary logistic regression to classify whether a token's node had the ``top'' attribute or not.  At decoding time, all nodes in the predicted graph (i.e., tokens where there is either an inbound or outbound edge) are possible candidates to be ``top''; the classifier probabilities are evaluated, and the highest-scoring node is chosen to be ``top''.
-This is suboptimal, since some graphs have multiple tops (and in PCEDT this is more common); but selection rules based on probability thresholds gave worse F-score performance on the devset. \bocomment{I wonder if I documented this on an issue/PR}
 
 
-\subsection{Graph-based parser} \label{s:graphparser}
+\subsubsection{Graph-based parser} \label{s:graphparser}
 
+\subsection{Top Prediction} \label{s:top_model}
+
+We trained a separate token-level binary logistic regression to classify
+whether a token's node had the ``top'' attribute or not.
+At decoding time, all nodes in the predicted graph (i.e., tokens where there is
+either an inbound or outbound edge) are possible candidates to be ``top'';
+the classifier probabilities are evaluated, and the highest-scoring node is
+chosen to be ``top''.
+This is suboptimal, since some graphs have multiple tops (and in PCEDT this is
+more common);
+but selection rules based on probability thresholds gave worse F-score
+performance on the devset. \bocomment{I wonder if I documented this on an issue/PR}
 
 \section{Features}
 
