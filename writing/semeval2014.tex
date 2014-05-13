@@ -230,8 +230,30 @@ performance on the devset. \bocomment{I wonder if I documented this on an issue/
 \item UnlabeledDepFE
 \item Brown clusters
 \end{itemize}
-\subsection{feature hashing}
 
+
+
+\subsection{Feature Hashing}
+
+As a memory optimization, we implemented feature hashing
+\cite{weinberger_feature_2009}.
+Let $F$ be the space of all feature names.
+Instead of storing our model parameters as a hashmap %from
+% \texttt{feature\_name} to \texttt{feature\_value},
+or array $\phi$ of size $|F|$, we instead store them in an array $\psi$ of size
+$k$, with $k < |F|$.
+We choose a hash function $h : F \rightarrow \{0, \ldots, k-1\}$, and
+let the $i^{th}$ component of $\psi$ be 
+\[
+\psi_i = \sum_{\text{feat}\in F \text{ s.t. }
+h(\text{feat})=i}{\phi_{\text{feat}}}
+\]
+By never explicitly storing the full set of feature names, we can use
+tens of millions of features while keeping a fixed memory overhead.
+The downside is that whenever there is a collision, and two features hash to the
+same value, our model can no longer differentiate between those two features.
+In practice, we choose large enough $k$ such that performance is unaffected by
+collisions.
 
 \subsection{Features for subsystem classifiers}
 
@@ -261,7 +283,7 @@ performance on the devset. \bocomment{I wonder if I documented this on an issue/
 \section*{Acknowledgements}
 
 \bibliographystyle{acl}
-\bibliography{semeval8,morebib}
+\bibliography{semeval8}
 
 
 
