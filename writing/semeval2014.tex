@@ -349,7 +349,8 @@ node may have more than one outgoing edge with the same label.
 \subsubsection{Edge Features}
 
 \label{s:features}
-These features were computed over an edge $E$ with source token $S$ and target token $T$.  For each of those listed here, we have an indicator feature for each value it takes on. 
+These features were computed over an edge $E$ with parent token $S$ and child
+token $T$.  For each of those listed here, we have an indicator feature for each value it takes on.
 
 \begin{itemize}
 \item Basic
@@ -482,7 +483,7 @@ information from multiple languages.
 The vectors contained 64 dimensions.
 
 For our edge factored model \logitedge, when considering a potential edge, we
-had a source word $W_1$ with associated word vector $V_1$ and a target word
+had a parent word $W_1$ with associated word vector $V_1$ and a child word
 $W_2$ with associated word vector $V_2$.
 For each method outlined below, the elements of the output vector was used as a
 feature.
