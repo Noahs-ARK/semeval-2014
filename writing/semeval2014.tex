@@ -48,6 +48,7 @@
 \newcommand{\transpose}{^\mathsf{T}}
 
 \newcommand{\bocomment}[1]{\textcolor{Bittersweet}{[#1 -BTO]}}
+\newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
 % turn off for submission, but on for a more tech report-y version.
 \newcommand{\codenote}[1]{\textcolor{PineGreen}{[Code: \emph{#1}]}}
@@ -159,36 +160,96 @@ This is suboptimal, since some graphs have multiple tops (and in PCEDT this is m
 
 \subsection{Graph-based parser} \label{s:graphparser}
 
+\subsection{Singleton Classification}
+For singleton prediction, we again use logistic regression. A singleton is a node in a graph without any parents or children. We trained one model for each of the three formalisms, as each of the three formalisms used different rules to determine whether a token would be included in the final graph for a sentence. In one formalism, PAS, the rules to determine whether a token was a singleton were relatively simple and deterministic, so our model achieved over 99\% accuracy. \jdcomment{I need to find the accuracy for the other two formalisms. Will include this in our Results section.}
+
+\subsubsection{Features}
+As this model only predicted whether a given token was a singleton, it used a subset of the features that the edge parsers used. Specifically, this model used the BasicFeatures feature set. 
+
+
+\subsection{Topness Classification}
+In each of the three formalisms, there is exactly one node that is at the top of the graph. 
+
+\subsubsection{Topness Features}
+For a given token $T$, the topness classifier used the following features:
+\begin{itemize}
+\item The PoS tag of $T$.
+\item Index($T$).
+\item Conjoined PoS tag of $T$ and Index($T$).
+\item The depth of $T$ in the syntactic dependency parse. 
+\end{itemize}
+
+\subsubsection{Logistic Regression}
+
 
 \section{Features}
 
 \subsection{all the stuff in our model}
 
 \label{s:features}
+These features were computed over an edge $E$ with source token $S$ and target token $T$.  For each of those listed here, we have an indicator feature for each value it takes on. 
 
 \begin{itemize}
 \item BasicFeatures
+\begin{itemize}
+\item Lemmas of $S$ and $T$.
+\item Part of speech tags of $S$ and $T$.
+\item Token strings of $S$ and $T$.
+\item 1 if Index($S$) $\le$ Index($T$), 0 otherwise.
+\end{itemize}
 \item LinearOrderFeatures
+\begin{itemize}
+\item Index($S$) - Index($T$).
+\end{itemize}
 \item CoarseDependencyFeatures
+\begin{itemize}
+\item 1 if $S$ is the parent of $T$ in syntactic dependency parse, 0 otherwise.
+\item Distance between $S$ and $T$ in syntactic dependency parse.
+\end{itemize}
 \item LinearContextFeatures
+\begin{itemize}
+\item Concatenated PoS tags of tokens at Index($S$)-1, Index($S$), Index($S$)+1, Index($T$)-1, Index($T$), Index($T$)+1.
+\item Concatenated PoS tags of tokens at Index($S$)-1, Index($S$), Index($T$)-1, Index($T$).
+\item Concatenated PoS tags of tokens at Index($S$), Index($S$)+1, Index($T$), Index($T$)+1.
+\end{itemize}
 \item DependencyPathv1
+\begin{itemize}
+\item The token string concatenated to the labeled path through the syntactic dependency tree from $S$ to $T$.
+\end{itemize}
 \item SubcatSequenceFE
+\begin{itemize}
+\item For each child $c$ of $S$ in the syntactic dependency tree, concatenate the PoS tag of $S$ with the label of the ark to the child. If $c$ is $T$, append a ``+''.
+\item For each child $c$ of $S$ in the syntactic dependency tree, concatenate the PoS tag of $S$ with the PoS tag of $c$ and the label of the ark to the child. If $c$ is $T$, append a ``+''.
+\end{itemize}
 \item UnlabeledDepFE
+\begin{itemize}
+\item The unlabeled path through the syntactic dependency tree from $S$ to $S$. 
+\item The unlabeled path through the syntactic dependency tree from $S$ to $T$, annotated with whether the each step through the tree was to the right or left in the sentence.
+\end{itemize}
 \item Brown clusters
+\begin{itemize}
+\item \jdcomment{The word on the street is that these weren't used. Check on that, then consider moving to ``didn't work'' section.}
+\end{itemize}
 \end{itemize}
 \subsection{feature hashing}
 
 
-\subsection{Features for subsystem classifiers}
-
- - Topness classifier
-
- - Singleton classifier
-
- - Predicate-ness classifier
-
 
 \subsection{all the stuff we tried but didn't work}
+\subsubsection{Word vectors}
+Word vectors have been shown to benefit a number of semantic tasks. We incorporated features based on trained word vectors in a number of ways, though we didn't find benefit from any of them. The vectors we used \cite{wordVectors} were trained trained on the WMT-2011 dataset, using a variation on latent semantic analysis which incorporated information from multiple languages. The vectors themselves contained 64 dimensions. 
+
+ For our edge factored model \logitedge, when considering a potential edge, we had a source word $W_1$ with associated word vector $V_1$ and a target word $W_2$ with associated word vector $V_2$. For each method outlined below, the elements of the output vector was used as a feature. As an example, if we concatenated the two vectors into a third vector $V_3$ (as we show in $f_1$), each element of $V_3$ was used as a feature in our model. 
+\begin{enumerate}
+\item $f_1(V_1,V_2)$ = $ \left( \begin{smallmatrix} V_1\\ V_2 \end{smallmatrix} \right)$
+\item $f_2(V_1,V_2)$ = $V_1 - V_2$.
+\item $f_3(V_1,V_2)$ = $V_1 \cdot V_2$ (Dot product)
+\item $f_4(V_1,V_2)$ = $V_1 \bigodot V_2$ (Element-wise multiplication)
+\end{enumerate}
+Unfortunately we saw no improvement from these features.
+
+\subsubsection{Random Forests}
+The word vectors added as features didn't reliably improve accuracy on any of the formalisms. One hypothesis as to why was that the vectors had a non-linear relationship with the labels. To address this, we trained a random forest in R\footnote{http://cran.r-project.org/web/packages/randomForest/randomForest.pdf} with the word vector features as described above, and used the hard labels predicted by the random forests as features in the \logitedge\ parser. Again, we saw no improvement.
 
 \bocomment{caveat, these were not carefully done.}
 
