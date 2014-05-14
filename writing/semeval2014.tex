@@ -480,7 +480,11 @@ predicted by the random forests as features in the \logitedge\ parser.
 Again, we saw no improvement.
 
 \subsection{Active vs. Passive Voice}
-Modeling active voice vs. passive voice contains some information about the semantics in a sentence. We found computing features based on this didn't give any benefit.
+A verb tends to realize its semantic arguments differently when the verb is in
+active voice vs. passive voice.
+We attempted to capture this by conjoining a ACTIVE/PASSIVE feature with both
+the LinearDistance features and the SubcatSequence features.
+We surprisingly did not see any improvement when including these features.
 
 \subsection{Alternative Distance Measures}
 Multiple kinds of distance features, including log distance, binned distance (i.e. less than five tokens apart, between five and ten tokens apart, more than ten tokens apart), and thresholded distance (i.e. zero to three tokens apart, zero to five tokens apart, etc.).
