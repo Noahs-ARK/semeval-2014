@@ -64,8 +64,8 @@
 \newenvironment{itemizesquish}{\begin{list}{\labelitemi}{\setlength{\itemsep}{-0.1em}\setlength{\labelwidth}{1em}\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}}}{\end{list}}
 
 
-\title{Broad-Coverage Semantic Dependency Parsing with Rich Edge-Factored
-Features \sam{better title, please}}
+\title{CMU-Ark: Broad-Coverage Semantic Dependency Parsing with Rich
+Edge-Factored Features \sam{better title, please}}
 
 \author{First Author \\
   Affiliation / Address line 1 \\
@@ -95,8 +95,8 @@ Dependency Parsing.
 \section{Introduction}
 
 We present a system that produces semantic dependency parses by extracting
-features for each potential dependency arc and learning a statistical model to
-discriminate between good arcs and bad.
+features for each potential semantic dependency arc and learning a statistical
+model to discriminate between good arcs and bad.
 The organizers of SemEval 2014 Shared Task 8: Broad-Coverage Semantic Dependency
 Parsing \sam{cite} have provided a corpus of English language newswire
 annotated with three different semantic dependency formalisms
@@ -143,12 +143,20 @@ For instance, in ``The bread baked in the oven.'' and ``I baked the bread in the
 ven.'' ``the bread'' bears the same semantic relationship to ``baked'' but is
 realized in a different syntactic position.
 These types of distinctions become important in downstream applications.
-%Even shallow semantic analysis can be useful in downstream applications.
-
-
 \sam{cite}.
 
-\sam{This paper is organized as follows\ldots}
+In this work, we explore a variety of rich edge-factored features, and test
+enforcing various constraints on the graph.
+We find a set of features which predict semantic dependencies well across all
+three formalisms (\S\ref{s:features}).
+We find only one graph constraint that improves performance on one of the
+formalisms (\S\ref{s:graphparser}).
+We describe both positive and negative results (\S\ref{s:negative}).
+We submitted our system to the open track (in which output from syntax parsers
+and other outside resources can be used), and placed second.
+We present our results, and compare to the first place system, Priberam
+\sam{cite}, in \S\ref{s:evaluation}.
+%\sam{This paper is organized as follows\ldots}
 
 
 
@@ -318,7 +326,7 @@ Adagrad \cite{duchi_adaptive_2011} is used for optimization.
 It seemed to optimize faster than L-BFGS\sam{cite}, at least for earlier
 iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
 
-In the FFF formalism, the training set (\S\ref{s:datasplits})
+In the FFF formalism, the training set (\S\ref{s:evaluation})
 contains NNN candidate edges (pairs of tokens with length between 1 and 10 inclusive),
 and NNN actual (non-null) edges.  $F_1$ performance was improved by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
@@ -474,7 +482,7 @@ For a given token $T$, the topness classifier used the following features:
 
 
 
-\section{Negative Results}
+\section{Negative Results} \label{s:negative}
 
 We followed a forward-selection process during feature engineering.
 For each potential feature, we tested the current feature set versus the current
@@ -548,7 +556,7 @@ child tokens.
 
 
 \section{Evaluation}
-\label{s:datasplits}
+\label{s:evaluation}
 
 We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
 labeled whole-sentence match (LM) on the held out test data (see
