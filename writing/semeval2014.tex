@@ -60,6 +60,9 @@
 \newcommand{\logitedge}{\textsc{LogitEdge}}
 \newcommand{\noedge}{\textsc{NoEdge}}
 
+% saves only a little bit of space. might need tweaking to save more.
+\newenvironment{itemizesquish}{\begin{list}{\labelitemi}{\setlength{\itemsep}{-0.1em}\setlength{\labelwidth}{1em}\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}}}{\end{list}}
+
 
 \title{Broad-Coverage Semantic Dependency Parsing with Rich Edge-Factored
 Features \sam{better title, please}}
@@ -192,6 +195,8 @@ semantic dependency graph.
 Formalisms sometimes annotate more than one ``top'' per sentence, but we
 found that we achieve the best performance on all formalisms by predicting only
 the one best-scoring ``top'' under the model.
+\bocomment{I thought that only LogitEdge has the separate third stage of ``top'' prediction. Maybe I'm wrong? delete this comment if so}
+\bocomment{Also, singleton pruning does not matter for LogitEdge.  It doesn't affect accuracy, I'm pretty sure.  But it is essential for the graph model.}
 
 
 \subsection{Singleton Classification} \label{s:singleton_model}
@@ -230,6 +235,7 @@ For the PAS formalism, we use a structured SVM
 \emph{determinism} constraint -- a word may not have two outgoing edges with the
 same label (\S\ref{s:graphparser}).
 \sam{explain why we use different models for different formalisms}
+\bocomment{shouldn't we just say, we tried both for all and are reporting the configurations that performed best on devset?}
 
 Both models consider only token index pairs $(i, j)$ where %that are within 10
 % tokens of each other (i.e.~
@@ -341,8 +347,8 @@ pair, only the edge with the higher score is chosen.
 % If the gold standard has an edge in the direction $i \rightarrow j$, the
 % direction $j \rightarrow i$ is considered a \noedge.
 There are no such bidirectional edges in the training data, and enforcing this
-restriction improved accuracy on the development set.%, though it is only a
-% primitive constraint on the graph decoding.
+restriction improved accuracy on the development set.
+The graph-based parser has much more sophisticated decoding constraints.
 
 
 
@@ -406,8 +412,10 @@ token $T$.  For each of those listed here, we have an indicator feature for each
 
 During our experiments, the number of instantiated features ranged into the tens
 of millions.
-As a memory optimization, we implemented feature hashing
-\cite{weinberger_feature_2009}.
+As a memory optimization to enable more experiments,
+we implemented feature hashing
+\cite{weinberger_feature_2009} for the \logitedge\ system.
+\bocomment{We only did this for LogitEdge, right? We definitely did there.}
 Let $F$ be the space of all feature names, and let $h$ be a hash function
 $h : F \rightarrow \{0, \ldots, k-1\}$ with $k < |F|$.
 Instead of storing our model parameters as a
@@ -434,6 +442,7 @@ same value, our model can no longer differentiate between those two features.
 In practice, we choose large enough $k$ such that performance is unaffected by
 collisions.
 \sam{which $k$ did we end up using? how many collisions?}
+\bocomment{can someone point me to the logs for the final training? did it just use the default value? if so that was $k=$ 100 million.  Also didn't we do tests that found hashing increased performance compared to not using it?}
 
 
 \subsection{Top Prediction} \label{s:top_model}
@@ -537,8 +546,6 @@ Neither did conjoining the above features with the PoS tags of the parent and
 child tokens.
 
 
-\bocomment{caveat, these were not carefully done.}
-
 
 \section{Evaluation}
 \label{s:datasplits}
@@ -616,7 +623,9 @@ Table~\ref{table:perf}).
 \caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
 whole-sentence match (LM) on the held out test data.
 We show results for our system (CMU) and the winning system (Prib) \sam{how to
-cite?}}
+cite?}
+\bocomment{why don't we show results for both logreg and the graph-based parser? did we not run all of them? i thought we did and that's why/how we picked the ones we did. maybe that was just hte devset?}
+}
 \label{table:perf}
 \end{center}
 \end{table*}
