@@ -58,7 +58,7 @@
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
 % turn off for submission, but on for a more tech report-y version.
-\newcommand{\codenote}[1]{\textcolor{PineGreen}{[Code: \emph{#1}]}}
+\newcommand{\codenote}[1]{\textcolor{PineGreen}{[\emph{Code:} #1]}}
 \newcommand{\logitedge}{\textsc{LogitEdge}}
 \newcommand{\noedge}{\textsc{NoEdge}}
 
@@ -268,6 +268,7 @@ $\bm{f}^{(\text{edge})}(i, j)$.
 These features are described in \S\ref{s:features}.
 The final binary feature vector is made by conjoining the output label with
 each:
+\bocomment{we dont always use binary features...}
 \begin{align*} 
 \bm{f}(i, j, \ell) =
 \{ \ell \} \otimes (& 
@@ -309,7 +310,7 @@ In the FFF formalism, the training set (\S\ref{s:evaluation})
 contains NNN candidate edges (pairs of tokens with length between 1 and 10 inclusive),
 and NNN actual (non-null) edges.  $F_1$ performance was improved by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
-$\sum_{i,j} \sum_k w_k \log P(y_{i,j}=\ell; \bm\phi)$, with $w_{\noedge}=0.3$
+$\sum_{i,j} \sum_\ell w_\ell \log P(y_{i,j}=\ell; \bm\phi)$, with $w_{\noedge}=0.3$
 and $1$ otherwise.
 (The weight was chosen by gridsearch on a development set; 
 PAS used a weight of $0.4$ while the others were $0.3$, though the differences at this granularity were small.)
@@ -335,7 +336,7 @@ pair, only the edge with the higher score is chosen.
 % direction $j \rightarrow i$ is considered a \noedge.
 There are no such bidirectional edges in the training data, and enforcing this
 restriction improved accuracy on the development set.
-The graph-based parser has much more sophisticated decoding constraints.
+The graph-based parser has more sophisticated decoding constraints.
 
 
 
@@ -353,6 +354,8 @@ node may have more than one outgoing edge with the same label.
 explain how this differs from 
 \cite{flanigan-etal:ACL2014}
 }
+
+\bocomment{Does this use the topness prediction system?}
 
 
 
@@ -404,39 +407,52 @@ token $T$.  For each of those listed here, we have an indicator feature for each
 
 \subsubsection{Feature Hashing}
 
-During our experiments, the number of instantiated features ranged into the tens
-of millions.
-As a memory optimization to enable more experiments,
-we implemented feature hashing
-\cite{weinberger_feature_2009} for the \logitedge\ system.
-\bocomment{We only did this for LogitEdge, right? We definitely did there.}
-Let $F$ be the space of all feature names, and let $h$ be a hash function
-$h : F \rightarrow \{0, \ldots, k-1\}$ with $k < |F|$.
-Instead of storing our model parameters as a
-hashmap %from \texttt{feature\_name} to \texttt{feature\_value},
-or array $\bm\phi$ of size $|F|$, we instead store them in an array
-$h(\bm\phi)$ of size $k$, where the $i^{th}$ component of $h(\bm\phi)$ is
-defined to be
+%% 7-10 million features (percepts) before label conjunction:
+% cab:~dbamman/semeval/mar3 % wc -l *.model
+%    7518732 mar3_recsplit.dm.model
+%    7038841 mar3_recsplit.pas.model
+%    9939549 mar3_recsplit.pcedt.model
+%   24497122 total
+
+\codenote{Look for use of flag LRParser.useHashing, esp LRParser.java:perceptNum() 
+  (hashed value before label conjunction),
+  and Model.java:coefIdx() (hashed value after label conjunction)}
+
+\noindent
+During our experiments, the number of instantiated features, before conjunction with labels, ranged in the tens of millions;
+since our implementation
+maintained a hash table of feature names to numeric indexes, the
+resulting several gigabytes of
+memory usage was an issue for conveniently running many simultaneous experiments.
+As a simple memory optimization for the \logitedge\ system,
+we implemented (multitask) feature hashing
+\cite{weinberger_feature_2009},
+which randomly assigns features' numeric indexes with a hash function.
+Let $F$ be the space of all feature names (before conjunction with the output label),
+and let $h$ be a hash function for the final conjunction,
+that maps the feature name and the label to one of $B$ bucket values:
+$h : (F \times L) \rightarrow \{1, \ldots, B\}$.
+Instead of storing model parameters in the usual approach,
+as a matrix $\bm\phi$ size $|F| \times |L|$,
+under hashing they are stored in a matrix $h(\bm\phi)$ size $B \times |L|$,
+where an entry of $h(\bm\phi)$ is defined as
 \[
-h(\bm\phi)_i = \sum_{\substack{\text{feat} \in F \\\text{ s.t. }
-h(\text{feat})=i}}{\phi_{\text{feat}}}
+  h(\bm\phi)_{b,l} = \sum_{\substack{\text{feat} \in F \\\text{ s.t. }
+h(\text{feat},l)=b}}{\phi_{\text{feat},l}}
 \]
-We similarly store our feature vectors as $h(\bm{f}) \in 2^k$ instead of
-$\bm{f} \in 2^{|F|}$.
-Note that the dot product is preserved,
-$h(\bm\phi)^\top h(\bm{f}) = \bm\phi^\top \bm{f}$.
-\sam{mention fact that dot products are approximately
-preserved with high probability.
-mention that should use the sign trick to get an unbiased approximation, but
-we don't happen to.}
-By never explicitly storing the full set of feature names, we can use
-tens of millions of features while keeping a fixed memory overhead.
-The downside is that whenever there is a collision, and two features hash to the
-same value, our model can no longer differentiate between those two features.
-In practice, we choose large enough $k$ such that performance is unaffected by
-collisions.
-\sam{which $k$ did we end up using? how many collisions?}
-\bocomment{can someone point me to the logs for the final training? did it just use the default value? if so that was $k=$ 100 million.  Also didn't we do tests that found hashing increased performance compared to not using it?}
+We similarly store our feature vectors in a hashed space.
+The theory of feature hashing shows that, even with collisions that erroneously force multiple features to use the same weight value,
+the final dot products are approximately preserved.
+ We used a value of $B$ as large as was convenient for memory usage, $B=10^{8}$,
+ which was actually higher than $|F|$ (but still had collisions:
+ with $|F|=10e6$ and $B=100e6$, about 9.5\% of features are hashed to a value shared by at least one other features).
+%% simulation:
+% num buckets count 0: 90484843
+% num buckets count 1: 9046266
+% num collisions: num features that are in a non-singleton bucket: 953734
+%%  average over simulations for last value:
+the memory savings were due to
+not having to represent the name-to-index map during feature extraction.
 
 
 \subsection{Top Prediction} \label{s:top_model}
