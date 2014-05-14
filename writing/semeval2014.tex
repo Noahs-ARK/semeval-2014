@@ -64,8 +64,8 @@
 \newenvironment{itemizesquish}{\begin{list}{\labelitemi}{\setlength{\itemsep}{-0.1em}\setlength{\labelwidth}{1em}\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}}}{\end{list}}
 
 
-\title{Broad-Coverage Semantic Dependency Parsing with Rich Edge-Factored
-Features \sam{better title, please}}
+\title{CMU-Ark: Broad-Coverage Semantic Dependency Parsing with Rich
+Edge-Factored Features \sam{better title, please}}
 
 \author{First Author \\
   Affiliation / Address line 1 \\
@@ -100,35 +100,12 @@ The particular task of \emph{broad-coverage} parsing discourages optimization to
 
 We present here two systems that produce semantic dependency parses by extracting
 features for each potential dependency arc and learning a statistical model to
-discriminate between good arcs and bad; the first treats each labeled edge decision as an independent multiclass logistic regression (\S \ref{s:logitedge}), while the second predicts all edges as part of a graphed-based structured SVM (\S \ref{s:graphparser}).  Common to both models are a set of edge features, described in \S \ref{s:edgefeatures}.  While the features included in the final prediction were all found to have a positive impact on the final development accuracy, we also describe a range of other features (\S \ref{s:badfeatures}) found to have no discernable impact (or even negative impact) in our development.
+discriminate between good arcs and bad; the first treats each labeled edge decision as an independent multiclass logistic regression (\S \ref{s:logitedge}), while the second predicts all edges as part of a graph-based structured SVM (\S \ref{s:graphparser}).  Common to both models are a rich set of edge features, described in \S \ref{s:edgefeatures}.  While the features included in the final prediction were all found to have a positive impact on the final development accuracy, we also describe a range of other features (\S \ref{s:badfeatures}) found to have no discernable impact (or even negative impact) in our development.
 
-%While semantic parsing remains unsolved, syntactic parsing in general, and
-%dependency parsing in particular has gotten very far towards these goals.
-%Syntactic parsing has greatly benefited from the existence of a large corpus of
-%annotations with high inter-annotator agreement: the Penn Treebank
-%\cite{marcus_building_1993}.
-%By representing semantic relationships between words as labeled
-%directed edges, we can reuse methodologies developed for syntactic dependency
-%parsing.
-%These methods are noted for their fast inference.
-
-
-%\sam{something about how we're inspired by the success
-%dependency parsing has had, because of PTB, and because loosening up the
-% representation allows fast inference.}
-
-%Dependency parsing is a popular form of syntactic processing, as it
-%is generally faster than constituency parsing, while still capturing much of
-%what is needed for downstream applications.
-% allows for a simpler representation
-
-%But while syntactic dependency parsers capture relationships between words in a
-%sentence, the relationships they capture are not semantic.
-%For instance, in ``The bread baked in the oven.'' and ``I baked the bread in the
-%ven.'' ``the bread'' bears the same semantic relationship to ``baked'' but is
-%realized in a different syntactic position.
-%These types of distinctions become important in downstream applications.
-%Even shallow semantic analysis can be useful in downstream applications.
+Our system placed second in the open track of the broad-coverage semantic parsing task (in which output from syntax parsers
+and other outside resources can be used).
+We present our results, and compare to the first place system, Priberam
+\sam{cite}, in \S\ref{s:evaluation}.
 
 
 
@@ -304,7 +281,7 @@ Adagrad \cite{duchi_adaptive_2011} is used for optimization.
 It seemed to optimize faster than L-BFGS\sam{cite}, at least for earlier
 iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
 
-In the FFF formalism, the training set (\S\ref{s:datasplits})
+In the FFF formalism, the training set (\S\ref{s:evaluation})
 contains NNN candidate edges (pairs of tokens with length between 1 and 10 inclusive),
 and NNN actual (non-null) edges.  $F_1$ performance was improved by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
@@ -347,6 +324,12 @@ max-margin objective during training, and enforces an additional constraint: no
 node may have more than one outgoing edge with the same label.
 
 \sam{TK from jflan}
+
+\sam{
+explain how this differs from 
+\cite{flanigan-etal:ACL2014}
+}
+
 
 
 \subsubsection{Edge Features}
@@ -461,8 +444,12 @@ For a given token $T$, the topness classifier used the following features:
 
 
 
+<<<<<<< HEAD
 \section{Negative Results}
 \label{s:badfeatures}
+=======
+\section{Negative Results} \label{s:negative}
+>>>>>>> 406f5dfff7aff9e0068574ad15f0db4f52f50bab
 
 We followed a forward-selection process during feature engineering.
 For each potential feature, we tested the current feature set versus the current
@@ -536,7 +523,7 @@ child tokens.
 
 
 \section{Evaluation}
-\label{s:datasplits}
+\label{s:evaluation}
 
 We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
 labeled whole-sentence match (LM) on the held out test data (see
@@ -627,9 +614,19 @@ While each of the three formalisms is different, there is much information share
 
 
 \section{Conclusion}
-We found that feature-rich models performed well on the task of mapping from sentences to semantic dependency parses. Our work has shown the best results when using one model for predicting whether a give token was to be included in the final graph, then using either our \logitedge parser or a graph-based structured SVM parser to predict a graph from the remaining tokens. Each of the three formalisms has different constraints; we found enforcing determinism in the PAS formalisms gave improvements, while enforcing other constraints did not. While our final approach was fairly standard for work in parsing, we tried to use a number of additional features which didn't help, including word embeddings and modeling active vs. passive voice.
+We found that feature-rich discriminative models performed well on the task of
+mapping from sentences to semantic dependency parses.
+Our work has shown the best results when using one model for predicting whether
+a given token was to be included in the final graph, then using either our
+\logitedge parser or a graph-based structured SVM parser to predict a graph
+from the remaining tokens.
+Each of the three formalisms has different constraints;
+we found enforcing determinism in the PAS formalisms gave improvements, while
+enforcing other constraints did not.
+While our final approach was fairly standard for work in parsing, we tried a
+number of additional features and constraints which did not help, and include
+those negative results.
 
-\nocite{flanigan-etal:ACL2014}
 
 
 \section*{Acknowledgements}
