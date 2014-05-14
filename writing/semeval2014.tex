@@ -62,7 +62,7 @@
 
 
 \title{Broad-Coverage Semantic Dependency Parsing with Rich Edge-Factored
-Features}
+Features \sam{better title, please}}
 
 \author{First Author \\
   Affiliation / Address line 1 \\
@@ -523,7 +523,18 @@ Modeling active voice vs. passive voice contains some information about the sema
 Multiple kinds of distance features, including log distance, binned distance (i.e. less than five tokens apart, between five and ten tokens apart, more than ten tokens apart), and thresholded distance (i.e. zero to three tokens apart, zero to five tokens apart, etc.).
 
 \subsection{Brown Clusters}
-Brown cluster features, including the using prefixes of length 2, 4, and 6, didn't help, even when conjoined with PoS tags.
+We experimented with Brown cluster features \cite{Brown:1992:CNG:176313.176316}
+for tokens in the sentence.
+These clusters were obtained by training on a large corpus of data crawled from
+the web.
+We used all cluster prefixes of length 2, 4, 6, 8, 10 and 12.
+We added a padding when the length of cluster was less than the required prefix
+size.
+We added the Brown cluster for the parent token, the child token, and both
+conjoined.
+No combination of the above settings helped performance.
+Neither did conjoining the above features with the PoS tags of the parent and
+child tokens.
 
 
 \bocomment{caveat, these were not carefully done.}
