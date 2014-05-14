@@ -30,6 +30,8 @@
 \usepackage{enumitem}
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage{subcaption}
+
 \setitemize{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
 \setenumerate{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
 
@@ -122,6 +124,27 @@ annotations in DeepBank \cite{flickinger_deepbank_2012}.
 conversion rules of \newcite{miyao_corpus_oriented_2004}.
 \emph{PCEDT} is automatically derived from the tectogrammatic layer of the
 Prague Czech--English Dependency Treebank \cite{hajic_building_1998}.
+See Figure~\ref{fig:formalisms} for an example sentence.
+\begin{figure*}
+	\centering
+	\begin{subfigure}{0.7\textwidth}
+		\includegraphics[width=\textwidth]{fig/example_dm}
+		\caption{DM}
+		\label{fig:dm}
+	\end{subfigure}
+	\begin{subfigure}{0.7\textwidth}
+		\includegraphics[width=\textwidth]{fig/example_pas}
+		\caption{PAS}
+		\label{fig:pas}
+	\end{subfigure}
+	\begin{subfigure}{0.7\textwidth}
+		\includegraphics[width=\textwidth]{fig/example_pcedt}
+		\caption{PCEDT}
+		\label{fig:pcedt}
+	\end{subfigure}
+	\caption{Example annotations for the three formalisms.}
+	\label{fig:formalisms}
+\end{figure*}
 
 All three formalisms come from very different linguistic theories, but all
 three are represented as labeled directed graphs, with words as vertices, and
@@ -130,7 +153,7 @@ all three have ``top'' annotations.
 This allows us to use the same machinery (\S\ref{s:models}) to simultaneously
 train and test statistical models for the three formalisms.
 \sam{Stats about \% multiple roots, \% multiple tops, \% tree, \% acyclic}
-\sam{Examples?}
+
 
 
 \section{Models} \label{s:models}
