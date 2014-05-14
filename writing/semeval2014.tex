@@ -370,6 +370,12 @@ node may have more than one outgoing edge with the same label.
 
 \sam{TK from jflan}
 
+\sam{
+explain how this differs from 
+\cite{flanigan-etal:ACL2014}
+}
+
+
 
 \subsubsection{Edge Features}
 
@@ -647,9 +653,19 @@ While each of the three formalisms is different, there is much information share
 
 
 \section{Conclusion}
-We found that feature-rich models performed well on the task of mapping from sentences to semantic dependency parses. Our work has shown the best results when using one model for predicting whether a give token was to be included in the final graph, then using either our \logitedge parser or a graph-based structured SVM parser to predict a graph from the remaining tokens. Each of the three formalisms has different constraints; we found enforcing determinism in the PAS formalisms gave improvements, while enforcing other constraints did not. While our final approach was fairly standard for work in parsing, we tried to use a number of additional features which didn't help, including word embeddings and modeling active vs. passive voice.
+We found that feature-rich discriminative models performed well on the task of
+mapping from sentences to semantic dependency parses.
+Our work has shown the best results when using one model for predicting whether
+a given token was to be included in the final graph, then using either our
+\logitedge parser or a graph-based structured SVM parser to predict a graph
+from the remaining tokens.
+Each of the three formalisms has different constraints;
+we found enforcing determinism in the PAS formalisms gave improvements, while
+enforcing other constraints did not.
+While our final approach was fairly standard for work in parsing, we tried a
+number of additional features and constraints which did not help, and include
+those negative results.
 
-\nocite{flanigan-etal:ACL2014}
 
 
 \section*{Acknowledgements}
