@@ -94,38 +94,23 @@ Dependency Parsing.
 
 \section{Introduction}
 
-We present a system that produces semantic dependency parses by extracting
-features for each potential dependency arc and learning a statistical model to
-discriminate between good arcs and bad.
-The organizers of SemEval 2014 Shared Task 8: Broad-Coverage Semantic Dependency
-Parsing \sam{cite} have provided a corpus of English language newswire
-annotated with three different semantic dependency formalisms
-(\S\ref{s:formalisms}).
-We test our system for each of the three formalisms using held out data
-from the provided corpus.
+The task of broad coverage semantic dependency parsing aims to provide a shallow semantic analysis of text across a range of dependency formalisms.  
+As distinct from deeper semantic analysis (e.g., full lambda-calculus logical form), shallow semantic parsing captures relationships between pairs of words or concepts in a sentence, and has wide application for information extraction, knowledge base population, and question answering (among others).
+The particular task of \emph{broad-coverage} parsing discourages optimization toward a single semantic representation; by diversifying the representations, we better tackle the broader task of semantic analysis itself.
 
-Building shallow semantic analyzers\footnote{By shallow semantic analysis we
-mean analyzing the semantic relationships between pairs of words or concepts in
-a sentence.
-This is in contrast to a deeper semantic analysis in which one produces a full
-lambda-calculus logical form, or other representation which can be grounded in a
-model of the world or from which further inferences can be made.
-}
-that can analyze broad-domain text quickly
-and accurately remains an open challenge.
-\begin{itemize}
-\item applications of semantic parsing: information extraction, knowledge base
-population, question answering, etc. \sam{get good cites}
-\end{itemize}
-While semantic parsing remains unsolved, syntactic parsing in general, and
-dependency parsing in particular has gotten very far towards these goals.
+We present here two systems that produce semantic dependency parses by extracting
+features for each potential dependency arc and learning a statistical model to
+discriminate between good arcs and bad; the first treats each labeled edge decision as an independent multiclass logistic regression (\S \ref{s:logitedge}), while the second predicts all edges as part of a graphed-based structured SVM (\S \ref{s:graphparser}).  Common to both models are a set of edge features, described in \S \ref{s:edgefeatures}.  While the features included in the final prediction were all found to have a positive impact on the final development accuracy, we also describe a range of other features (\S \ref{s:badfeatures}) found to have no discernable impact (or even negative impact) in our development.
+
+%While semantic parsing remains unsolved, syntactic parsing in general, and
+%dependency parsing in particular has gotten very far towards these goals.
 %Syntactic parsing has greatly benefited from the existence of a large corpus of
 %annotations with high inter-annotator agreement: the Penn Treebank
 %\cite{marcus_building_1993}.
-By representing semantic relationships between words as labeled
-directed edges, we can reuse methodologies developed for syntactic dependency
-parsing.
-These methods are noted for their fast inference.
+%By representing semantic relationships between words as labeled
+%directed edges, we can reuse methodologies developed for syntactic dependency
+%parsing.
+%These methods are noted for their fast inference.
 
 
 %\sam{something about how we're inspired by the success
@@ -137,22 +122,22 @@ These methods are noted for their fast inference.
 %what is needed for downstream applications.
 % allows for a simpler representation
 
-But while syntactic dependency parsers capture relationships between words in a
-sentence, the relationships they capture are not semantic.
-For instance, in ``The bread baked in the oven.'' and ``I baked the bread in the
-ven.'' ``the bread'' bears the same semantic relationship to ``baked'' but is
-realized in a different syntactic position.
-These types of distinctions become important in downstream applications.
+%But while syntactic dependency parsers capture relationships between words in a
+%sentence, the relationships they capture are not semantic.
+%For instance, in ``The bread baked in the oven.'' and ``I baked the bread in the
+%ven.'' ``the bread'' bears the same semantic relationship to ``baked'' but is
+%realized in a different syntactic position.
+%These types of distinctions become important in downstream applications.
 %Even shallow semantic analysis can be useful in downstream applications.
-
-
-\sam{cite}.
-
-\sam{This paper is organized as follows\ldots}
 
 
 
 \section{Formalisms} \label{s:formalisms}
+
+The organizers of SemEval 2014 Shared Task 8: Broad-Coverage Semantic Dependency
+Parsing \sam{cite} have provided a corpus of English language newswire
+annotated with three different semantic dependency formalisms
+(\S\ref{s:formalisms}).
 
 \begin{itemize}
 	\item Quick overview of three formalisms, emphasizing differences between them, consequences for parsing
@@ -251,7 +236,8 @@ Both directions $i \rightarrow j$ and $j \rightarrow
 i$ are considered between every pair.
 
 
-\subsubsection{\logitedge\ parser} \label{s:logitedge}
+\subsubsection{\logitedge\ parser} 
+\label{s:logitedge}
 
 
 \codenote{LRParser.java}
@@ -364,6 +350,7 @@ node may have more than one outgoing edge with the same label.
 
 
 \subsubsection{Edge Features}
+\label{s:edgefeatures}
 
 \label{s:features}
 These features were computed over an edge $E$ with parent token $S$ and child
@@ -475,6 +462,7 @@ For a given token $T$, the topness classifier used the following features:
 
 
 \section{Negative Results}
+\label{s:badfeatures}
 
 We followed a forward-selection process during feature engineering.
 For each potential feature, we tested the current feature set versus the current
