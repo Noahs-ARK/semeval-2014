@@ -222,23 +222,20 @@ faster overall.
 In the second stage of the pipeline, we predict the set of labeled directed
 edges in the graph.
 We use the same set of edge-factored features (\S\ref{s:features}) in two
-different models.
-For the \emph{DM} and \emph{PCEDT} formalisms, we use an edge-independent multiclass logistic
-regression model (\logitedge, \S\ref{s:logitedge}).
-For the \emph{PAS} formalism, we use a structured SVM 
+alternative models: an edge-independent multiclass logistic
+regression model (\logitedge, \S\ref{s:logitedge}); and a structured SVM 
 \cite{taskar_max_2003,tsochantaridis_support_2004} that enforces 
 \emph{determinism}\jmf{I'll find a citation} constraints that allow a word to
 have at most one outgoing edge with the
 same label (\svmedge, \S\ref{s:graphparser}).
 For each formalism, we trained both models with varying features enabled and
 hyperparameter settings and submitted the configuration that produced the best
-labeled $F_1$ on the development set.  We report results only for the submitted
-configurations, with different features enabled.  Due to time constraints, full
-hyperparameter sweeps and comparable feature sweeps were not possible.
-%\sam{explain why we use different models for different formalisms}
-%\bocomment{shouldn't we just say, we tried both for all and are reporting the
-% configurations that performed best on devset?}
-%\sam{yes, that sounds good. waiting on graph vs. non-graph results from jflan}
+labeled $F_1$ on the development set.
+For \emph{DM} and \emph{PCEDT}, this was \logitedge;
+for \emph{PAS}, this was \svmedge.
+We report results only for the submitted configurations, with different features
+enabled.
+Due to time constraints, full hyperparameter sweeps and comparable feature sweeps were not possible.
 
 
 \subsubsection{\logitedge\ Parser}
