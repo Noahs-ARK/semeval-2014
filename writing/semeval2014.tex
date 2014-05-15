@@ -30,6 +30,7 @@
 \usepackage{enumitem}
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage{framed}
 \usepackage{subcaption}
 
 \setitemize{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
@@ -427,43 +428,62 @@ using early-stopping on a development set. % Tops are predicted using the
   easier to read.}
 
 \sam{would be nice to cite where we stole these features from, where applicable}
-These features were computed over an edge $e$ with parent token $s$ at index
-$i$ and child token $t$ at index $j$. 
-For each feature listed, we have an indicator feature for each value it takes
-on.
+Table~\ref{table:edgefeatures} describes the features we used for predicting
+edges.
+These features were computed over an edge $e$ with parent token $s$ at
+index $i$ and child token $t$ at index $j$. 
+Unless otherwise stated, each feature template listed has an indicator
+feature that fires for each value it can take on.
+\begin{table}
+\begin{framed}
+\begin{small}
+\textbf{Bias}
 
-\begin{itemize}
-	\item \textbf{Bias}
-	\item \textbf{Tokens:} The tokens $s$ and $t$ themselves.
-	\item \textbf{Lemmas:} Lemmas of $s$ and $t$.
-	\item \textbf{POS tags:} Part of speech tags of $s$ and $t$.
-	\item \textbf{Linear Order:} 1 if $i < j$, 0 otherwise.
-	\item \textbf{Linear Distance:} $i - j$.
-	\item \textbf{Dependency Path:} The concatenation of all tokens and arc labels
+\textbf{Tokens:} The tokens $s$ and $t$ themselves.
+
+\textbf{Lemmas:} Lemmas of $s$ and $t$.
+
+\textbf{POS tags:} Part of speech tags of $s$ and $t$.
+
+\textbf{Linear Order:} 1 if $i < j$, 0 otherwise.
+
+\textbf{Linear Distance:} $i - j$.
+
+\textbf{Dependency Path:} The concatenation of all tokens and arc labels
 	on the labeled path in the syntactic dependency tree from $s$ to $t$.
-	\item \textbf{Up/Down Dependency Path:} The sequence of upward and
+
+\textbf{Up/Down Dependency Path:} The sequence of upward and
 	downward moves needed to get from $s$ to $t$ in the syntactic dependency
 	tree.
-	\item \textbf{Up/Down/Left/Right Dependency Path:} The unlabeled path through
+
+\textbf{Up/Down/Left/Right Dependency Path:} The unlabeled path through
 	the syntactic dependency tree from $s$ to $t$, annotated with whether the each
 	step through the tree was up or down, and whether it was to the right or left
 	in the sentence.
-	\item \textbf{Is Parent:} 1 if $s$ is the parent of $t$ in the syntactic
+
+\textbf{Is Parent:} 1 if $s$ is the parent of $t$ in the syntactic
 	dependency parse, 0 otherwise.
-	\item \textbf{Dependency Path Length:} Distance between $s$ and $t$ in the
+
+\textbf{Dependency Path Length:} Distance between $s$ and $t$ in the
 	syntactic dependency parse.
-	\item \textbf{POS Context:} Concatenated POS tags of tokens at $i-1$, $i$,
+
+\textbf{POS Context:} Concatenated POS tags of tokens at $i-1$, $i$,
 	$i+1$, $j-1$, $j$, and $j+1$. Concatenated POS tags of tokens at $i-1, i, j-1$,
 	and $j$. Concatenated POS tags of tokens at $i, i+1, j$, and $j+1$.
-	\item \textbf{Subcategorization Sequence} For each direct child $c$ of $s$ in
+
+\textbf{Subcategorization Sequence:} For each direct child $c$ of $s$ in
 	the syntactic dependency tree, concatenate the label of the arc to the child.
 	If $c$ is $t$, distinguish the arc label by appending a ``+''.
-	\item \textbf{Subcategorization Sequence with POS tags} For each child $c$ of
+
+\textbf{Subcategorization Sequence with POS tags:} For each child $c$ of
 	$s$ in the syntactic dependency tree, the concatenation of the POS tag of $c$
 	and the label of the arc from $s$ to $c$.
 	If $c$ is $t$, distinguish the arc label by appending a ``+''.
-\end{itemize}
-
+\end{small}
+\caption{Features used in edge prediction}
+\label{table:edgefeatures}
+\end{framed}
+\end{table}
 
 
 \subsubsection{Feature Hashing}
