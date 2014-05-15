@@ -60,11 +60,11 @@
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
- %\renewcommand{\bocomment}[1]{}
- %\renewcommand{\sam}[1]{}
- %\renewcommand{\nas}[1]{}
- %\renewcommand{\jmf}[1]{}
- %\renewcommand{\jdcomment}[1]{}
+ \renewcommand{\bocomment}[1]{}
+ \renewcommand{\sam}[1]{}
+ \renewcommand{\nas}[1]{}
+ \renewcommand{\jmf}[1]{}
+ \renewcommand{\jdcomment}[1]{}
 
 
 % turn off for submission, but on for a more tech report-y version.
@@ -356,7 +356,7 @@ To predict edges for the \emph{PAS} formalism, we use a structured SVM
 with determinism constraints.
 This ensures that each word token has at most one outgoing edge for each label
 type.  We found these contraints to improve the $F_1$-score for this formalism only.
-\bocomment{need to answer here: why only PAS?}
+\bocomment{need to answer here: why only PAS?}\jmf{fixed I think}
 
 Consider the fully dense graph of all edges between all words predicted
 as not singletons by the singleton classifier \S\ref{s:singleton_model} (in all
