@@ -1,6 +1,5 @@
 %
 % File twocolumn.tex
-%
 %%
 %% Based on the style files for *SEM-2014, which were, in turn,
 %% Based on the style files for COLING-2014, which were, in turn,
@@ -361,9 +360,6 @@ it did improve \emph{PAS} by $\sim 0.2\%$ absolute $F_1$-score, but we did not s
 
 \subsubsection{Structured SVM Parser with Determinism Constraints} \label{s:graphparser}
 
-\nas{note section title change above; ``Deterministic Structured SVM''
-  is easily misparsed to suggest a very different meaning!}
-
 
 To predict edges for the \emph{PAS} formalism, we use a model with determinism
 constraints.  This ensures that each word token has at most one
@@ -382,27 +378,27 @@ scoring function: \nas{no-edge is not included here, I am guessing.
 \[
 c(i,j,\ell) = \bm\psi_\ell \cdot \bm{f}(i,j)
 \]
-The decoder finds the highest scoring subgraph of the dense graph
-subject to the determinism constraints.  Let $edge(i,j,\ell)$ be a
-binary function where $edge(i,j,\ell) = 1 $ denotes inclusion of an edge
-from $i$ to $j$ with a label $\ell$.  Then $edge(i,j,\ell)$ is computed
-as follows:
-\[
-edge(i,j,\ell) =
-\begin{cases}
-1 & \text{if } j = \argmax_{k} c(i,k,\ell) \\
-& \text{and } c(i,j,\ell) > 0 \\
-0 & \text{otherwise}
-\end{cases}
-\]
-In other words, for each node and each label, the decoder searches for
+%  Let $edge(i,j,\ell)$ be a
+% binary function where $edge(i,j,\ell) = 1 $ denotes inclusion of an edge
+% from $i$ to $j$ with a label $\ell$.  Then $edge(i,j,\ell)$ is computed
+% as follows:
+% \[
+% edge(i,j,\ell) =
+% \begin{cases}
+% 1 & \text{if } j = \argmax_{k} c(i,k,\ell) \\
+% & \text{and } c(i,j,\ell) > 0 \\
+% 0 & \text{otherwise}
+% \end{cases}
+% \]
+% In other words, f
+For each node and each label, the decoder searches for
 the highest scoring outgoing edge and adds it if its weight is
-positive.  The algorithm's runtime is $O(n^2)$. \nas{I can't tell
-  whether you are claiming this algorithm gives the optimal subgraph
-  (according to some unstated criterion) or if it's just a hack.
-  don't make me guess!  say how we are defining the best structure,
-  and state explicitly that our algorithm exactly optimizes that
-  criterion in quadratic time}
+positive.
+This procedure is guaranteed to find the highest scoring subgraph (largest sum
+of edge weights) of the dense graph subject to the determinism constraints.
+Its runtime is $O(n^2)$.
+
+
 
 The model weights are trained using the structured SVM loss.  If $x$
 is a sentence and $y$ is a graph over that sentence, let the features 
