@@ -77,6 +77,8 @@
 % saves only a little bit of space. might need tweaking to save more.
 \newenvironment{itemizesquish}{\begin{list}{\labelitemi}{\setlength{\itemsep}{-0.1em}\setlength{\labelwidth}{1em}\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}}}{\end{list}}
 
+% \renewcommand{\baselinestretch}{0.95}
+
 
 
 \title{CMU-ARK: Arc-Factored, Discriminative Semantic Dependency Parsing}
@@ -321,12 +323,11 @@ are many more $\noedge$ examples than true edge examples.
 \sam{If we get these numbers, it would be nicer to quantify, and say something
 like ``In the FFF formalism, the training set (\S\ref{s:evaluation}) contains NNN
 candidate edges (pairs of tokens with length between 1 and 10 inclusive), and NNN actual (non-null) edges.''}
-We found that $F_1$ performance was improved by
+We improved $F_1$ performance by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
-$\sum_{i,j} \sum_\ell w_\ell \log P(y_{i,j}=\ell; \bm\phi)$, with $w_{\noedge}=0.3$
-and $w_{\ell} = 1$ otherwise, when $\ell \neq \noedge$.
-\bocomment{i removed $\forall \ell \in L$ becuase i thought $L$ includes NoEdge. need to clarify?}
-(The weight was chosen by gridsearch on a development set.)
+$\sum_{i,j} \sum_\ell w_\ell \log P(y_{i,j}=\ell; \bm\phi)$, 
+with $w_{\noedge}=0.3$ (selected on development set)
+and $w_{\ell} = 1$ otherwise.
 
 % 0.4
 
