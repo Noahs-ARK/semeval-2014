@@ -56,6 +56,7 @@
 
 \newcommand{\bocomment}[1]{\textcolor{Bittersweet}{[#1 -BTO]}}
 \newcommand{\sam}[1]{\textcolor{blue}{[#1 -SMT]}}
+\newcommand{\nas}[1]{\textcolor{red}{[#1 -NAS]}}
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
@@ -69,8 +70,7 @@
 
 
 
-\title{CMU-Ark: Broad-Coverage Semantic Dependency Parsing with Rich
-Edge-Factored Features \sam{better title, please}}
+\title{CMU-ARK: Arc-Factored, Discriminative Semantic Dependency Parsing}
 
 \author{
 	Sam Thomson \quad
@@ -81,7 +81,7 @@ Edge-Factored Features \sam{better title, please}}
 	Swabha Swayamdipta \quad
 	Nathan Schneider \quad
 	Chris Dyer \quad
-	Noah Smith} \\
+	Noah A.~Smith} \\
   Language Technologies Institute \\
   Carnegie Mellon University \\
   Pittsburgh, PA 15213, USA \\
@@ -95,10 +95,11 @@ Edge-Factored Features \sam{better title, please}}
 \maketitle
 
 \begin{abstract}
-We present an edge-factored statistical model for semantic dependency parsing.
-\sam{need more here.}
-Our system placed second in the open track of SemEval 2014 Shared Task 8:
-Broad-Coverage Semantic Dependency Parsing.
+We present an arc-factored statistical model for broad-coverage
+semantic dependency parsing, as defined by the SemEval 2014 Shared
+Task 8 on
+Broad-Coverage Semantic Dependency Parsing.    Our entry in the open
+track placed second in the competition.
 \end{abstract}
 
 
@@ -111,77 +112,61 @@ As distinct from deeper semantic analysis (e.g., parsing to a full
 lambda-calculus logical form), shallow semantic parsing captures relationships
 between pairs of words or concepts in a sentence, and has wide application for
 information extraction, knowledge base population, and question answering (among others).
-SemEval 2014 Shared Task 8: Broad-Coverage Semantic Dependency
+SemEval 2014 Shared Task 8 on Broad-Coverage Semantic Dependency
 Parsing \cite{oepens_broad_2014} includes three different semantic
 formalisms (\S\ref{s:formalisms}), which encourages finding features and methods
 that are broadly applicable to semantic parsing, and discourages optimization
 toward a single semantic representation.
-By diversifying the representations, we better tackle the broader task of
-semantic analysis itself.
+%By diversifying the representations, we better tackle the broader task of
+%semantic analysis itself.
 
 We present here two systems that produce semantic dependency parses by extracting
 features for each potential dependency arc and learning a statistical model to
 discriminate between good arcs and bad;
 the first treats each labeled edge decision as an independent multiclass
-logistic regression (\S\ref{s:logitedge}), while the second predicts edges
-as part of a graph-based structured SVM (\S~\ref{s:graphparser}).\jmf{I removed ``all'' edges since it's a little abiguous.  We actually do them one at a time.} 
-Common to both models are a rich set of edge features, described in
-\S\ref{s:edgefeatures}.
-While the features included in the final prediction were all found to have a
-positive impact on the final development accuracy, we also describe a range of
-other features (\S\ref{s:badfeatures}) found to have no discernable impact (or
-even negative impact) in our development.
+logistic regression (\S\ref{s:logitedge}), while the second predicts arcs
+as part of a graph-based structured support vector machine (\S~\ref{s:graphparser}).
+Common to both models are a rich set of features on arcs, described in
+\S\ref{s:edgefeatures}.  We include a discussion of features found to
+have no discernable effect, or negative effect, during development (\S\ref{s:badfeatures}).
 
 Our system placed second in the open track of the broad-coverage semantic
-parsing task (in which output from syntax parsers and other outside resources can be used).
-We present our results, and compare to the first place system, PRIB-IT
+parsing task (in which output from syntax parsers and other outside resources \emph{can} be used).
+We present our results, \nas{I advise cutting this; the Priberam paper
+  will describe their system and the overview paper will describe
+  everything together:} and compare to the first place system, PRIB-IT
 \cite{martins_prib_2014}, in \S\ref{s:evaluation}.
 
 
 
 \section{Formalisms} \label{s:formalisms}
 
-The organizers of Shared Task 8 have provided a corpus of English language
-newswire annotated with three different semantic dependency formalisms.
-\sam{should mention/cite that it's PTB}
-%Here we briefly describe the three formalisms, and refer the reader to \sam{the
-%shared task paper, cite} for a more complete summary.
+The organizers of Shared Task 8 provided a corpus of English news text
+drawn from the Penn Treebank, annotated according to three different semantic dependency formalisms.
 \emph{DM} is automatically derived from LinGO English Resource Grammar (ERG)
 annotations in DeepBank \cite{flickinger_deepbank_2012}.
 \emph{PAS} is automatically derived from the Enju HPSG treebank using the
 conversion rules of \newcite{miyao_corpus_oriented_2004}.
-And \emph{PCEDT} is automatically derived from the tectogrammatic layer of the
-Prague Czech--English Dependency Treebank \cite{hajic_building_1998}.
+\emph{PCEDT} is automatically derived from the tectogrammatic layer of the
+Prague Czech-English Dependency Treebank \cite{hajic_building_1998}.
 See Figure~\ref{fig:formalisms} for an example sentence.
 \begin{figure*}
 	\centering
-	\begin{subfigure}{0.7\textwidth}
-		\includegraphics[width=\textwidth]{fig/example_dm}
-		\caption{DM}
-		\label{fig:dm}
-	\end{subfigure}
-	\begin{subfigure}{0.7\textwidth}
-		\includegraphics[width=\textwidth]{fig/example_pas}
-		\caption{PAS}
-		\label{fig:pas}
-	\end{subfigure}
-	\begin{subfigure}{0.7\textwidth}
+		\includegraphics[width=\textwidth]{fig/example_dm} \\
+		\includegraphics[width=\textwidth]{fig/example_pas} \\
 		\includegraphics[width=\textwidth]{fig/example_pcedt}
-		\caption{PCEDT}
-		\label{fig:pcedt}
-	\end{subfigure}
-	\caption{Example annotations for the three formalisms.\jmf{are the
+	\caption{Example annotations for \emph{DM} (top), \emph{PAS}
+          (middle), and \emph{PCEDT} (bottom). \jmf{are the
     three LOC's in PCEDT correct? is the capitalization of 'BAKER
     FALTERS' meaningful?}}
 	\label{fig:formalisms}
 \end{figure*}
 
-All three formalisms come from very different linguistic theories, but all
+The three formalisms come from very different linguistic theories, but all
 three are represented as labeled directed graphs, with words as vertices, and
-all three have ``top'' annotations\footnote{
-``Top'' annotations roughly correspond to the semantic focus of a
-sentence, but there is no constraint that the ``top'' must be a root of the
-semantic dependency graph.}.
+all three have ``top'' annotations, corresponding roughly to the
+semantic focus of the sentence.  The ``top'' need not be a root of the
+graph.
 This allows us to use the same machinery (\S\ref{s:models}) to simultaneously
 train and test statistical models for the three formalisms.
 \sam{Stats about \% multiple roots, \% multiple tops, \% tree, \% acyclic}
@@ -191,12 +176,11 @@ train and test statistical models for the three formalisms.
 \section{Models} \label{s:models}
 
 We treat the problem as a three-stage pipeline.
-The first stage prunes words by predicting whether a word is a \emph{singleton}
-or not--whether it has any incoming or outgoing edges at all (\S\ref{s:singleton_model}).
-If a word is predicted to be a singleton, then it no longer needs to be
+The first stage prunes words by predicting whether has any incoming or
+outgoing edges at all (\S\ref{s:singleton_model}); if not, then it need not be 
 considered in later stages.
 The second stage jointly predicts whether an edge is
-present, and if so, what its label is (\S\ref{s:edge_model}).
+present, and if so, its label (\S\ref{s:edge_model}).
 The third stage predicts whether a word is a \emph{top} or not
 (\S\ref{s:top_model}).
 Formalisms sometimes annotate more than one ``top'' per sentence, but we
@@ -212,20 +196,16 @@ We call a node in a graph without any parents or children a \emph{singleton}.
 For singleton prediction, we train a simple token-level logistic regression
 classifier.
 We train a model for each of the three formalisms, as each of the three
-formalisms follow different conventions determining whether a token would be
+formalisms follow different conventions determining whether a token is
 included in the final graph for a sentence.
-The PAS formalism, for example, includes almost all tokens that are not
+\emph{PAS}, for example, includes almost all tokens that are not
 punctuation or a determiner, and our singleton model achieves over 99\%
 accuracy.
 \jdcomment{I need to find the accuracy for the other two formalisms. Will
 include this in our Results section.}
 
-For each token $t$, the model considers the following features:
-\begin{itemize}
-\item the token $t$ itself
-\item the lemma of $t$
-\item the part of speech tag of $t$
-\end{itemize}
+For each token $t$, the features include
+the token $t$, its lemma, and its part-of-speech tag.
 
 
 
@@ -235,11 +215,11 @@ In the second stage of the pipeline, we predict the set of labeled directed
 edges in the graph.
 We use the same set of edge-factored features (\S\ref{s:features}) in two
 different models.
-For the DM and PCEDT formalisms, we use an edge-independent multiclass logistic
+For the \emph{DM} and \emph{PCEDT} formalisms, we use an edge-independent multiclass logistic
 regression model (\logitedge, \S\ref{s:logitedge}).
-For the PAS formalism, we use a structured SVM 
-\cite{taskar_max_2003,tsochantaridis_support_2004} that enforces a
-\emph{determinism}\jmf{I'll find a citation} constraint -- a word can
+For the \emph{PAS} formalism, we use a structured SVM 
+\cite{taskar_max_2003,tsochantaridis_support_2004} that enforces 
+\emph{determinism}\jmf{I'll find a citation} constraints that allow a word to
 have at most one outgoing edge with the
 same label (\S\ref{s:graphparser}).
 \sam{For each formalism, we trained both models with varying features enabled
@@ -249,7 +229,10 @@ Due to time constraints, full feature and hyperparameter sweeps were not
 possible.
 Jeff, please make it clear here about what happened in the 11th
 hour.}
-We report only the best performing configuration.
+We report only the best performing configuration. \nas{previous
+  sentence is unclear and could get us into trouble.  best according
+  to what criterion on what data?  you do NOT mean best accuracy on
+  the test set, that is cheating! }
 %\sam{explain why we use different models for different formalisms}
 %\bocomment{shouldn't we just say, we tried both for all and are reporting the
 % configurations that performed best on devset?}
@@ -257,10 +240,10 @@ We report only the best performing configuration.
 
 Both models consider only token index pairs $(i, j)$ where %that are within 10
 % tokens of each other (i.e.~
-$|i-j| \leq 10$, $i \ne j$, and both $i$ and
-$j$ have been predicted to be non-singletons by the first stage.\jmf{actually, the graph parser doesn't have the distance constraint}
-In other words, edges with more than 9 tokens between its two endpoints are not
-considered.
+$|i-j| \leq 10$, $i \ne j$, and both $t_i$ and
+$t_j$ have been predicted to be non-singletons by the first stage.\jmf{actually, the graph parser doesn't have the distance constraint}
+% In other words, edges with more than 9 tokens between its two endpoints are not
+% considered.
 Although this prunes some gold edges, among the formalisms,
 95\%-97\% of all gold edges are between tokens of distance 10 or less.
 We found that pruning long edges increased accuracy overall, in addition to
@@ -316,7 +299,7 @@ $\bm{f}(i, j)$, as described in \S\ref{s:features}.
 The multiclass logistic regression model defines a distribution over $L$,
 parametrized by the weight vectors $\Phi = \{\bm\phi_\ell\}_{\ell \in L}$:
 \[
-  Pr_\Phi(\ell)  = \frac{
+  P_\Phi(\ell)  = \frac{
   	\exp\{\bm\phi_\ell \cdot \bm{f}(i, j)\}
   } {
   	\sum_{\ell^\prime \in L} {
@@ -342,9 +325,10 @@ candidate edges (pairs of tokens with length between 1 and 10 inclusive), and NN
 We found that $F_1$ performance was improved by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
 $\sum_{i,j} \sum_\ell w_\ell \log P(y_{i,j}=\ell; \bm\phi)$, with $w_{\noedge}=0.3$
-and $1$ otherwise.
+and $w_{\ell} = 1, \forall \ell \in L$.
 (The weight was chosen by gridsearch on a development set; 
-PAS used a weight of $0.4$ while the others were $0.3$, though the differences at this granularity were small.)
+\emph{PAS} \nas{confusing because you did not use this model for PAS!}
+used a weight of $0.4$ while the others were $0.3$, though the differences at this granularity were small.)
 
 % Besides the edge logistic regression system, there were both pre- and post-processing steps.
 
@@ -363,13 +347,16 @@ an edge in both directions between any pair of words.
 If an edge is predicted for both directions for a single $(i, j)$
 pair, only the edge with the higher score is chosen.
 There are no such bidirectional edges in the training data, and enforcing this
-restriction slightly improved accuracy on the development set ($~0.2\%$ absolute F on PAS; other formalisms unchanged).\codenote{\url{https://github.com/Noahs-ARK/semeval-2014/pull/21}}
+restriction slightly improved accuracy on the development set ($\sim 0.2\%$ absolute $F_1$-score on PAS; other formalisms unchanged).\codenote{\url{https://github.com/Noahs-ARK/semeval-2014/pull/21}}
 
 
-\subsubsection{Deterministic Structured SVM Parser} \label{s:graphparser}
+\subsubsection{Structured SVM Parser with Determinism Constraints} \label{s:graphparser}
 
-To predict edges for the PAS formalism, we use a model with determinism
-constraints.  This ensures that at each word, there is at most one
+\nas{note section title change above; ``Deterministic Structured SVM''
+  is easily misparsed to suggest a very different meaning!}
+
+To predict edges for the \emph{PAS} formalism, we use a model with determinism
+constraints.  This ensures that each word token has at most one
 outgoing edge for each label type.
 
 Consider the fully dense graph of all edges between all words predicted
@@ -379,7 +366,8 @@ If $\Psi = \{\bm\psi_\ell\}_{\ell \in L}$ denotes the model
 weights, and $\bm{f}$ denotes the same features as the
 \logitedge~model, then an edge from $i$ to $j$ with label $\ell$ in the
 dense graph has a weight $c(i,j,\ell)$ assigned to it using the linear
-scoring function:
+scoring function: \nas{no-edge is not included here, I am guessing.
+  say so explicitly since this is a subtle difference with the logit model}
 \[
 c(i,j,\ell) = \bm\psi_\ell \cdot \bm{f}(i,j)
 \]
@@ -398,7 +386,12 @@ edge(i,j,\ell) =
 \]
 In other words, for each node and each label, the decoder searches for
 the highest scoring outgoing edge and adds it if its weight is
-positive.  The algorithm's runtime is $O(n^2)$.
+positive.  The algorithm's runtime is $O(n^2)$. \nas{I can't tell
+  whether you are claiming this algorithm gives the optimal subgraph
+  (according to some unstated criterion) or if it's just a hack.
+  don't make me guess!  say how we are defining the best structure,
+  and state explicitly that our algorithm exactly optimizes that
+  criterion in quadratic time}
 
 The model weights are trained using the structured SVM loss.  If $x$
 is a sentence and $y$ is a graph over that sentence, let the features 
@@ -406,24 +399,28 @@ be denoted $\bm{f}(x,y) = \sum_{(i,j,\ell) \in edges(y)}
 \bm{f}(i,j,\ell)$.  The SVM loss for each training example $(x_i, y_i)$ is:
 \begin{multline*}
 -\bm\psi^\top \bm{f}(x_i,y_i) + \max_{y} \bm\psi^\top \bm{f}(x_i,y) +
-cost(y,y_i)
+\mathit{cost}(y,y_i)
 \end{multline*}
-where $cost(y,y_i)$
+where $\mathit{cost}(y,y_i)$
 is the cost function
 \begin{multline*}
-cost(y,y_i) = \alpha |edges(y)\setminus edges(y_i)| + \\
+\mathit{cost}(y,y_i) = \alpha |edges(y)\setminus edges(y_i)| + \\
 \beta |edges(y_i)\setminus edges(y)|.
 \end{multline*}
 $\alpha$ and $\beta$ trade off between precision and recall for the
 edges.  The loss is minimized with AdaGrad
-using early-stopping on a development set.  Tops are predicted using the
-top prediction model \S\ref{s:top_model}.
+using early-stopping on a development set. % Tops are predicted using the
+%top prediction model \S\ref{s:top_model}.
 
 
 \subsubsection{Edge Features}
 \label{s:edgefeatures}
 
 \label{s:features}
+
+\nas{make more compact by putting in a table with small font;
+  indentation and space between items is killing you, and a table is
+  easier to read.}
 
 \sam{would be nice to cite where we stole these features from, where applicable}
 These features were computed over an edge $e$ with parent token $s$ at index
@@ -482,63 +479,72 @@ on.
 
 \subsubsection{Feature Hashing}
 
-\bocomment{ALTERNATE VERSION TO SAVE SPACE:
-  The biggest memory usage was in the hash table implementing the map of feature names to integer indexes, used during feature extraction.  In order to facilitate more convenient experimentation, we implemented multitask feature hashing \cite{weinberger_feature_2009}, which randomly assigns features' numeric indexes with a hash function, under the theory that errors due to collisions tend to cancel each other out.  We indeed found no drop in accuracy when using the technique.}
-\sam{I think we can get away with this short version}
-%% 7-10 million features (percepts) before label conjunction:
-% cab:~dbamman/semeval/mar3 % wc -l *.model
-%    7518732 mar3_recsplit.dm.model
-%    7038841 mar3_recsplit.pas.model
-%    9939549 mar3_recsplit.pcedt.model
-%   24497122 total
+%\bocomment{ALTERNATE VERSION TO SAVE SPACE:
+  The biggest memory usage was in the hash table implementing the map
+  of feature names to integer indexes, used during feature extraction.
+  In order to facilitate more convenient experimentation, we
+  implemented multitask feature hashing
+  \cite{weinberger_feature_2009}, which randomly assigns features'
+  numeric indexes with a hash function, under the theory that errors
+  due to collisions tend to cancel each other out.  We found no
+  drop in accuracy when using the technique.
 
-\codenote{
-\url{https://github.com/Noahs-ARK/semeval-2014/pull/20}
-Code:
-  See use of flag LRParser.useHashing, esp LRParser::perceptNum() 
-  and Model::coefIdx(): hashed values before and after label conjunction.
-}
+% }
+% \sam{I think we can get away with this short version}
+% %% 7-10 million features (percepts) before label conjunction:
+% % cab:~dbamman/semeval/mar3 % wc -l *.model
+% %    7518732 mar3_recsplit.dm.model
+% %    7038841 mar3_recsplit.pas.model
+% %    9939549 mar3_recsplit.pcedt.model
+% %   24497122 total
 
-\noindent
-For \logitedge, the biggest memory usage was from
-the hash table that implemented
-a map of feature names to integer indexes, used during feature extraction.
-Tens of millions of features (before conjunction) resulted in several gigabytes of memory use.  To facilitate more convenient experimentation,
-we eliminated this by using
-multitask feature hashing
-\cite{weinberger_feature_2009},
-which randomly assigns features' numeric indexes with a hash function.\footnote{We also tried replacing the hash table with a Patricia Tree, trying several open-source implementations; but they had worse memory usage than a GNU Trove hash table. 
-  \codenote{\url{https://github.com/brendano/myutil/blob/0a5697a7f066c265a75ce1b7bd527feafa683c8a/src/vocabalts/vocabalts_results.txt}}}
-Let $F$ be the space of all feature names (before conjunction with the output label).
-In the usual approach, a hash table is maintained containing a
-one-one onto map from features to integer indexes $g: F \rightarrow \{1,\ldots,|F|\}$,
-and each output label has an array of model parameters $\bm\phi^\ell \in \mathbb{R}^{|F|}$,
-which $g(f)$ indexes into.
-In the hashing approach, a hash function $h_{\ell}$
-maps feature name to one of $B$ bucket values,
-$h_{\ell} : F \rightarrow \{1, \ldots, B\}$.
-(A different hash function is used for each output label.)
-The model parameters are stored in an array $h_\ell(\bm\phi^\ell) \in \mathbb{R}^{B}$,
-for which an entry is defined as
-\[
-  h_\ell(\bm\phi^\ell)_{b} = 
-  \sum_{\substack{\text{feat} \in F 
-    \\\text{ s.t. } h_\ell(\text{feat})=b}}
-  {\phi^\ell_{\text{feat}}}
-\]
-This is easy to implement:
-array lookups and gradient steps are simply implemented with $h$ instead of $g$, and feature vectors are also stored in a hashed space.
-\cite{weinberger_feature_2009} show that, even with some collisions,
-dot products are approximately preserved with high probability;
-and indeed, we observed no drop in accuracy compared to using an explicit feature map.
-We used a value of $B$ as large as was convenient for memory usage (due only to $h(\phi)$), $B=10^{8}$.
-This is actually higher than $|F|\approx 10^7$, though plenty of collisions still happen: about 9.5\% of features are hashed to a value shared by at least one other feature.
+% \codenote{
+% \url{https://github.com/Noahs-ARK/semeval-2014/pull/20}
+% Code:
+%   See use of flag LRParser.useHashing, esp LRParser::perceptNum() 
+%   and Model::coefIdx(): hashed values before and after label conjunction.
+% }
 
-%% simulation:
-% num buckets count 0: 90484843
-% num buckets count 1: 9046266
-% num collisions: num features that are in a non-singleton bucket: 953734
-%%  average over simulations for last value: 9.518e+05 
+% \noindent
+% For \logitedge, the biggest memory usage was from
+% the hash table that implemented
+% a map of feature names to integer indexes, used during feature extraction.
+% Tens of millions of features (before conjunction) resulted in several gigabytes of memory use.  To facilitate more convenient experimentation,
+% we eliminated this by using
+% multitask feature hashing
+% \cite{weinberger_feature_2009},
+% which randomly assigns features' numeric indexes with a hash function.\footnote{We also tried replacing the hash table with a Patricia Tree, trying several open-source implementations; but they had worse memory usage than a GNU Trove hash table. 
+%   \codenote{\url{https://github.com/brendano/myutil/blob/0a5697a7f066c265a75ce1b7bd527feafa683c8a/src/vocabalts/vocabalts_results.txt}}}
+% Let $F$ be the space of all feature names (before conjunction with the output label).
+% In the usual approach, a hash table is maintained containing a
+% one-one onto map from features to integer indexes $g: F \rightarrow \{1,\ldots,|F|\}$,
+% and each output label has an array of model parameters $\bm\phi^\ell \in \mathbb{R}^{|F|}$,
+% which $g(f)$ indexes into.
+% In the hashing approach, a hash function $h_{\ell}$
+% maps feature name to one of $B$ bucket values,
+% $h_{\ell} : F \rightarrow \{1, \ldots, B\}$.
+% (A different hash function is used for each output label.)
+% The model parameters are stored in an array $h_\ell(\bm\phi^\ell) \in \mathbb{R}^{B}$,
+% for which an entry is defined as
+% \[
+%   h_\ell(\bm\phi^\ell)_{b} = 
+%   \sum_{\substack{\text{feat} \in F 
+%     \\\text{ s.t. } h_\ell(\text{feat})=b}}
+%   {\phi^\ell_{\text{feat}}}
+% \]
+% This is easy to implement:
+% array lookups and gradient steps are simply implemented with $h$ instead of $g$, and feature vectors are also stored in a hashed space.
+% \cite{weinberger_feature_2009} show that, even with some collisions,
+% dot products are approximately preserved with high probability;
+% and indeed, we observed no drop in accuracy compared to using an explicit feature map.
+% We used a value of $B$ as large as was convenient for memory usage (due only to $h(\phi)$), $B=10^{8}$.
+% This is actually higher than $|F|\approx 10^7$, though plenty of collisions still happen: about 9.5\% of features are hashed to a value shared by at least one other feature.
+
+% %% simulation:
+% % num buckets count 0: 90484843
+% % num buckets count 1: 9046266
+% % num collisions: num features that are in a non-singleton bucket: 953734
+% %%  average over simulations for last value: 9.518e+05 
 
 
 \subsection{Top Prediction} \label{s:top_model}
@@ -548,25 +554,22 @@ whether a token's node had the ``top'' attribute or not.
 At decoding time, all nodes in the predicted graph (i.e., tokens where there is
 either an inbound or outbound edge) are possible candidates to be ``top'';
 the classifier probabilities are evaluated, and the highest-scoring node is
-chosen to be ``top''.
-This is suboptimal, since some graphs have multiple tops (and in PCEDT this is
+chosen to be ``top.''
+This is suboptimal, since some graphs have multiple tops (in \emph{PCEDT} this is
 more common);
 but selection rules based on probability thresholds gave worse $F_1$
 performance on the development set. \codenote{\url{https://github.com/Noahs-ARK/semeval-2014/issues/37}}
 
-For a given token $t$ at index $i$, the topness classifier used the following
-features:
-\begin{itemize}
-\item The POS tag of $t$.
-\item $i$.
-\item $i$ conjoined with the POS tag of $t$.
-\item The depth of $t$ in the syntactic dependency tree. 
-\end{itemize}
+For a given token $t$ at index $i$, the top classifier's features
+included $t$'s POS tag, $i$, $i$, those two conjoined, and the depth
+of $t$ in the syntactic dependency tree.
 
 \section{Experiment Setup}
 \label{s:evaluation}
 
-We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (section 20), training on sections 00 through 19.
+\nas{move this \emph{after} the negative results section}
+
+We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (\S 20), training on \S 00--19.
 
 %\section{Evaluation}
 
@@ -669,6 +672,8 @@ on a subsample of the training data, for a reduced number of iterations.
 The following results thus have a 
 the strong caveat that the experiments were
 not exhaustive.  It could be these that any of the following features would help under more careful testing.
+
+\nas{NOAH LEFT OFF HERE}
 
 \subsubsection{Word vectors}
 
