@@ -326,9 +326,10 @@ We found that $F_1$ performance was improved by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
 $\sum_{i,j} \sum_\ell w_\ell \log P(y_{i,j}=\ell; \bm\phi)$, with $w_{\noedge}=0.3$
 and $w_{\ell} = 1, \forall \ell \in L$.
-(The weight was chosen by gridsearch on a development set; 
-\emph{PAS} \nas{confusing because you did not use this model for PAS!}
-used a weight of $0.4$ while the others were $0.3$, though the differences at this granularity were small.)
+(The weight was chosen by gridsearch on a development set.)
+\bocomment{ok, i removed the point on PAS.  this paper is very awkward because of how formalisms and systems are split. it makes it harder to make useful points.}
+
+% 0.4
 
 % Besides the edge logistic regression system, there were both pre- and post-processing steps.
 
