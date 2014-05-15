@@ -60,11 +60,11 @@
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
- \renewcommand{\bocomment}[1]{}
- \renewcommand{\sam}[1]{}
- \renewcommand{\nas}[1]{}
- \renewcommand{\jmf}[1]{}
- \renewcommand{\jdcomment}[1]{}
+ %\renewcommand{\bocomment}[1]{}
+ %\renewcommand{\sam}[1]{}
+ %\renewcommand{\nas}[1]{}
+ %\renewcommand{\jmf}[1]{}
+ %\renewcommand{\jdcomment}[1]{}
 
 
 % turn off for submission, but on for a more tech report-y version.
@@ -225,7 +225,7 @@ We use the same set of edge-factored features (\S\ref{s:features}) in two
 alternative models: an edge-independent multiclass logistic
 regression model (\logitedge, \S\ref{s:logitedge}); and a structured SVM 
 \cite{taskar_max_2003,tsochantaridis_support_2004} that enforces 
-\emph{determinism}\jmf{I'll find a citation} constraints that allow a word to
+\emph{determinism} constraints that allow a word to
 have at most one outgoing edge with the
 same label (\svmedge, \S\ref{s:graphparser}).
 For each formalism, we trained both models with varying features enabled and
