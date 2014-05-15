@@ -618,11 +618,12 @@ not exhaustive.  It could be these that any of the following features would help
 
 We experimented with features derived from distributional word embeddings using 64-dimensional vectors from  \cite{wordVectors}.  
  Features
-derived from these vectors for a potential edge include their
-concatenation, difference, inner product, and element-wise
-multiplication, and offered no benefit.  We also trained a
-random forest\footnote{We trained using:  \url{http://cran.r-project.org/web/packages/randomForest/randomForest.pdf}}  from the word vectors and used hard labels it predicted
-as features in the \logitedge\ parser; no improvement was visible.
+derived from these vectors for a potential edge---including their
+concatenation, difference, inner product, and element-wise multiplication---offered no benefit.
+We also trained a
+random forest\footnote{Using \cite{RandomForest2002}'s \emph{randomForest} R implementation.}
+from the word vectors, using its predicted hard labels as features;
+no improvement was visible.
 
 % For each method outlined below, each dimension of the output vector was used as
 % a feature, whose value was the value of the vector along that dimension.
@@ -796,7 +797,7 @@ support of the Reading is Believing project at CMU.
 
 
 \bibliographystyle{acl}
-\bibliography{semeval8}
+\bibliography{semeval8,morebib}
 
 
 
