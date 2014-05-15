@@ -617,23 +617,22 @@ not exhaustive.  It could be the case that that any of these features would help
 \begin{small}
 %\textbf{Bias:} Always fires.
 
-\textbf{Word vectors:} Features derived from 64-dimensional vectors from  \cite{wordVectors}, including their
-concatenation, difference, inner product, and element-wise multiplication. Random forest\footnote{Using \cite{RandomForest2002}'s \emph{randomForest} R implementation.}
-from the word vectors, using its predicted hard labels as features;
+\textbf{Word vectors:} Features derived from 64-dimensional vectors from  \cite{wordVectors}, including the
+concatenation, difference, inner product, and element-wise multiplication of the two vectors associated with a parent-child edge. We also trained a random forest\footnote{Using \cite{RandomForest2002}'s \emph{randomForest} R implementation.} on the word vectors (using the vector elements as features to predict the observed semantic label); at test time, the predicted hard labels were incorporated as features.
 
 \textbf{Brown clusters} Features derived from Brown clusters \cite{Brown:1992:CNG:176313.176316}
 trained on a large corpus of web data. Parent, child and conjoined parent-child edge features from cluster prefixes of length 2, 4, 6, 8, 10 and 12. Conjunctions of those features with the POS tags of the parent and
 child tokens.
 
-
 \textbf{Active/passive:} Active/passive voice feature
 (as in \newcite{johansson_dependency-based_2008}) conjoined with both the Linear
-Distance features and the Subcategorization Sequence features (we hypothesize
+Distance features and the Subcategorization Sequence features. (We hypothesize
 voice information may already have been incorporated into our featureset by the
 use of the supplied Stanford dependency-style parses, which include
-passivization information in arc labels such as \emph{nsubjpass},\emph{auxpass}).
+passivization information in arc labels such as \emph{nsubjpass} and \emph{auxpass}\cite{Marneffe2008DepColing}).
 
-\textbf{Connectivity constraint:} Enforcing that the graph was connected (ignoring singletons), similarly
+
+\textbf{Connectivity constraint:} Enforcing that the graph is connected (ignoring singletons), similar
 to \newcite{flanigan-etal:ACL2014}. Almost all semantic dependency graphs are connected (ignoring singletons) in the
 training data, but we found that enforcing this constraint causes more edges to be predicted, significantly hurting
 performance.
@@ -642,7 +641,7 @@ performance.
 
 \end{small}
 \end{framed}
-\caption{Negative features and graph constraints.}
+\caption{Features and constraints giving negative results.}
 \label{table:negedgefeatures}
 \end{table}
 
