@@ -471,7 +471,7 @@ array lookups and gradient steps are simply implemented with $h$ instead of $g$,
 dot products are approximately preserved with high probability;
 and indeed, we observed no drop in accuracy compared to using an explicit feature map.
 We used a value of $B$ as large as was convenient for memory usage (due only to $h(\phi)$), $B=10^{8}$.
-This was actually higher than $|F|\approx 10^7$, though there were still plenty of collisions: about 9.5\% of features are hashed to a value shared by at least one other feature.
+This is actually higher than $|F|\approx 10^7$, though plenty of collisions still happen: about 9.5\% of features are hashed to a value shared by at least one other feature.
 
 %% simulation:
 % num buckets count 0: 90484843
