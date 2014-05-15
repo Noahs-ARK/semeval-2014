@@ -164,7 +164,9 @@ See Figure~\ref{fig:formalisms} for an example sentence.
 		\caption{PCEDT}
 		\label{fig:pcedt}
 	\end{subfigure}
-	\caption{Example annotations for the three formalisms.}
+	\caption{Example annotations for the three formalisms.\jmf{are the
+    three LOC's in PCEDT correct? is the capitalization of 'BAKER
+    FALTERS' meaningful?}}
 	\label{fig:formalisms}
 \end{figure*}
 
@@ -379,12 +381,26 @@ edge(i,j,\ell) =
 \]
 In other words, for each node and each label, the decoder searches for
 the highest scoring outgoing edge and adds it if its weight is
-positive.
+positive.  The algorithm's runtime is $O(n^2)$.
 
-The model weights are trained using the structured SVM loss optimized
-with AdaGrad \cite{duchi_adaptive_2011} using early-stopping on a
-development set.  Tops are predicted using the top prediction model
-\S\ref{s:top_model}.
+The model weights are trained using the structured SVM loss.  If $x$
+is a sentence and $y$ is a graph over that sentence, let the features 
+be denoted $\bm{f}(x,y) = \sum_{(i,j,\ell) \in edges(y)}
+\bm{f}(i,j,\ell)$.  The SVM loss for each training example $(x_i, y_i)$ is:
+\begin{multline*}
+-\bm\psi^\top \bm{f}(x_i,y_i) + \max_{y} \bm\psi^\top \bm{f}(x_i,y) +
+cost(y,y_i)
+\end{multline*}
+where $cost(y,y_i)$
+is the cost function
+\begin{multline*}
+cost(y,y_i) = \alpha |edges(y)\setminus edges(y_i)| + \\
+\beta |edges(y_i)\setminus edges(y)|.
+\end{multline*}
+$\alpha$ and $\beta$ trade off between precision and recall for the
+edges.  The loss is minimized with AdaGrad
+using early-stopping on a development set.  Tops are predicted using the
+top prediction model \S\ref{s:top_model}.
 
 \bocomment{Does this use the topness prediction system?}\jmf{yup}
 
