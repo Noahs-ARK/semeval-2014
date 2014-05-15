@@ -329,7 +329,8 @@ candidate edges (pairs of tokens with length between 1 and 10 inclusive), and NN
 We found that $F_1$ performance was improved by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
 $\sum_{i,j} \sum_\ell w_\ell \log P(y_{i,j}=\ell; \bm\phi)$, with $w_{\noedge}=0.3$
-and $w_{\ell} = 1, \forall \ell \in L$.
+and $w_{\ell} = 1$ otherwise, when $\ell \neq \noedge$.
+\bocomment{i removed $\forall \ell \in L$ becuase i thought $L$ includes NoEdge. need to clarify?}
 (The weight was chosen by gridsearch on a development set.)
 
 % 0.4
