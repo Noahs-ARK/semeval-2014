@@ -60,11 +60,11 @@
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
-% \renewcommand{\bocomment}[1]{}
-% \renewcommand{\sam}[1]{}
-% \renewcommand{\nas}[1]{}
-% \renewcommand{\jmf}[1]{}
-% \renewcommand{\jdcomment}[1]{}
+ \renewcommand{\bocomment}[1]{}
+ \renewcommand{\sam}[1]{}
+ \renewcommand{\nas}[1]{}
+ \renewcommand{\jmf}[1]{}
+ \renewcommand{\jdcomment}[1]{}
 
 
 % turn off for submission, but on for a more tech report-y version.
@@ -770,62 +770,26 @@ whole-sentence match (LM) on the held out test data.
 \end{table}
 
 
-
-\section{Future work}
-
+\section{Conclusion and Future Work}
+We found that feature-rich discriminative models perform well at the task of
+mapping from sentences to semantic dependency parses. 
+While our final approach is fairly standard for work in parsing, we
+note here additional features and constraints which did not
+appear to help (contrary to expectation).
 There are a number of clear extensions to this work that could improve
 performance.
 While using an edge factored model allows for efficient inference, there is
-much to be gained from using higher-order features.
-Extending the model in this way often requires resorting to approximate
-inference, but others have shown gains without a significant decrease in
-speed \cite{mcdonald_online_2006,martins_turning_2013}.
-
-While each of the three formalisms is different, there is much information
-shared between them.
-For example, the head of a sentence is often the same in all three formalisms.
-Taking advantage of this shared structure in a multi-task learning framework
+much to be gained from using \textbf{higher-order features} \cite{mcdonald_online_2006,martins_turning_2013}
+The amount of information
+shared between the three formalisms suggests that a \textbf{multi-task learning} framework
 could lead to gains.
-
-There is additional structure in the formalisms which could be
-exploited.
-\emph{PCEDT} annotations were originally a tree, but underwent a preprocessing step by
-the task organizers in order to better capture bilexical dependency
-relationships.
-Wherever there is a coordination arc\footnote{A coordination arc
-is one of ``CONJ.member,'' ``APPS.member,'' ``GRAD.member,'' ``CONTRA.member,''
-or ``REAS.member.''} present from $i \rightarrow j$, edges incoming to $i$ were
-copied to instead point to $j$.
-For example, in 
-Figure~\ref{fig:formalisms}
-the ``CPR'' arcs incoming to ``flashlights'' and ``alarms'' 
- are a result of this step.
-There was originally just one arc pointing to ``and.''
-\emph{PCEDT} trees were also mostly deterministic with respect to non-coordination arcs
-before this step.
-We conjecture that this copying is one reason that determinism constraints were
-not helpful for \emph{PCEDT}.
-Formulating more subtle graph constraints that are able to capture this a priori
-knowledge of the graph structure could lead to improved performance.
-
-
-\section{Conclusion}
-We found that feature-rich discriminative models performed well on the task of
-mapping from sentences to semantic dependency parses.
-Our work has shown the best \nas{what?  best comparing what to what?
-  this was not in the paper} results when using one model for predicting whether
-a given token was to be included in the final graph, then using either our
-\logitedge\ parser or a graph-based structured SVM parser to predict a graph
-from the remaining tokens.
-Each of the three formalisms has different constraints;
-we found enforcing determinism in the \emph{PAS} formalism gave improvements, while
-enforcing other constraints did not.
-While our final approach was fairly standard for work in parsing, we
-have noted some additional features and constraints which did not
-appear to help.
+And finally, there is additional structure in the formalisms which could be
+exploited (such as the deterministic processes by which an original PCEDT tree annotation was converted into a graph); formulating more subtle \textbf{graph constraints} that are able to capture this a priori
+knowledge of the graph structure could lead to improved performance.  We leave such explorations to future work.
 
 
 
+\small
 \section*{Acknowledgements}
 We are grateful to Manaal Faruqui for his help in the word vector experiments.
 The research reported in this article was sponsored by the U.S.~Army Research
