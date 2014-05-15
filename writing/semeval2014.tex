@@ -433,53 +433,38 @@ For each feature listed, we have an indicator feature for each value it takes
 on.
 
 \begin{itemize}
-	\item Bias
-	\item Basic
-	\begin{itemize}
-		\item The tokens $s$ and $t$ themselves.
-		\item Lemmas of $s$ and $t$.
-		\item Part of speech tags of $s$ and $t$.
-		\item 1 if $i \le j$, 0 otherwise.
-	\end{itemize}
-	\item LinearOrder
-		\begin{itemize}
-		\item $i - j$.
-	\end{itemize}
-	\item CoarseDependency
-		\begin{itemize}
-		\item 1 if $s$ is the parent of $t$ in the syntactic dependency parse, 0
-		otherwise.
-		\item Distance between $s$ and $t$ in syntactic dependency parse.
-	\end{itemize}
-	\item LinearContext
-		\begin{itemize}
-		\item Concatenated POS tags of tokens at $i-1$, $i$, $i+1$, $j-1$, $j$,
-		and $j+1$.
-		\item Concatenated POS tags of tokens at $i-1, i, j-1$, and $j$.
-		\item Concatenated POS tags of tokens at $i, i+1, j$, and $j+1$.
-	\end{itemize}
-	\item DependencyPath
-		\begin{itemize}
-		\item The concatenation of all tokens and arc labels on the labeled path in
-		the syntactic dependency tree from $s$ to $t$.
-	\end{itemize}
-	\item UnlabeledDep
-		\begin{itemize}
-		\item The unlabeled path through the syntactic dependency tree from $s$ to $t$. 
-		\item The unlabeled path through the syntactic dependency tree from $s$ to $t$,
-		annotated with whether the each step through the tree was to the right or left in the sentence.
-	\end{itemize}
-	\item SubcatSequence
-		\begin{itemize}
-		\item For each direct child $c$ of $s$ in the syntactic dependency tree, the
-		concatenation of the POS tag of $c$ with the label of the arc to the child.
-		If $c$ is $t$, append a ``+''.
-		\item For each child $c$ of $s$ in the syntactic dependency tree, the
-		concatenation of the POS tag of $s$ with the POS tag of $c$ and the label of the
-		arc from $s$ to $c$.
-		If $c$ is $t$, append a ``+''.
-	\end{itemize}
+	\item \textbf{Bias}
+	\item \textbf{Tokens:} The tokens $s$ and $t$ themselves.
+	\item \textbf{Lemmas:} Lemmas of $s$ and $t$.
+	\item \textbf{POS tags:} Part of speech tags of $s$ and $t$.
+	\item \textbf{Linear Order:} 1 if $i < j$, 0 otherwise.
+	\item \textbf{Linear Distance:} $i - j$.
+	\item \textbf{Dependency Path:} The concatenation of all tokens and arc labels
+	on the labeled path in the syntactic dependency tree from $s$ to $t$.
+	\item \textbf{Up/Down Dependency Path:} The sequence of upward and
+	downward moves needed to get from $s$ to $t$ in the syntactic dependency
+	tree.
+	\item \textbf{Up/Down/Left/Right Dependency Path:} The unlabeled path through
+	the syntactic dependency tree from $s$ to $t$, annotated with whether the each
+	step through the tree was up or down, and whether it was to the right or left
+	in the sentence.
+	\item \textbf{Is Parent:} 1 if $s$ is the parent of $t$ in the syntactic
+	dependency parse, 0 otherwise.
+	\item \textbf{Dependency Path Length:} Distance between $s$ and $t$ in the
+	syntactic dependency parse.
+	\item \textbf{POS Context:} Concatenated POS tags of tokens at $i-1$, $i$,
+	$i+1$, $j-1$, $j$, and $j+1$. Concatenated POS tags of tokens at $i-1, i, j-1$,
+	and $j$. Concatenated POS tags of tokens at $i, i+1, j$, and $j+1$.
+	\item \textbf{Subcategorization Sequence} For each direct child $c$ of $s$ in
+	the syntactic dependency tree, concatenate the label of the arc to the child.
+	If $c$ is $t$, distinguish the arc label by appending a ``+''.
+	\item \textbf{Subcategorization Sequence with POS tags} For each child $c$ of
+	$s$ in the syntactic dependency tree, the concatenation of the POS tag of $c$
+	and the label of the arc from $s$ to $c$.
+	If $c$ is $t$, distinguish the arc label by appending a ``+''.
 \end{itemize}
+
+
 
 \subsubsection{Feature Hashing}
 
