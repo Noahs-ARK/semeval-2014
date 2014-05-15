@@ -230,9 +230,18 @@ For the PAS formalism, we use a structured SVM
 \cite{taskar_max_2003,tsochantaridis_support_2004} that enforces a
 \emph{determinism} constraint -- a word may not have two outgoing edges with the
 same label (\S\ref{s:graphparser}).
-\sam{explain why we use different models for different formalisms}
-\bocomment{shouldn't we just say, we tried both for all and are reporting the configurations that performed best on devset?}
-\sam{yes, that sounds good. waiting on graph vs. non-graph results from jflan}
+\sam{For each formalism, we trained both models with varying features enabled
+and hyperparameter settings and chose the configuration that performed best on
+development set.
+Due to time constraints, full feature and hyperparameter sweeps were not
+possible.
+Jeff, please make it clear here about what happened in the 11th
+hour.}
+We report only the best performing configuration.
+%\sam{explain why we use different models for different formalisms}
+%\bocomment{shouldn't we just say, we tried both for all and are reporting the
+% configurations that performed best on devset?}
+%\sam{yes, that sounds good. waiting on graph vs. non-graph results from jflan}
 
 Both models consider only token index pairs $(i, j)$ where %that are within 10
 % tokens of each other (i.e.~
