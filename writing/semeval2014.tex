@@ -327,17 +327,12 @@ PAS used a weight of $0.4$ while the others were $0.3$, though the differences a
 To predict a graph structure at test-time for a new sentence,
 the most likely edge label is predicted for every candidate $(i, j)$ pair of
 tokens that has not been pruned by an earlier stage.
-%There were several post-processing steps.
 We enforce only one graph constraint, which is that there cannot be
 an edge in both directions between any pair of words.
 If an edge is predicted for both directions for a single $(i, j)$
 pair, only the edge with the higher score is chosen.
-% If the gold standard has an edge in the direction $i \rightarrow j$, the
-% direction $j \rightarrow i$ is considered a \noedge.
 There are no such bidirectional edges in the training data, and enforcing this
-restriction improved accuracy on the development set.
-The graph-based parser has more sophisticated decoding constraints.
-
+restriction slightly improved accuracy on the development set ($~0.2\%$ absolute F on PAS; other formalisms unchanged).\codenote{\url{https://github.com/Noahs-ARK/semeval-2014/pull/21}}
 
 
 \subsubsection{Graph-based Structured SVM Parser} \label{s:graphparser}
@@ -477,8 +472,7 @@ chosen to be ``top''.
 This is suboptimal, since some graphs have multiple tops (and in PCEDT this is
 more common);
 but selection rules based on probability thresholds gave worse $F_1$
-performance on the development set. \bocomment{I wonder if I documented this on
-an issue/PR}
+performance on the development set. \codenote{\url{https://github.com/Noahs-ARK/semeval-2014/issues/37}}
 
 
 \subsubsection{Top Features}
@@ -490,10 +484,9 @@ For a given token $T$, the topness classifier used the following features:
 \item The depth of $T$ in the syntactic dependency parse. 
 \end{itemize}
 
+\section{Experiment Setup}
 
-
-
-
+We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (section 20), training on sections 00 through 19.
 
 \section{Negative Results}
 \label{s:badfeatures}
@@ -505,11 +498,11 @@ If the new feature did not improve performance, we did not add it.
 We list below some of the features which we tested, but did not find to improve
 performance.
 
-Note that in order to save time, we ran these feature selection experiments
+In order to save time, we ran these feature selection experiments
 on a subsample of the training data, for a reduced number of iterations.
-So please regard the following with the strong caveat that our experiments were
-not exhaustive, and we do not claim that these features could not be found to
-help.
+The following results thus have a 
+the strong caveat that the experiments were
+not exhaustive.  It could be these that any of the following features would help under more careful testing.
 
 \subsection{Word vectors}
 Word vectors have been shown to benefit a number of semantic tasks. We
@@ -552,7 +545,13 @@ A verb tends to realize its semantic arguments differently when the verb is in
 active voice vs. passive voice.
 We attempted to capture this by conjoining a ACTIVE/PASSIVE feature with both
 the LinearDistance features and the SubcatSequence features.
-We surprisingly did not see any improvement when including these features.
+\bocomment{From reading this i don't understand how this was computed. word patterns for "has been" etc? PTB POSes? left-vs-right directionality?}
+
+There was no improvement from including these features.
+Since we were already using dependency features from the 
+organizers' supplied Stanford Dependencies-style parses,
+which include passivization information in arc labels (\emph{nsubjpass},\emph{auxpass}),
+we hypothesize this information may have already been incorporated into the syntactic analysis preprocessing.
 
 \subsection{Alternative Distance Measures}
 Multiple kinds of distance features, including log distance, binned distance (i.e. less than five tokens apart, between five and ten tokens apart, more than ten tokens apart), and thresholded distance (i.e. zero to three tokens apart, zero to five tokens apart, etc.).
