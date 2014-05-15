@@ -72,16 +72,22 @@
 \title{CMU-Ark: Broad-Coverage Semantic Dependency Parsing with Rich
 Edge-Factored Features \sam{better title, please}}
 
-\author{First Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\\And
-  Second Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\}
+\author{
+	Sam Thomson \quad
+	Brendan O'Connor \quad
+	Jeff Flanigan \quad
+	David Bamman \quad  \\
+	\bf{Jesse Dodge \quad
+	Swabha Swayamdipta \quad
+	Nathan Schneider \quad
+	Chris Dyer \quad
+	Noah Smith} \\
+  Language Technologies Institute \\
+  Carnegie Mellon University \\
+  Pittsburgh, PA 15213, USA \\
+  {\tt\{sthomson,brenocon,jflanigan,dbamman,jessed,}\\
+   \tt{swabha,nschneid,cdyer,nasmith\}@cs.cmu.edu}
+}
 
 \date{}
 
@@ -89,10 +95,10 @@ Edge-Factored Features \sam{better title, please}}
 \maketitle
 
 \begin{abstract}
-We present an edge-factored statistical model for parsing to the three semantic
-dependency formalisms in SemEval 2014 Shared Task 8: Broad-Coverage Semantic
-Dependency Parsing.
-
+We present an edge-factored statistical model for semantic dependency parsing.
+\sam{need more here.}
+Our system placed second in the open track of SemEval 2014 Shared Task 8:
+Broad-Coverage Semantic Dependency Parsing.
 \end{abstract}
 
 
@@ -276,53 +282,63 @@ the formalism's original $K$ edge labels plus the additional label \noedge,
 which indicates that no edge exists from $i$ to $j$.
 Let $L$ be the set of possible edge labels.
 
-In our implementation, we separate features into two classes:
-those which can be extracted for any one word, $\bm{f}^{(\text{node})}(i)$;
-and those which look at both the parent and the child,
-$\bm{f}^{(\text{edge})}(i, j)$.
-These features are described in \S\ref{s:features}.
-The final binary feature vector is made by conjoining the output label with
-each:
-\begin{align*} 
-\bm{f}(i, j, \ell) =
-\{ \ell \} \otimes (& 
-	\{ \text{``bias''} \} \\
-	& \cup \bm{f}^{(\text{edge})}(i, j) \\
-	& \cup \{ \text{``parent''} \} \otimes \bm{f}^{(\text{node})}(i) \\
-	& \cup \{ \text{``child''} \} \otimes \bm{f}^{(\text{node})}(j)
-)\\
-\end{align*}
-\noindent
-where  $\otimes$ represents the Cartesian product.
+% In our implementation, we separate features into two classes:
+% those which can be extracted for any one token, $\bm{f}^{(\text{node})}(i)$;
+% and those which look at both the parent and the child,
+% $\bm{f}^{(\text{edge})}(i, j)$.
+% These features are described in \S\ref{s:features}.
+% Then the final feature vector $\bm{f}(i, j)$ is $\bm{f}^{(\text{edge})}(i,
+% j)$, along with the $\bm{f}^{(\text{node})}$ features for both the parent and
+% child token.
+% The final feature vector is made by conjoining the output label with
+% each:
+% \[
+% 	\bm{f}(i, j, \ell) := \text{conjoin}(\ell, \bm{f}^{\text{percept}}(i, j))
+% \]
+% where
+% 
+% \begin{aligned}
+% \bm{f}^{\text{percept}}(i, j) := & \bm{f}^{(\text{edge})}(i, j) \\
+% 	& \cup \text{ conjoin}(\text{``par''}, \bm{f}^{(\text{node})}(i)) \\
+% 	& \cup \text{ conjoin}(\text{``child''}, \bm{f}^{(\text{node})}(j))
+% \end{aligned}
+% \[
+% \text{conjoin}(\alpha, M) := \{ ((\alpha, k), v) \mid (k, v) \in M \}
+% \]
 %Feature extractors are defined to extract
 %features both for individual tokens ($f^{(\text{node})}(i)$), and also for
 % pairs of tokens ($f^{(\text{edge})}(i,j)$), which are conjoined against all possible output
 %labels.
-For candidate parent index $i$ and child index $j$, the model defines a
-distribution over $y_{i,j} \in L$, parametrized by the weight vector $\bm\phi$,
-
-\begin{equation}
-  Pr(y_{i,j}=\ell; \bm\phi)  = \frac{
-  	e^{\bm\phi^\top \bm{f}(i, j, \ell)}
+% \noindent
+For candidate parent index $i$ and child index $j$, we extract a feature vector
+$\bm{f}(i, j)$, as described in \S\ref{s:features}.
+The multiclass logistic regression model defines a distribution over $L$,
+parametrized by the weight vectors $\Phi = \{\bm\phi_\ell\}_{\ell \in L}$:
+\[
+  Pr_\Phi(\ell)  = \frac{
+  	\exp\{\bm\phi_\ell \cdot \bm{f}(i, j)\}
   } {
   	\sum_{\ell^\prime \in L} {
-  		e^{\bm\phi^\top \bm{f}(i, j, \ell^\prime)}
+  		\exp\{\bm\phi_{\ell^\prime} \cdot \bm{f}(i, j)\}
   	}
   }
-\end{equation}
+\]
 
 \noindent
 %In this notation, an $f$ function outputs a real-valued vector, defined as the
 % concatenation of features from all the feature classes (\S\ref{s:features}).
-$\bm\phi$ is learned by minimizing total negative log-likelihood of the above
+$\Phi$ is learned by minimizing total negative log-likelihood of the above
 (with weighting; see below), plus $\ell_2$ regularization.
 Adagrad \cite{duchi_adaptive_2011} is used for optimization.
 This seemed to optimize faster than L-BFGS \cite{byrd_limited_1995}, at least for earlier
 iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
 
-In the FFF\jmf{what's FFF and NNN?} formalism, the training set (\S\ref{s:evaluation})
-contains NNN candidate edges (pairs of tokens with length between 1 and 10 inclusive),
-and NNN actual (non-null) edges.  $F_1$ performance was improved by
+There is a class imbalance in the output labels; in all three formalisms, there
+are many more $\noedge$ examples than true edge examples.
+\sam{If we get these numbers, it would be nicer to quantify, and say something
+like ``In the FFF formalism, the training set (\S\ref{s:evaluation}) contains NNN
+candidate edges (pairs of tokens with length between 1 and 10 inclusive), and NNN actual (non-null) edges.''}
+We found that $F_1$ performance was improved by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
 $\sum_{i,j} \sum_\ell w_\ell \log P(y_{i,j}=\ell; \bm\phi)$, with $w_{\noedge}=0.3$
 and $1$ otherwise.
@@ -349,7 +365,7 @@ There are no such bidirectional edges in the training data, and enforcing this
 restriction slightly improved accuracy on the development set ($~0.2\%$ absolute F on PAS; other formalisms unchanged).\codenote{\url{https://github.com/Noahs-ARK/semeval-2014/pull/21}}
 
 
-\subsubsection{Graph-based Structured SVM Parser} \label{s:graphparser}
+\subsubsection{Deterministic Structured SVM Parser} \label{s:graphparser}
 
 To predict edges for the PAS formalism, we use a model with determinism
 constraints.  This ensures that at each word, there is at most one
@@ -357,15 +373,15 @@ outgoing edge for each label type.
 
 Consider the fully dense graph of all edges between all words predicted
 as not singletons by the singleton classifier \S\ref{s:singleton_model} (in all
-directions with all possible labels).  If $\bm\psi$ denotes the model
+directions with all possible labels).
+If $\Psi = \{\bm\psi_\ell\}_{\ell \in L}$ denotes the model
 weights, and $\bm{f}$ denotes the same features as the
 \logitedge~model, then an edge from $i$ to $j$ with label $\ell$ in the
 dense graph has a weight $c(i,j,\ell)$ assigned to it using the linear
 scoring function:
 \[
-c(i,j,\ell) = \bm\psi^\top \bm{f}(i,j,\ell)
+c(i,j,\ell) = \bm\psi_\ell \cdot \bm{f}(i,j)
 \]
-
 The decoder finds the highest scoring subgraph of the dense graph
 subject to the determinism constraints.  Let $edge(i,j,\ell)$ be a
 binary function where $edge(i,j,\ell) = 1 $ denotes inclusion of an edge
@@ -410,12 +426,18 @@ top prediction model \S\ref{s:top_model}.
 \label{s:edgefeatures}
 
 \label{s:features}
+
+\sam{would be nice to cite where we stole these features from, where applicable}
 These features were computed over an edge $e$ with parent token $s$ at index
 $i$ and child token $t$ at index $j$. 
 For each feature listed, we have an indicator feature for each value it takes
 on.
 
 \begin{itemize}
+	\item Bias:
+	\begin{itemize}
+	  \item ``BIAS''
+	\end{itemize}
 	\item Basic
 	\begin{itemize}
 		\item The tokens $s$ and $t$ themselves.
@@ -547,8 +569,93 @@ features:
 \end{itemize}
 
 \section{Experiment Setup}
+\label{s:evaluation}
 
 We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (section 20), training on sections 00 through 19.
+
+%\section{Evaluation}
+
+We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
+labeled whole-sentence match (LM) on the held out test data using the
+evaluation script provided by the organizers (see Table~\ref{table:perf}).
+LF was averaged over the formalisms to determine the winning system.
+
+% CMU:
+% DM:
+% LP: 0.844641
+% LR: 0.834849
+% LF: 0.839716
+% LM: 0.087537
+% 
+% 
+% PAS:
+% LP: 0.907832
+% LR: 0.885141
+% LF: 0.896343
+% LM: 0.260386
+% 
+% 
+% PCEDT:
+% LP: 0.768139
+% LR: 0.707173
+% LF: 0.736396
+% LM: 0.071217
+
+% Priberam:
+% DM:
+% LP: 0.902322
+% LR: 0.881050
+% LF: 0.891559
+% LM: 0.268546
+% 
+% PAS:
+% LP: 0.925576
+% LR: 0.909676
+% LF: 0.917557
+% LM: 0.378338
+% 
+% PCEDT:
+% LP: 0.801397
+% LR: 0.757900
+% LF: 0.779042
+% LM: 0.106825
+
+
+\begin{table*}
+\begin{center}
+\begin{tabular*}{\textwidth}%{.6\textwidth}
+{@{\extracolsep{\fill}}cc|cccc}%|c|c|c|c|c|c|}
+% \hline
+ & System & LP & LR & LF & LM \\
+\hline
+\hline
+\multirow{2}{*}{\textbf{DM}}
+& CMU & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
+& PRIB-IT & 0.9023 & 0.8811 & 0.8916 & 0.2685 \\
+\hline
+\multirow{2}{*}{\textbf{PAS}}
+& CMU & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
+& PRIB-IT & 0.9256 & 0.9097 & 0.9176 & 0.3783 \\
+\hline
+\multirow{2}{*}{\textbf{PCEDT}}
+& CMU & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
+& PRIB-IT & 0.8014 & 0.7580 & 0.7790 & 0.1068 \\
+\hline
+\hline
+\multirow{2}{*}{\textbf{Average}}
+& CMU & 0.8402 & 0.8090 & 0.8241 & 0.1397 \\
+& PRIB-IT & 0.8764 & 0.8496 & 0.8627 & 0.2512 \\
+\end{tabular*}
+\caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
+whole-sentence match (LM) on the held out test data.
+We show results for our system (CMU) and the winning system (PRIB-IT).
+%\cite{martins_prib_2014}
+}
+\label{table:perf}
+\end{center}
+\end{table*}
+
+
 
 \section{Negative Results}
 \label{s:badfeatures}
@@ -634,90 +741,6 @@ conjoined.
 No combination of the above settings helped performance.
 Neither did conjoining the above features with the POS tags of the parent and
 child tokens.
-
-
-
-\section{Evaluation}
-\label{s:evaluation}
-
-We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
-labeled whole-sentence match (LM) on the held out test data (see
-Table~\ref{table:perf}).
-
-% CMU:
-% DM:
-% LP: 0.844641
-% LR: 0.834849
-% LF: 0.839716
-% LM: 0.087537
-% 
-% 
-% PAS:
-% LP: 0.907832
-% LR: 0.885141
-% LF: 0.896343
-% LM: 0.260386
-% 
-% 
-% PCEDT:
-% LP: 0.768139
-% LR: 0.707173
-% LF: 0.736396
-% LM: 0.071217
-
-% Priberam:
-% DM:
-% LP: 0.902322
-% LR: 0.881050
-% LF: 0.891559
-% LM: 0.268546
-% 
-% PAS:
-% LP: 0.925576
-% LR: 0.909676
-% LF: 0.917557
-% LM: 0.378338
-% 
-% PCEDT:
-% LP: 0.801397
-% LR: 0.757900
-% LF: 0.779042
-% LM: 0.106825
-
-
-\begin{table*}
-\begin{center}
-\begin{tabular*}{\textwidth}%{.6\textwidth}
-{@{\extracolsep{\fill}}cc|cccc}%|c|c|c|c|c|c|}
-% \hline
- & System & LP & LR & LF & LM \\
-\hline
-\hline
-\multirow{2}{*}{\textbf{DM}}
-& CMU & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
-& PRIB-IT & 0.9023 & 0.8811 & 0.8916 & 0.2685 \\
-\hline
-\multirow{2}{*}{\textbf{PAS}}
-& CMU & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
-& PRIB-IT & 0.9256 & 0.9097 & 0.9176 & 0.3783 \\
-\hline
-\multirow{2}{*}{\textbf{PCEDT}}
-& CMU & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
-& PRIB-IT & 0.8014 & 0.7580 & 0.7790 & 0.1068 \\
-\hline
-\hline
-\multirow{2}{*}{\textbf{Average}}
-& CMU & 0.8402 & 0.8090 & 0.8241 & 0.1397 \\
-& PRIB-IT & 0.8764 & 0.8496 & 0.8627 & 0.2512 \\
-\end{tabular*}
-\caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
-whole-sentence match (LM) on the held out test data.
-We show results for our system (CMU) and the winning system (PRIB-IT)
-\cite{martins_prib_2014}.}
-\label{table:perf}
-\end{center}
-\end{table*}
-
 
 
 \section{Future work}
