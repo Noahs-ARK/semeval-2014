@@ -60,11 +60,11 @@
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
-% \renewcommand{\bocomment}[1]{}
-% \renewcommand{\sam}[1]{}
-% \renewcommand{\nas}[1]{}
-% \renewcommand{\jmf}[1]{}
-% \renewcommand{\jdcomment}[1]{}
+ \renewcommand{\bocomment}[1]{}
+ \renewcommand{\sam}[1]{}
+ \renewcommand{\nas}[1]{}
+ \renewcommand{\jmf}[1]{}
+ \renewcommand{\jdcomment}[1]{}
 
 
 % turn off for submission, but on for a more tech report-y version.
@@ -120,15 +120,16 @@ As distinct from deeper semantic analysis (e.g., parsing to a full
 lambda-calculus logical form), shallow semantic parsing captures relationships
 between pairs of words or concepts in a sentence, and has wide application for
 information extraction, knowledge base population, and question answering (among others).
-SemEval 2014 Shared Task 8 on Broad-Coverage Semantic Dependency
-Parsing \cite{oepens_broad_2014} includes three different semantic
-formalisms (\S\ref{s:formalisms}), which encourages finding features and methods
-that are broadly applicable to semantic parsing, and discourages optimization
-toward a single semantic representation.
+%The SemEval 2014 Shared Task 8 on Broad-Coverage Semantic Dependency
+%Parsing \cite{oepens_broad_2014} includes three different semantic
+%formalisms (\S\ref{s:formalisms}), which encourages finding features and methods
+%that are broadly applicable to semantic parsing, and discourages optimization
+%toward a single semantic representation.
 %By diversifying the representations, we better tackle the broader task of
 %semantic analysis itself.
 
-We present here two systems that produce semantic dependency parses by extracting
+We present here two systems that produce semantic dependency parses in the three formalisms of the SemEval 2014 Shared Task 8 on Broad-Coverage Semantic Dependency
+Parsing \cite{oepens_broad_2014}.  These systems generate parses by extracting
 features for each potential dependency arc and learning a statistical model to
 discriminate between good arcs and bad;
 the first treats each labeled edge decision as an independent multiclass
@@ -145,14 +146,14 @@ We present our results in \S\ref{s:evaluation}.
 
 
 \section{Formalisms} \label{s:formalisms}
-
-The organizers of Shared Task 8 provided a corpus of English news text
-drawn from the Penn Treebank, annotated according to three different semantic dependency formalisms.
-\emph{DM} is automatically derived from LinGO English Resource Grammar (ERG)
+The dataset on which Shared Task 8 focuses is comprised of annotations of the Penn Treebank in three different semantic dependency formalisms.
+%The organizers of Shared Task 8 provided a corpus of English news text
+%drawn from the Penn Treebank, annotated according to three different semantic dependency formalisms.
+\emph{DM} is derived from LinGO English Resource Grammar (ERG)
 annotations in DeepBank \cite{flickinger_deepbank_2012}.
-\emph{PAS} is automatically derived from the Enju HPSG treebank using the
+\emph{PAS} is derived from the Enju HPSG treebank using the
 conversion rules of \newcite{miyao_corpus_oriented_2004}.
-\emph{PCEDT} is automatically derived from the tectogrammatic layer of the
+\emph{PCEDT} is derived from the tectogrammatic layer of the
 Prague Czech-English Dependency Treebank \cite{hajic_building_1998}.
 See Figure~\ref{fig:formalisms} for an example sentence.
 \begin{figure}
@@ -608,21 +609,15 @@ performance.
 In order to save time, we ran these feature selection experiments
 on a subsample of the training data, for a reduced number of iterations.
 The following results thus have a 
-the strong caveat that the experiments were
+ strong caveat that the experiments were
 not exhaustive.  It could be these that any of the following features would help under more careful testing.
 
 
-We experimented with features derived from distributional word embeddings.
-The vectors we used \cite{wordVectors} were trained trained on the WMT-2011
-dataset, using a variation on latent semantic analysis which incorporated
-information from multiple languages.
-The vectors contained 64 dimensions.
-When considering a potential edge, we
-had a parent token $s$ with associated word vector $\bm{v_1}$ and a child token
-$t$ with associated word vector $\bm{v_2}$.  Features
-derived as the
+We experimented with features derived from distributional word embeddings using 64-dimensional vectors from  \cite{wordVectors}.  
+ Features
+derived from these vectors for a potential edge include their
 concatenation, difference, inner product, and element-wise
-multiplication of these vectors offered no benefit.  We also trained a
+multiplication, and offered no benefit.  We also trained a
 random forest\footnote{We trained using:  \url{http://cran.r-project.org/web/packages/randomForest/randomForest.pdf}}  from the word vectors and used hard labels it predicted
 as features in the \logitedge\ parser; no improvement was visible.
 
@@ -663,15 +658,7 @@ zero to five tokens apart, etc.).
 
 
 We experimented with Brown cluster features \cite{Brown:1992:CNG:176313.176316}
-for tokens in the sentence.
-These clusters were obtained by training on a large corpus of data crawled from
-the web.
-We used all cluster prefixes of length 2, 4, 6, 8, 10 and 12.
-We added a padding when the length of cluster was less than the required prefix
-size.
-We added the Brown cluster for the parent token, the child token, and both
-conjoined.
-No combination of the above settings helped performance, nor did conjoining the above features with the POS tags of the parent and
+trained on a large corpus of web data, creating parent, child and conjoined parent-child edge features from cluster prefixes of length 2, 4, 6, 8, 10 and 12. No combination of the above settings helped performance, nor did conjoining the above features with the POS tags of the parent and
 child tokens.
 
 \subsection{Graph Constraints}
