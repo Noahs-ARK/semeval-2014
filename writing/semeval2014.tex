@@ -449,8 +449,12 @@ feature that fires for each value it can take on.
 
 \textbf{Linear Distance:} $i - j$.
 
-\textbf{Dependency Path:} The concatenation of all tokens and arc labels
-	on the labeled path in the syntactic dependency tree from $s$ to $t$.
+\textbf{Dependency Path v1:} The concatenation of all pos tags\jmf{was: tokens} and arc labels
+	on the labeled path in the syntactic dependency tree from $s$ to $t$.  Conjoined with head word,
+    with dependent word, and without either.
+
+\textbf{Dependency Path v2:}\jmf{graph-based only. DPv1 not used in graph-based.} Same as dependency path v1, but with lemmas instead of head word
+    or dependent word, and substituting the token for any IN pos tag.
 
 \textbf{Up/Down Dependency Path:} The sequence of upward and
 	downward moves needed to get from $s$ to $t$ in the syntactic dependency
@@ -480,6 +484,16 @@ feature that fires for each value it can take on.
 
 \textbf{Subcategorization Sequence with POS:} As above, but add the
 	POS tag of each child to its arc label.
+
+\textbf{POS Path:}\jmf{only for graph based} Concatenated POS tags between
+    and including $i$ and $j$.  Conjoined with head lemma, with dependent
+    lemma, and without either.
+
+
+\textbf{Distance Thresholds:}\jmf{only graph based} Fires for every integer between
+    $1$ and $\lfloor \log(|i-j|)/\log(1.39) \rfloor$ inclusive.
+
+
 \end{small}
 \end{framed}
 \caption{Features used in edge prediction}
