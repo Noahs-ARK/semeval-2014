@@ -60,11 +60,11 @@
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
-% \newcommand{\bocomment}[1]{}
-% \newcommand{\sam}[1]{}
-% \newcommand{\nas}[1]{}
-% \newcommand{\jmf}[1]{}
-% \newcommand{\jdcomment}[1]{}
+% \renewcommand{\bocomment}[1]{}
+% \renewcommand{\sam}[1]{}
+% \renewcommand{\nas}[1]{}
+% \renewcommand{\jmf}[1]{}
+% \renewcommand{\jdcomment}[1]{}
 
 
 % turn off for submission, but on for a more tech report-y version.
@@ -433,10 +433,12 @@ Thresholds, and the structured SVM parser uses all features except Dependency
 Path v1.  This was due to the fact that the structured SVM parser was faster to
 train, and due to time constraints for the submission we were unable to retrain
 \logitedge~with these features.\jmf{added this, I hope it's clear}
+
+\renewcommand{\floatpagefraction}{0.8}
 \begin{table}
 \begin{framed}
 \begin{small}
-\textbf{Bias:} Always fires.
+%\textbf{Bias:} Always fires.
 
 \textbf{Tokens:} The tokens $s$ and $t$ themselves.
 
