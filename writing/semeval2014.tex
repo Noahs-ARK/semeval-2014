@@ -358,46 +358,57 @@ explain how this differs from
 \label{s:edgefeatures}
 
 \label{s:features}
-These features were computed over an edge $E$ with parent token $S$ and child
-token $T$.  For each of those listed here, we have an indicator feature for each value it takes on.
+These features were computed over an edge $e$ with parent token $s$ at index
+$i$ and child token $t$ at index $j$. 
+For each feature listed, we have an indicator feature for each value it takes
+on.
 
 \begin{itemize}
-\item Basic
-\begin{itemize}
-\item Lemmas of $S$ and $T$.
-\item Part of speech tags of $S$ and $T$.
-\item Token strings of $S$ and $T$.
-\item 1 if Index($S$) $\le$ Index($T$), 0 otherwise.
-\end{itemize}
-\item LinearOrder
-\begin{itemize}
-\item Index($S$) - Index($T$).
-\end{itemize}
-\item CoarseDependency
-\begin{itemize}
-\item 1 if $S$ is the parent of $T$ in syntactic dependency parse, 0 otherwise.
-\item Distance between $S$ and $T$ in syntactic dependency parse.
-\end{itemize}
-\item LinearContext
-\begin{itemize}
-\item Concatenated PoS tags of tokens at Index($S$)-1, Index($S$), Index($S$)+1, Index($T$)-1, Index($T$), Index($T$)+1.
-\item Concatenated PoS tags of tokens at Index($S$)-1, Index($S$), Index($T$)-1, Index($T$).
-\item Concatenated PoS tags of tokens at Index($S$), Index($S$)+1, Index($T$), Index($T$)+1.
-\end{itemize}
-\item DependencyPath
-\begin{itemize}
-\item The token string concatenated to the labeled path through the syntactic dependency tree from $S$ to $T$.
-\end{itemize}
-\item SubcatSequence
-\begin{itemize}
-\item For each child $c$ of $S$ in the syntactic dependency tree, concatenate the PoS tag of $S$ with the label of the arc to the child. If $c$ is $T$, append a ``+''.
-\item For each child $c$ of $S$ in the syntactic dependency tree, concatenate the PoS tag of $S$ with the PoS tag of $c$ and the label of the arc to the child. If $c$ is $T$, append a ``+''.
-\end{itemize}
-\item UnlabeledDep
-\begin{itemize}
-\item The unlabeled path through the syntactic dependency tree from $S$ to $S$. 
-\item The unlabeled path through the syntactic dependency tree from $S$ to $T$, annotated with whether the each step through the tree was to the right or left in the sentence.
-\end{itemize}
+	\item Basic
+	\begin{itemize}
+		\item The tokens $s$ and $t$ themselves.
+		\item Lemmas of $s$ and $t$.
+		\item Part of speech tags of $s$ and $t$.
+		\item 1 if $i \le j$, 0 otherwise.
+	\end{itemize}
+	\item LinearOrder
+		\begin{itemize}
+		\item $i - j$.
+	\end{itemize}
+	\item CoarseDependency
+		\begin{itemize}
+		\item 1 if $s$ is the parent of $t$ in the syntactic dependency parse, 0
+		otherwise.
+		\item Distance between $s$ and $t$ in syntactic dependency parse.
+	\end{itemize}
+	\item LinearContext
+		\begin{itemize}
+		\item Concatenated POS tags of tokens at $i-1$, $i$, $i+1$, $j-1$, $j$,
+		and $j+1$.
+		\item Concatenated POS tags of tokens at $i-1, i, j-1$, and $j$.
+		\item Concatenated POS tags of tokens at $i, i+1, j$, and $j+1$.
+	\end{itemize}
+	\item DependencyPath
+		\begin{itemize}
+		\item The concatenation of all tokens and arc labels on the labeled path in
+		the syntactic dependency tree from $s$ to $t$.
+	\end{itemize}
+	\item UnlabeledDep
+		\begin{itemize}
+		\item The unlabeled path through the syntactic dependency tree from $s$ to $t$. 
+		\item The unlabeled path through the syntactic dependency tree from $s$ to $t$,
+		annotated with whether the each step through the tree was to the right or left in the sentence.
+	\end{itemize}
+	\item SubcatSequence
+		\begin{itemize}
+		\item For each direct child $c$ of $s$ in the syntactic dependency tree, the
+		concatenation of the POS tag of $c$ with the label of the arc to the child.
+		If $c$ is $t$, append a ``+''.
+		\item For each child $c$ of $s$ in the syntactic dependency tree, the
+		concatenation of the POS tag of $s$ with the POS tag of $c$ and the label of the
+		arc from $s$ to $c$.
+		If $c$ is $t$, append a ``+''.
+	\end{itemize}
 \end{itemize}
 
 \subsubsection{Feature Hashing}
@@ -474,14 +485,13 @@ more common);
 but selection rules based on probability thresholds gave worse $F_1$
 performance on the development set. \codenote{\url{https://github.com/Noahs-ARK/semeval-2014/issues/37}}
 
-
-\subsubsection{Top Features}
-For a given token $T$, the topness classifier used the following features:
+For a given token $t$ at index $i$, the topness classifier used the following
+features:
 \begin{itemize}
-\item The PoS tag of $T$.
-\item Index($T$).
-\item Conjoined PoS tag of $T$ and Index($T$).
-\item The depth of $T$ in the syntactic dependency parse. 
+\item The POS tag of $t$.
+\item $i$.
+\item $i$ conjoined with the POS tag of $t$.
+\item The depth of $t$ in the syntactic dependency tree. 
 \end{itemize}
 
 \section{Experiment Setup}
@@ -554,7 +564,10 @@ which include passivization information in arc labels (\emph{nsubjpass},\emph{au
 we hypothesize this information may have already been incorporated into the syntactic analysis preprocessing.
 
 \subsection{Alternative Distance Measures}
-Multiple kinds of distance features, including log distance, binned distance (i.e. less than five tokens apart, between five and ten tokens apart, more than ten tokens apart), and thresholded distance (i.e. zero to three tokens apart, zero to five tokens apart, etc.).
+We tried multiple kinds of distance features, including log distance, binned
+distance (i.e. less than five tokens apart, between five and ten tokens apart, more than
+ten tokens apart), and thresholded distance (i.e. zero to three tokens apart,
+zero to five tokens apart, etc.).
 
 \subsection{Brown Clusters}
 We experimented with Brown cluster features \cite{Brown:1992:CNG:176313.176316}
@@ -567,7 +580,7 @@ size.
 We added the Brown cluster for the parent token, the child token, and both
 conjoined.
 No combination of the above settings helped performance.
-Neither did conjoining the above features with the PoS tags of the parent and
+Neither did conjoining the above features with the POS tags of the parent and
 child tokens.
 
 
@@ -658,9 +671,39 @@ cite?}
 
 
 \section{Future work}
-There are a number of clear extensions to this work that could improve performance. While using an edge factored model allows for efficient inference, there is much to be gained from using higher-order features. Extending the model in this way would require using some kind of approximate inference, but others have shown large gains without a significant decrease in speed. 
 
-While each of the three formalisms is different, there is much information shared between them. For example, the head of a sentence is often the same in all three formalisms. Taking advantage of this information in a multi-task learning framework could lead to significant gains. 
+There are a number of clear extensions to this work that could improve
+performance.
+While using an edge factored model allows for efficient inference, there is
+much to be gained from using higher-order features.
+Extending the model in this way often requires resorting to approximate
+inference, but others have shown gains without a significant decrease in
+speed \cite{mcdonald_online_2006,martins_turning_2013}.
+
+While each of the three formalisms is different, there is much information
+shared between them.
+For example, the head of a sentence is often the same in all three formalisms.
+Taking advantage of this shared structure in a multi-task learning framework
+could lead to gains.
+
+There is additional structure in the formalisms which were unable to take
+advantage of due to time constraints.
+PCEDT annotations were originally a tree, but underwent a preprocessing step by
+the task organizers in order to better capture bilexical dependency
+relationships.
+Wherever there is a coordination arc\footnote{A coordination arc
+is one of ``CONJ.member'', ``APPS.member'', ``GRAD.member'', ``CONTRA.member'',
+or ``REAS.member''.} present from $i \rightarrow j$, edges incoming to $i$ were
+copied to instead point to $j$.
+The ``LOC'' arcs incoming to ``paralysis'' and ``politics'' in
+Figure~\ref{fig:pcedt}) are a result of this step, for example.
+There was originally just one arc pointing to ``and''.
+PCEDT trees were also mostly deterministic with respect to non-coordination arcs
+before this step.
+We conjecture that this copying is one reason that determinism constraints were
+not helpful for PCEDT.
+Formulating more subtle graph constraints that are able to capture this a priori
+knowledge of the graph structure could lead to improved performance.
 
 
 \section{Conclusion}
