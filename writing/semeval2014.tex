@@ -337,7 +337,9 @@ used a weight of $0.4$ while the others were $0.3$, though the differences at th
 
 % \textbf{Decoding and postprocessing:}
 \textbf{Decoding:}
-\codenote{decodeEdgeProbsToGraph(), MyGraph.java}
+\codenote{MyGraph::decodeEdgeProbsToGraph()}
+
+\bocomment{may15 11:23am: The below describes how it works in LogitEdge.  Jeff, please confirm this is how you use the topness classifier, or modify appropriately.}
 
 To predict a graph structure at test-time for a new sentence,
 the most likely edge label is predicted for every candidate $(i, j)$ pair of
@@ -551,10 +553,11 @@ on.
 
 We trained a separate token-level binary logistic regression to classify
 whether a token's node had the ``top'' attribute or not.
-At decoding time, all nodes in the predicted graph (i.e., tokens where there is
-either an inbound or outbound edge) are possible candidates to be ``top'';
+At decoding time, all predicated predicates (i.e., nodes where there is at least one outbound edge)
+are possible candidates to be ``top'';
 the classifier probabilities are evaluated, and the highest-scoring node is
 chosen to be ``top.''
+\codenote{MyGraph::decideTops()}
 This is suboptimal, since some graphs have multiple tops (in \emph{PCEDT} this is
 more common);
 but selection rules based on probability thresholds gave worse $F_1$
