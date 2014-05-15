@@ -72,16 +72,22 @@
 \title{CMU-Ark: Broad-Coverage Semantic Dependency Parsing with Rich
 Edge-Factored Features \sam{better title, please}}
 
-\author{First Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\\And
-  Second Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\}
+\author{
+	Sam Thomson \quad
+	Brendan O'Connor \quad
+	Jeff Flanigan \quad
+	David Bamman \quad  \\
+	\bf{Jesse Dodge \quad
+	Swabha Swayamdipta \quad
+	Nathan Schneider \quad
+	Chris Dyer \quad
+	Noah Smith} \\
+  Language Technologies Institute \\
+  Carnegie Mellon University \\
+  Pittsburgh, PA 15213, USA \\
+  {\tt\{sthomson,brenocon,jflanigan,dbamman,jessed,}\\
+   \tt{swabha,nschneid,cdyer,nasmith\}@cs.cmu.edu}
+}
 
 \date{}
 
@@ -89,10 +95,10 @@ Edge-Factored Features \sam{better title, please}}
 \maketitle
 
 \begin{abstract}
-We present an edge-factored statistical model for parsing to the three semantic
-dependency formalisms in SemEval 2014 Shared Task 8: Broad-Coverage Semantic
-Dependency Parsing.
-
+We present an edge-factored statistical model for semantic dependency parsing.
+\sam{need more here.}
+Our system placed second in the open track of SemEval 2014 Shared Task 8:
+Broad-Coverage Semantic Dependency Parsing.
 \end{abstract}
 
 
@@ -318,9 +324,12 @@ Adagrad \cite{duchi_adaptive_2011} is used for optimization.
 This seemed to optimize faster than L-BFGS \cite{byrd_limited_1995}, at least for earlier
 iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
 
-In the FFF\jmf{what's FFF and NNN?} formalism, the training set (\S\ref{s:evaluation})
-contains NNN candidate edges (pairs of tokens with length between 1 and 10 inclusive),
-and NNN actual (non-null) edges.  $F_1$ performance was improved by
+There is a class imbalance in the output labels; in all three formalisms, there
+are many more $\noedge$ examples than true edge examples.
+\sam{If we get these numbers, it would be nicer to quantify, and say something
+like ``In the FFF formalism, the training set (\S\ref{s:evaluation}) contains NNN
+candidate edges (pairs of tokens with length between 1 and 10 inclusive), and NNN actual (non-null) edges.''}
+We found that $F_1$ performance was improved by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
 $\sum_{i,j} \sum_\ell w_\ell \log P(y_{i,j}=\ell; \bm\phi)$, with $w_{\noedge}=0.3$
 and $1$ otherwise.
@@ -394,6 +403,8 @@ development set.  Tops are predicted using the top prediction model
 \label{s:edgefeatures}
 
 \label{s:features}
+
+\sam{would be nice to cite where we stole these features from, where applicable}
 These features were computed over an edge $e$ with parent token $s$ at index
 $i$ and child token $t$ at index $j$. 
 For each feature listed, we have an indicator feature for each value it takes
@@ -531,8 +542,93 @@ features:
 \end{itemize}
 
 \section{Experiment Setup}
+\label{s:evaluation}
 
 We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (section 20), training on sections 00 through 19.
+
+%\section{Evaluation}
+
+We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
+labeled whole-sentence match (LM) on the held out test data using the
+evaluation script provided by the organizers (see Table~\ref{table:perf}).
+LF was averaged over the formalisms to determine the winning system.
+
+% CMU:
+% DM:
+% LP: 0.844641
+% LR: 0.834849
+% LF: 0.839716
+% LM: 0.087537
+% 
+% 
+% PAS:
+% LP: 0.907832
+% LR: 0.885141
+% LF: 0.896343
+% LM: 0.260386
+% 
+% 
+% PCEDT:
+% LP: 0.768139
+% LR: 0.707173
+% LF: 0.736396
+% LM: 0.071217
+
+% Priberam:
+% DM:
+% LP: 0.902322
+% LR: 0.881050
+% LF: 0.891559
+% LM: 0.268546
+% 
+% PAS:
+% LP: 0.925576
+% LR: 0.909676
+% LF: 0.917557
+% LM: 0.378338
+% 
+% PCEDT:
+% LP: 0.801397
+% LR: 0.757900
+% LF: 0.779042
+% LM: 0.106825
+
+
+\begin{table*}
+\begin{center}
+\begin{tabular*}{\textwidth}%{.6\textwidth}
+{@{\extracolsep{\fill}}cc|cccc}%|c|c|c|c|c|c|}
+% \hline
+ & System & LP & LR & LF & LM \\
+\hline
+\hline
+\multirow{2}{*}{\textbf{DM}}
+& CMU & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
+& PRIB-IT & 0.9023 & 0.8811 & 0.8916 & 0.2685 \\
+\hline
+\multirow{2}{*}{\textbf{PAS}}
+& CMU & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
+& PRIB-IT & 0.9256 & 0.9097 & 0.9176 & 0.3783 \\
+\hline
+\multirow{2}{*}{\textbf{PCEDT}}
+& CMU & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
+& PRIB-IT & 0.8014 & 0.7580 & 0.7790 & 0.1068 \\
+\hline
+\hline
+\multirow{2}{*}{\textbf{Average}}
+& CMU & 0.8402 & 0.8090 & 0.8241 & 0.1397 \\
+& PRIB-IT & 0.8764 & 0.8496 & 0.8627 & 0.2512 \\
+\end{tabular*}
+\caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
+whole-sentence match (LM) on the held out test data.
+We show results for our system (CMU) and the winning system (PRIB-IT).
+%\cite{martins_prib_2014}
+}
+\label{table:perf}
+\end{center}
+\end{table*}
+
+
 
 \section{Negative Results}
 \label{s:badfeatures}
@@ -618,90 +714,6 @@ conjoined.
 No combination of the above settings helped performance.
 Neither did conjoining the above features with the POS tags of the parent and
 child tokens.
-
-
-
-\section{Evaluation}
-\label{s:evaluation}
-
-We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
-labeled whole-sentence match (LM) on the held out test data (see
-Table~\ref{table:perf}).
-
-% CMU:
-% DM:
-% LP: 0.844641
-% LR: 0.834849
-% LF: 0.839716
-% LM: 0.087537
-% 
-% 
-% PAS:
-% LP: 0.907832
-% LR: 0.885141
-% LF: 0.896343
-% LM: 0.260386
-% 
-% 
-% PCEDT:
-% LP: 0.768139
-% LR: 0.707173
-% LF: 0.736396
-% LM: 0.071217
-
-% Priberam:
-% DM:
-% LP: 0.902322
-% LR: 0.881050
-% LF: 0.891559
-% LM: 0.268546
-% 
-% PAS:
-% LP: 0.925576
-% LR: 0.909676
-% LF: 0.917557
-% LM: 0.378338
-% 
-% PCEDT:
-% LP: 0.801397
-% LR: 0.757900
-% LF: 0.779042
-% LM: 0.106825
-
-
-\begin{table*}
-\begin{center}
-\begin{tabular*}{\textwidth}%{.6\textwidth}
-{@{\extracolsep{\fill}}cc|cccc}%|c|c|c|c|c|c|}
-% \hline
- & System & LP & LR & LF & LM \\
-\hline
-\hline
-\multirow{2}{*}{\textbf{DM}}
-& CMU & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
-& PRIB-IT & 0.9023 & 0.8811 & 0.8916 & 0.2685 \\
-\hline
-\multirow{2}{*}{\textbf{PAS}}
-& CMU & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
-& PRIB-IT & 0.9256 & 0.9097 & 0.9176 & 0.3783 \\
-\hline
-\multirow{2}{*}{\textbf{PCEDT}}
-& CMU & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
-& PRIB-IT & 0.8014 & 0.7580 & 0.7790 & 0.1068 \\
-\hline
-\hline
-\multirow{2}{*}{\textbf{Average}}
-& CMU & 0.8402 & 0.8090 & 0.8241 & 0.1397 \\
-& PRIB-IT & 0.8764 & 0.8496 & 0.8627 & 0.2512 \\
-\end{tabular*}
-\caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
-whole-sentence match (LM) on the held out test data.
-We show results for our system (CMU) and the winning system (PRIB-IT)
-\cite{martins_prib_2014}.}
-\label{table:perf}
-\end{center}
-\end{table*}
-
 
 
 \section{Future work}
