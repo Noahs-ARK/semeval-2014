@@ -30,7 +30,7 @@
 \usepackage{multirow}
 \usepackage{tabularx}
 \usepackage{framed}
-\usepackage{subcaption}
+%\usepackage{subcaption}
 
 \setitemize{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
 \setenumerate{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
@@ -595,8 +595,7 @@ chosen to be ``top.''
 This is suboptimal, since some graphs have multiple tops (in \emph{PCEDT} this is
 more common);
 but selection rules based on probability thresholds gave worse $F_1$
-performance on the development set. \codenote{\url{https://github.com/Noahs-ARK/semeval-2014/issues/37}}
-
+performance on the dev set. \codenote{\url{https://github.com/Noahs-ARK/semeval-2014/issues/37}}
 For a given token $t$ at index $i$, the top classifier's features
 included $t$'s POS tag, $i$, $i$, those two conjoined, and the depth
 of $t$ in the syntactic dependency tree.
@@ -609,14 +608,14 @@ We followed a forward-selection process during feature engineering.
 For each potential feature, we tested the current feature set versus the current
 feature set plus the new potential feature.
 If the new feature did not improve performance, we did not add it.
-We list in table \ref{table:negedgefeatures} some of the features which we tested, but did not find to improve
+We list in table \ref{table:negedgefeatures} some of the features which we tested but did not improve
 performance.
 
 In order to save time, we ran these feature selection experiments
 on a subsample of the training data, for a reduced number of iterations.
 These results thus have a 
  strong caveat that the experiments were
-not exhaustive.  It could be the case that that any of these features would help under more careful testing.
+not exhaustive.  It may be that some of these features could help under more careful study.
 
 
 \begin{table}
