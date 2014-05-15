@@ -554,96 +554,6 @@ For a given token $t$ at index $i$, the top classifier's features
 included $t$'s POS tag, $i$, $i$, those two conjoined, and the depth
 of $t$ in the syntactic dependency tree.
 
-\section{Experiment Setup}
-\label{s:evaluation}
-
-\nas{move this \emph{after} the negative results section}
-
-We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (\S 20), training on \S 00--19.
-
-%\section{Evaluation}
-
-We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
-labeled whole-sentence match (LM) on the held out test data using the
-evaluation script provided by the organizers (see Table~\ref{table:perf}).
-LF was averaged over the formalisms to determine the winning system.
-
-% CMU:
-% DM:
-% LP: 0.844641
-% LR: 0.834849
-% LF: 0.839716
-% LM: 0.087537
-% 
-% 
-% PAS:
-% LP: 0.907832
-% LR: 0.885141
-% LF: 0.896343
-% LM: 0.260386
-% 
-% 
-% PCEDT:
-% LP: 0.768139
-% LR: 0.707173
-% LF: 0.736396
-% LM: 0.071217
-
-% Priberam:
-% DM:
-% LP: 0.902322
-% LR: 0.881050
-% LF: 0.891559
-% LM: 0.268546
-% 
-% PAS:
-% LP: 0.925576
-% LR: 0.909676
-% LF: 0.917557
-% LM: 0.378338
-% 
-% PCEDT:
-% LP: 0.801397
-% LR: 0.757900
-% LF: 0.779042
-% LM: 0.106825
-
-
-\begin{table*}
-\begin{center}
-\begin{tabular*}{\textwidth}%{.6\textwidth}
-{@{\extracolsep{\fill}}cc|cccc}%|c|c|c|c|c|c|}
-% \hline
- & System & LP & LR & LF & LM \\
-\hline
-\hline
-\multirow{2}{*}{\textbf{DM}}
-& CMU & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
-& PRIB-IT & 0.9023 & 0.8811 & 0.8916 & 0.2685 \\
-\hline
-\multirow{2}{*}{\textbf{PAS}}
-& CMU & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
-& PRIB-IT & 0.9256 & 0.9097 & 0.9176 & 0.3783 \\
-\hline
-\multirow{2}{*}{\textbf{PCEDT}}
-& CMU & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
-& PRIB-IT & 0.8014 & 0.7580 & 0.7790 & 0.1068 \\
-\hline
-\hline
-\multirow{2}{*}{\textbf{Average}}
-& CMU & 0.8402 & 0.8090 & 0.8241 & 0.1397 \\
-& PRIB-IT & 0.8764 & 0.8496 & 0.8627 & 0.2512 \\
-\end{tabular*}
-\caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
-whole-sentence match (LM) on the held out test data.
-We show results for our system (CMU) and the winning system (PRIB-IT).
-%\cite{martins_prib_2014}
-}
-\label{table:perf}
-\end{center}
-\end{table*}
-
-
 
 \section{Negative Results}
 
@@ -755,6 +665,97 @@ this hurts overall.
 We also tried enforcing a tree constraint, although most gold graphs are not
 trees.
 Unsurprisingly, we found that enforcing a tree constraint hurt performance.
+
+
+
+\section{Experiment Setup}
+\label{s:evaluation}
+
+We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (\S 20), training on \S 00--19.
+
+%\section{Evaluation}
+
+We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
+labeled whole-sentence match (LM) on the held out test data using the
+evaluation script provided by the organizers (see Table~\ref{table:perf}).
+LF was averaged over the formalisms to determine the winning system.
+
+% CMU:
+% DM:
+% LP: 0.844641
+% LR: 0.834849
+% LF: 0.839716
+% LM: 0.087537
+% 
+% 
+% PAS:
+% LP: 0.907832
+% LR: 0.885141
+% LF: 0.896343
+% LM: 0.260386
+% 
+% 
+% PCEDT:
+% LP: 0.768139
+% LR: 0.707173
+% LF: 0.736396
+% LM: 0.071217
+
+% Priberam:
+% DM:
+% LP: 0.902322
+% LR: 0.881050
+% LF: 0.891559
+% LM: 0.268546
+% 
+% PAS:
+% LP: 0.925576
+% LR: 0.909676
+% LF: 0.917557
+% LM: 0.378338
+% 
+% PCEDT:
+% LP: 0.801397
+% LR: 0.757900
+% LF: 0.779042
+% LM: 0.106825
+
+
+\begin{table*}
+\begin{center}
+\begin{tabular*}{\textwidth}%{.6\textwidth}
+{@{\extracolsep{\fill}}cc|cccc}%|c|c|c|c|c|c|}
+% \hline
+ & System & LP & LR & LF & LM \\
+\hline
+\hline
+\multirow{2}{*}{\textbf{DM}}
+& CMU & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
+& PRIB-IT & 0.9023 & 0.8811 & 0.8916 & 0.2685 \\
+\hline
+\multirow{2}{*}{\textbf{PAS}}
+& CMU & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
+& PRIB-IT & 0.9256 & 0.9097 & 0.9176 & 0.3783 \\
+\hline
+\multirow{2}{*}{\textbf{PCEDT}}
+& CMU & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
+& PRIB-IT & 0.8014 & 0.7580 & 0.7790 & 0.1068 \\
+\hline
+\hline
+\multirow{2}{*}{\textbf{Average}}
+& CMU & 0.8402 & 0.8090 & 0.8241 & 0.1397 \\
+& PRIB-IT & 0.8764 & 0.8496 & 0.8627 & 0.2512 \\
+\end{tabular*}
+\caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
+whole-sentence match (LM) on the held out test data.
+We show results for our system (CMU) and the winning system (PRIB-IT).
+%\cite{martins_prib_2014}
+}
+\label{table:perf}
+\end{center}
+\end{table*}
+
+
 
 \section{Future work}
 
