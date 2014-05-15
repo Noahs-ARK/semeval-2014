@@ -343,8 +343,6 @@ and $w_{\ell} = 1, \forall \ell \in L$.
 \textbf{Decoding:}
 \codenote{MyGraph::decodeEdgeProbsToGraph()}
 
-\bocomment{may15 11:23am: The below describes how it works in LogitEdge.  Jeff, please confirm this is how you use the topness classifier, or modify appropriately.}
-
 To predict a graph structure at test-time for a new sentence,
 the most likely edge label is predicted for every candidate $(i, j)$ pair of
 tokens that has not been pruned by an earlier stage.
@@ -557,13 +555,15 @@ feature that fires for each value it can take on.
 
 \subsection{Top Prediction} \label{s:top_model}
 
+\bocomment{may15 afternoon: The below describes how top pred works in LogitEdge.  Jeff, please confirm this is how you use the topness classifier, or modify appropriately.}
+
 We trained a separate token-level binary logistic regression to classify
 whether a token's node had the ``top'' attribute or not.
 At decoding time, all predicated predicates (i.e., nodes where there is at least one outbound edge)
 are possible candidates to be ``top'';
 the classifier probabilities are evaluated, and the highest-scoring node is
 chosen to be ``top.''
-\codenote{MyGraph::decideTops()}
+\codenote{LogitEdge: MyGraph::decideTops()}
 This is suboptimal, since some graphs have multiple tops (in \emph{PCEDT} this is
 more common);
 but selection rules based on probability thresholds gave worse $F_1$
