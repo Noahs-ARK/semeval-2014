@@ -61,6 +61,12 @@
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
+% \newcommand{\bocomment}[1]{}
+% \newcommand{\sam}[1]{}
+% \newcommand{\nas}[1]{}
+% \newcommand{\jmf}[1]{}
+% \newcommand{\jdcomment}[1]{}
+
 % turn off for submission, but on for a more tech report-y version.
 % \newcommand{\codenote}[1]{\textcolor{PineGreen}{[#1]}}
 \newcommand{\codenote}[1]{}
@@ -423,10 +429,6 @@ using early-stopping on a development set. % Tops are predicted using the
 
 \label{s:features}
 
-\nas{make more compact by putting in a table with small font;
-  indentation and space between items is killing you, and a table is
-  easier to read.}
-
 \sam{would be nice to cite where we stole these features from, where applicable}
 Table~\ref{table:edgefeatures} describes the features we used for predicting
 edges.
@@ -437,7 +439,7 @@ feature that fires for each value it can take on.
 \begin{table}
 \begin{framed}
 \begin{small}
-\textbf{Bias}
+\textbf{Bias:} Always fires.
 
 \textbf{Tokens:} The tokens $s$ and $t$ themselves.
 
@@ -445,7 +447,7 @@ feature that fires for each value it can take on.
 
 \textbf{POS tags:} Part of speech tags of $s$ and $t$.
 
-\textbf{Linear Order:} 1 if $i < j$, 0 otherwise.
+\textbf{Linear Order:} Fires if $i < j$.
 
 \textbf{Linear Distance:} $i - j$.
 
@@ -461,8 +463,8 @@ feature that fires for each value it can take on.
 	step through the tree was up or down, and whether it was to the right or left
 	in the sentence.
 
-\textbf{Is Parent:} 1 if $s$ is the parent of $t$ in the syntactic
-	dependency parse, 0 otherwise.
+\textbf{Is Parent:} Fires if  $s$ is the parent of $t$ in the syntactic
+	dependency parse.
 
 \textbf{Dependency Path Length:} Distance between $s$ and $t$ in the
 	syntactic dependency parse.
@@ -471,18 +473,19 @@ feature that fires for each value it can take on.
 	$i+1$, $j-1$, $j$, and $j+1$. Concatenated POS tags of tokens at $i-1, i, j-1$,
 	and $j$. Concatenated POS tags of tokens at $i, i+1, j$, and $j+1$.
 
-\textbf{Subcategorization Sequence:} For each direct child $c$ of $s$ in
-	the syntactic dependency tree, concatenate the label of the arc to the child.
-	If $c$ is $t$, distinguish the arc label by appending a ``+''.
+\textbf{Subcategorization Sequence:} 
+	The sequence of dependency arc labels out of $s$, ordered by the index of the
+	child.
+	Distinguish left children from right children.
+	If $t$ is a direct child of $s$, distinguish its arc label with a ``+''.
+	Conjoin this sequence with the POS tag of $s$.
 
-\textbf{Subcategorization Sequence with POS tags:} For each child $c$ of
-	$s$ in the syntactic dependency tree, the concatenation of the POS tag of $c$
-	and the label of the arc from $s$ to $c$.
-	If $c$ is $t$, distinguish the arc label by appending a ``+''.
+\textbf{Subcategorization Sequence with POS:} As above, but add the
+	POS tag of each child to its arc label.
 \end{small}
+\end{framed}
 \caption{Features used in edge prediction}
 \label{table:edgefeatures}
-\end{framed}
 \end{table}
 
 
