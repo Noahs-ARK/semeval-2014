@@ -644,11 +644,11 @@ as features in the \logitedge\ parser; no improvement was visible.
 
 A verb tends to realize its semantic arguments differently when the verb is in
 active voice vs.~passive voice.
-We attempted to capture this by conjoining a ACTIVE/PASSIVE feature with both
-the LinearDistance features and the SubcatSequence features.
-\bocomment{From reading this i don't understand how this was
-  computed. word patterns for "has been" etc? PTB POSes? left-vs-right
-  directionality?} \nas{agreed, this is confusing}
+We attempted to capture this by conjoining an ACTIVE/PASSIVE voice feature
+with both the Linear Distance features and the Subcategorization Sequence
+features.
+The voice feature was calculated with code from the system described in
+\newcite{johansson_dependency-based_2008}.
 There was no improvement from including these features.
 Since we were already using dependency features from the 
 organizers' supplied Stanford Dependencies-style parses,
