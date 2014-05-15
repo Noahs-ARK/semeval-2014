@@ -269,7 +269,8 @@ Both directions $i \rightarrow j$ and $j \rightarrow
 i$ are considered between every pair.
 
 
-\subsubsection{\logitedge\ parser\jmf{I think we should call this \sc{LogisticEdge}}}
+\subsubsection{\logitedge\ Parser\jmf{I think we should call this
+\sc{LogisticEdge}}}
 \label{s:logitedge}
 
 
@@ -418,9 +419,6 @@ edges.  The loss is minimized with AdaGrad
 using early-stopping on a development set.  Tops are predicted using the
 top prediction model \S\ref{s:top_model}.
 
-\bocomment{Does this use the topness prediction system?}\jmf{yup}
-
-
 
 \subsubsection{Edge Features}
 \label{s:edgefeatures}
@@ -434,10 +432,7 @@ For each feature listed, we have an indicator feature for each value it takes
 on.
 
 \begin{itemize}
-	\item Bias:
-	\begin{itemize}
-	  \item ``BIAS''
-	\end{itemize}
+	\item Bias
 	\item Basic
 	\begin{itemize}
 		\item The tokens $s$ and $t$ themselves.
@@ -489,7 +484,7 @@ on.
 
 \bocomment{ALTERNATE VERSION TO SAVE SPACE:
   The biggest memory usage was in the hash table implementing the map of feature names to integer indexes, used during feature extraction.  In order to facilitate more convenient experimentation, we implemented multitask feature hashing \cite{weinberger_feature_2009}, which randomly assigns features' numeric indexes with a hash function, under the theory that errors due to collisions tend to cancel each other out.  We indeed found no drop in accuracy when using the technique.}
-
+\sam{I think we can get away with this short version}
 %% 7-10 million features (percepts) before label conjunction:
 % cab:~dbamman/semeval/mar3 % wc -l *.model
 %    7518732 mar3_recsplit.dm.model
@@ -658,6 +653,8 @@ We show results for our system (CMU) and the winning system (PRIB-IT).
 
 
 \section{Negative Results}
+
+\subsection{Features}
 \label{s:badfeatures}
 
 We followed a forward-selection process during feature engineering.
@@ -673,32 +670,34 @@ The following results thus have a
 the strong caveat that the experiments were
 not exhaustive.  It could be these that any of the following features would help under more careful testing.
 
-\subsection{Word vectors}
-Word vectors have been shown to benefit a number of semantic tasks. We
-incorporated features based on trained word vectors in a number of ways, though
-in this task we did not find benefit from any of them.
+\subsubsection{Word vectors}
+
+We experimented with features derived from distributional word embeddings.
 The vectors we used \cite{wordVectors} were trained trained on the WMT-2011
 dataset, using a variation on latent semantic analysis which incorporated
 information from multiple languages.
 The vectors contained 64 dimensions.
 
-For our edge factored model \logitedge, when considering a potential edge, we
-had a parent word $W_1$ with associated word vector $V_1$ and a child word
-$W_2$ with associated word vector $V_2$.
-For each method outlined below, the elements of the output vector was used as a
-feature.
-As an example, if we concatenated the two vectors into a third vector $V_3$ (as
-we show in $f_1$), each element of $V_3$ was used as a feature in our model.
+%For our edge factored model \logitedge, w
+When considering a potential edge, we
+had a parent token $s$ with associated word vector $\bm{v_1}$ and a child token
+$t$ with associated word vector $\bm{v_2}$.
+For each method outlined below, each dimension of the output vector was used as
+a feature, whose value was the value of the vector along that dimension.
+%As an example, if we concatenated the two vectors into a third vector $V_3$ (as
+%we show in $f_1$), each element of $V_3$ was used as a feature in our model.
 
-\begin{enumerate}
-\item $f_1(V_1,V_2)$ = $ \left( \begin{smallmatrix} V_1\\ V_2 \end{smallmatrix} \right)$
-\item $f_2(V_1,V_2)$ = $V_1 - V_2$.
-\item $f_3(V_1,V_2)$ = $V_1 \cdot V_2$ (Dot product)
-\item $f_4(V_1,V_2)$ = $V_1 \bigodot V_2$ (Element-wise multiplication)
-\end{enumerate}
+\begin{itemize}
+\item Concatenation:
+$ \left( \begin{smallmatrix} \bm{v_1}\\ \bm{v_2}
+\end{smallmatrix} \right)$
+\item Difference: $\bm{v_1} - \bm{v_2}$.
+\item Dot product: $\bm{v_1} \cdot \bm{v_2}$
+\item Element-wise multiplication: $\bm{v_1} \bigodot \bm{v_2}$
+\end{itemize}
 Unfortunately we saw no improvement from these features.
 
-\subsection{Random Forests Over Word Vectors}
+\subsubsection{Random Forests Over Word Vectors}
 The word vectors added as features didn't reliably improve accuracy on any of
 the formalisms.
 One hypothesis as to why was that the vectors had a non-linear relationship
@@ -709,7 +708,7 @@ with the word vector features as described above, and used the hard labels
 predicted by the random forests as features in the \logitedge\ parser.
 Again, we saw no improvement.
 
-\subsection{Active vs. Passive Voice}
+\subsubsection{Active vs. Passive Voice}
 A verb tends to realize its semantic arguments differently when the verb is in
 active voice vs. passive voice.
 We attempted to capture this by conjoining a ACTIVE/PASSIVE feature with both
@@ -722,13 +721,13 @@ organizers' supplied Stanford Dependencies-style parses,
 which include passivization information in arc labels (\emph{nsubjpass},\emph{auxpass}),
 we hypothesize this information may have already been incorporated into the syntactic analysis preprocessing.
 
-\subsection{Alternative Distance Measures}
+\subsubsection{Alternative Distance Measures}
 We tried multiple kinds of distance features, including log distance, binned
 distance (i.e. less than five tokens apart, between five and ten tokens apart, more than
 ten tokens apart), and thresholded distance (i.e. zero to three tokens apart,
 zero to five tokens apart, etc.).
 
-\subsection{Brown Clusters}
+\subsubsection{Brown Clusters}
 We experimented with Brown cluster features \cite{Brown:1992:CNG:176313.176316}
 for tokens in the sentence.
 These clusters were obtained by training on a large corpus of data crawled from
@@ -742,6 +741,23 @@ No combination of the above settings helped performance.
 Neither did conjoining the above features with the POS tags of the parent and
 child tokens.
 
+\subsection{Graph Constraints}
+\label{s:badconstraints}
+
+We experimented with enforcing other graph constraints in the structured SVM
+decoder (\S\ref{s:graphparser}).
+We tried enforcing that the graph was connected (ignoring singletons), similarly
+to \newcite{flanigan-etal:ACL2014}.
+Almost all semantic dependency graphs are connected (ignoring singletons) in the
+training data, but we found that enforcing this constraint significantly hurt
+performance.
+Enforcing this constraint causes more edges to be predicted, and we conjecture
+that because the evaluation metric penalizes wrongly labeled edges more than
+false negatives, this hurts overall.
+
+We also tried enforcing a tree constraint, although most gold graphs are not
+trees.
+Unsurprisingly, we found that enforcing a tree constraint hurt performance.
 
 \section{Future work}
 
