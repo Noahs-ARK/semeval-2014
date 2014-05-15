@@ -340,9 +340,7 @@ and $w_{\ell} = 1, \forall \ell \in L$.
 % \bocomment{TODO need to check how much preproc was used for this.  Was singleton pruning turned on?  It looks like we commented out the prune features in LRParser.java.  But singleton pruning might have been turned on.}
 
 % \textbf{Decoding and postprocessing:}
-\textbf{Decoding:}
-\codenote{MyGraph::decodeEdgeProbsToGraph()}
-
+\textbf{Decoding:} \codenote{MyGraph::decodeEdgeProbsToGraph()}
 To predict a graph structure at test-time for a new sentence,
 the most likely edge label is predicted for every candidate $(i, j)$ pair of
 tokens that has not been pruned by an earlier stage.
