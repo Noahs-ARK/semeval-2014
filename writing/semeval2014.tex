@@ -59,22 +59,18 @@
 \newcommand{\nas}[1]{\textcolor{red}{[#1 -NAS]}}
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
-% \newcommand{\bocomment}[1]{}
-% \newcommand{\sam}[1]{}
-% \newcommand{\nas}[1]{}
-% \newcommand{\jmf}[1]{}
-% \newcommand{\jdcomment}[1]{}
 
 % \newcommand{\bocomment}[1]{}
 % \newcommand{\sam}[1]{}
 % \newcommand{\nas}[1]{}
 % \newcommand{\jmf}[1]{}
 % \newcommand{\jdcomment}[1]{}
+
 
 % turn off for submission, but on for a more tech report-y version.
 % \newcommand{\codenote}[1]{\textcolor{PineGreen}{[#1]}}
 \newcommand{\codenote}[1]{}
-\newcommand{\logitedge}{\textsc{LogitEdge}}
+\newcommand{\logitedge}{\textsc{LogisticEdge}}
 \newcommand{\noedge}{\textsc{NoEdge}}
 
 % saves only a little bit of space. might need tweaking to save more.
@@ -159,22 +155,20 @@ conversion rules of \newcite{miyao_corpus_oriented_2004}.
 \emph{PCEDT} is automatically derived from the tectogrammatic layer of the
 Prague Czech-English Dependency Treebank \cite{hajic_building_1998}.
 See Figure~\ref{fig:formalisms} for an example sentence.
-\begin{figure*}
+\begin{figure}
 	\centering
-		\includegraphics[width=\textwidth]{fig/example_dm} \\
-		\includegraphics[width=\textwidth]{fig/example_pas} \\
-		\includegraphics[width=\textwidth]{fig/example_pcedt}
+		\includegraphics[width=.5\textwidth]{fig/example_dm} \\
+		\includegraphics[width=.5\textwidth]{fig/example_pas} \\
+		\includegraphics[width=.5\textwidth]{fig/example_pcedt}
 	\caption{Example annotations for \emph{DM} (top), \emph{PAS}
-          (middle), and \emph{PCEDT} (bottom). \jmf{are the
-    three LOC's in PCEDT correct? is the capitalization of 'BAKER
-    FALTERS' meaningful?}}
+          (middle), and \emph{PCEDT} (bottom).}
 	\label{fig:formalisms}
-\end{figure*}
+\end{figure}
 
 The three formalisms come from very different linguistic theories, but all
 three are represented as labeled directed graphs, with words as vertices, and
 all three have ``top'' annotations, corresponding roughly to the
-semantic focus of the sentence.  The ``top'' need not be a root of the
+semantic focus of the sentence.  A ``top'' need not be a root of the
 graph.
 This allows us to use the same machinery (\S\ref{s:models}) to simultaneously
 train and test statistical models for the three formalisms.
@@ -245,8 +239,7 @@ hour.}
 %\sam{yes, that sounds good. waiting on graph vs. non-graph results from jflan}
 
 
-\subsubsection{\logitedge\ Parser\jmf{I think we should call this
-\sc{LogisticEdge}}}
+\subsubsection{\logitedge\ Parser}
 \label{s:logitedge}
 
 
@@ -799,8 +792,8 @@ Wherever there is a coordination arc\footnote{A coordination arc
 is one of ``CONJ.member'', ``APPS.member'', ``GRAD.member'', ``CONTRA.member'',
 or ``REAS.member''.} present from $i \rightarrow j$, edges incoming to $i$ were
 copied to instead point to $j$.
-The ``LOC'' arcs incoming to ``paralysis'' and ``politics'' in
-Figure~\ref{fig:formalisms}) are a result of this step, for example.
+The ``CPR'' arcs incoming to ``flashlights'' and ``alarms'' in
+Figure~\ref{fig:formalisms} are a result of this step, for example.
 There was originally just one arc pointing to ``and''.
 PCEDT trees were also mostly deterministic with respect to non-coordination arcs
 before this step.
