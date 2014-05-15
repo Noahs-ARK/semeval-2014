@@ -360,10 +360,12 @@ with a determinism constraint.
 This constraint ensures that each word token has at most one outgoing edge for
 each label in a set of deterministic labels $L_d$.
 $L_d$ was chosen to be the set of edges that were $> 99.9\%$ deterministic in
-the training data\footnote{
-For \emph{DM}, $L_d=L \setminus$ \{``\_and\_c,'' ``\_or\_c,'' ``\_then\_c,''
-``loc,'' ``mwe,'' ``subord''\}, for \emph{DM}, $L_d = L$, and for \emph{PCEDT},
-$L_d=\emptyset$.}.
+the training data.\footnote{
+By this we mean that of the nodes that have at least one
+outgoing $\ell$ edge, $99.9\%$ of them have only one outgoing $\ell$ edge.
+For \emph{DM}, $L_d=L \setminus$\{``\_and\_c,'' ``\_or\_c,'' ``\_then\_c,'' ``loc,'' ``mwe,'' ``subord''\},
+for \emph{PAS}, $L_d = L$, and for \emph{PCEDT},
+$L_d=\emptyset$.}
 %We found this contraint improved the $F_1$-score for the
 %\emph{PAS} formalism only.
 
