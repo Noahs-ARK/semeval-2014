@@ -191,26 +191,27 @@ The third stage predicts whether a word is a \emph{top} or not
 Formalisms sometimes annotate more than one ``top'' per sentence, but we
 found that we achieve the best performance on all formalisms by predicting only
 the one best-scoring ``top'' under the model.
-\bocomment{I thought that only LogitEdge has the separate third stage of ``top'' prediction. Maybe I'm wrong? delete this comment if so}
-\bocomment{Also, singleton pruning does not matter for LogitEdge.  It doesn't affect accuracy, I'm pretty sure.  But it is essential for the graph model.}
+\bocomment{Singleton pruning does not matter for LogitEdge.  It doesn't affect accuracy, I'm pretty sure.  But it is essential for the graph model.}
+
 
 
 \subsection{Singleton Classification} \label{s:singleton_model}
 
 We call a node in a graph without any parents or children a \emph{singleton}.
-For singleton prediction, we train a simple token-level logistic regression
+For singleton prediction, we train a token-level logistic regression
 classifier.
-We train a model for each of the three formalisms, as each of the three
-formalisms follow different conventions determining whether a token is
-included in the final graph for a sentence.
-\emph{PAS}, for example, includes almost all tokens that are not
-punctuation or a determiner, and our singleton model achieves over 99\%
-accuracy.
-\jdcomment{I need to find the accuracy for the other two formalisms. Will
-include this in our Results section.}
+For each token $t$, the features include the token $t$, its lemma, and its
+part-of-speech tag.
+If the classifier predicts a probability of 99\% or higher (a
+threshold chosen by grid search on the development set), then we prune the
+token.
+% Our singleton model achieves over 99\% accuracy for the \emph{PAS} formalism,
+% for example.
+We found that pruning words predicted to be singletons improved accuracy in later stages, and made the system
+faster overall.
+% \jdcomment{I need to find the accuracy for the other two formalisms. Will
+% include this in our Results section.}
 
-For each token $t$, the features include
-the token $t$, its lemma, and its part-of-speech tag.
 
 
 
@@ -251,9 +252,6 @@ The \logitedge\ model considers only token index pairs $(i, j)$ where %that are
 % within 10 tokens of each other (i.e.~
 $|i-j| \leq 10$, $i \ne j$, and both $t_i$ and
 $t_j$ have been predicted to be non-singletons by the first stage.
-\jmf{actually, the graph parser doesn't have the distance constraint}
-\sam{this could account for the discrepency in performance btwn logit/svm. we
-found that this pruning helped.}
 % In other words, edges with more than 9 tokens between its two endpoints are not
 % considered.
 Although this prunes some gold edges, among the formalisms,
@@ -496,7 +494,8 @@ Conjoined with head lemma, with dependent lemma, and without either.
 
 
 \textbf{Distance Thresholds (\svmedge~only):}
-For each $x \in \{1, 2, 3, 5, 7, 10, 13, 19\}$, fires if $|i-j| \le x$.
+For each $x \in \{1, 2, 3, 5, 7, 10, 13, 19\}$, a feature fires if
+$|i-j| \le x$.
 
 
 \end{small}
