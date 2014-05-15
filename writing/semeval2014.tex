@@ -60,11 +60,11 @@
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
-% \newcommand{\bocomment}[1]{}
-% \newcommand{\sam}[1]{}
-% \newcommand{\nas}[1]{}
-% \newcommand{\jmf}[1]{}
-% \newcommand{\jdcomment}[1]{}
+% \renewcommand{\bocomment}[1]{}
+% \renewcommand{\sam}[1]{}
+% \renewcommand{\nas}[1]{}
+% \renewcommand{\jmf}[1]{}
+% \renewcommand{\jdcomment}[1]{}
 
 
 % turn off for submission, but on for a more tech report-y version.
@@ -427,10 +427,12 @@ These features were computed over an edge $e$ with parent token $s$ at
 index $i$ and child token $t$ at index $j$. 
 Unless otherwise stated, each feature template listed has an indicator
 feature that fires for each value it can take on.
+
+\renewcommand{\floatpagefraction}{0.8}
 \begin{table}
 \begin{framed}
 \begin{small}
-\textbf{Bias:} Always fires.
+%\textbf{Bias:} Always fires.
 
 \textbf{Tokens:} The tokens $s$ and $t$ themselves.
 
