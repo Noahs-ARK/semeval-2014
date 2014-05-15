@@ -61,7 +61,8 @@
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
 % turn off for submission, but on for a more tech report-y version.
-\newcommand{\codenote}[1]{\textcolor{PineGreen}{[#1]}}
+% \newcommand{\codenote}[1]{\textcolor{PineGreen}{[#1]}}
+\newcommand{\codenote}[1]{}
 \newcommand{\logitedge}{\textsc{LogitEdge}}
 \newcommand{\noedge}{\textsc{NoEdge}}
 
@@ -132,10 +133,7 @@ have no discernable effect, or negative effect, during development (\S\ref{s:bad
 
 Our system placed second in the open track of the broad-coverage semantic
 parsing task (in which output from syntax parsers and other outside resources \emph{can} be used).
-We present our results, \nas{I advise cutting this; the Priberam paper
-  will describe their system and the overview paper will describe
-  everything together:} and compare to the first place system, PRIB-IT
-\cite{martins_prib_2014}, in \S\ref{s:evaluation}.
+We present our results in \S\ref{s:evaluation}.
 
 
 
@@ -223,33 +221,17 @@ For the \emph{PAS} formalism, we use a structured SVM
 have at most one outgoing edge with the
 same label (\S\ref{s:graphparser}).
 \sam{For each formalism, we trained both models with varying features enabled
-and hyperparameter settings and chose the configuration that performed best on
-development set.
+and hyperparameter settings and submitted the configuration that produced the
+best labeled $F_1$ on the development set.
+We report results only for the submitted configurations.
 Due to time constraints, full feature and hyperparameter sweeps were not
 possible.
 Jeff, please make it clear here about what happened in the 11th
 hour.}
-We report only the best performing configuration. \nas{previous
-  sentence is unclear and could get us into trouble.  best according
-  to what criterion on what data?  you do NOT mean best accuracy on
-  the test set, that is cheating! }
 %\sam{explain why we use different models for different formalisms}
 %\bocomment{shouldn't we just say, we tried both for all and are reporting the
 % configurations that performed best on devset?}
 %\sam{yes, that sounds good. waiting on graph vs. non-graph results from jflan}
-
-Both models consider only token index pairs $(i, j)$ where %that are within 10
-% tokens of each other (i.e.~
-$|i-j| \leq 10$, $i \ne j$, and both $t_i$ and
-$t_j$ have been predicted to be non-singletons by the first stage.\jmf{actually, the graph parser doesn't have the distance constraint}
-% In other words, edges with more than 9 tokens between its two endpoints are not
-% considered.
-Although this prunes some gold edges, among the formalisms,
-95\%-97\% of all gold edges are between tokens of distance 10 or less.
-We found that pruning long edges increased accuracy overall, in addition to
-speeding up training and prediction.
-Both directions $i \rightarrow j$ and $j \rightarrow
-i$ are considered between every pair.
 
 
 \subsubsection{\logitedge\ Parser\jmf{I think we should call this
@@ -259,8 +241,24 @@ i$ are considered between every pair.
 
 \codenote{LRParser.java}
 
+The \logitedge\ model considers only token index pairs $(i, j)$ where %that are
+% within 10 tokens of each other (i.e.~
+$|i-j| \leq 10$, $i \ne j$, and both $t_i$ and
+$t_j$ have been predicted to be non-singletons by the first stage.
+\jmf{actually, the graph parser doesn't have the distance constraint}
+\sam{this could account for the discrepency in performance btwn logit/svm. we
+found that this pruning helped.}
+% In other words, edges with more than 9 tokens between its two endpoints are not
+% considered.
+Although this prunes some gold edges, among the formalisms,
+95\%-97\% of all gold edges are between tokens of distance 10 or less.
+We found that pruning long edges increased accuracy overall, in addition to
+speeding up training and prediction.
+Both directions $i \rightarrow j$ and $j \rightarrow
+i$ are considered between every pair.
+
 %\noindent
-The \logitedge\ model treats every ordered pair of token indices $(i, j)$ as a
+The model treats every ordered pair of token indices $(i, j)$ as a
 multiclass logistic regression with $K+1$ possible outputs:
 the formalism's original $K$ edge labels plus the additional label \noedge,
 which indicates that no edge exists from $i$ to $j$.
@@ -799,7 +797,7 @@ is one of ``CONJ.member'', ``APPS.member'', ``GRAD.member'', ``CONTRA.member'',
 or ``REAS.member''.} present from $i \rightarrow j$, edges incoming to $i$ were
 copied to instead point to $j$.
 The ``LOC'' arcs incoming to ``paralysis'' and ``politics'' in
-Figure~\ref{fig:pcedt}) are a result of this step, for example.
+Figure~\ref{fig:formalisms}) are a result of this step, for example.
 There was originally just one arc pointing to ``and''.
 PCEDT trees were also mostly deterministic with respect to non-coordination arcs
 before this step.
