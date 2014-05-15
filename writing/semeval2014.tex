@@ -105,7 +105,8 @@ As distinct from deeper semantic analysis (e.g., parsing to a full
 lambda-calculus logical form), shallow semantic parsing captures relationships
 between pairs of words or concepts in a sentence, and has wide application for
 information extraction, knowledge base population, and question answering (among others).
-SemEval 2014 Shared Task 8 \sam{cite}, includes three different semantic
+SemEval 2014 Shared Task 8: Broad-Coverage Semantic Dependency
+Parsing \cite{oepens_broad_2014} includes three different semantic
 formalisms (\S\ref{s:formalisms}), which encourages finding features and methods
 that are broadly applicable to semantic parsing, and discourages optimization
 toward a single semantic representation.
@@ -134,16 +135,16 @@ We present our results, and compare to the first place system, PRIB-IT
 
 \section{Formalisms} \label{s:formalisms}
 
-The organizers of SemEval 2014 Shared Task 8: Broad-Coverage Semantic Dependency
-Parsing \sam{cite} have provided a corpus of English language newswire
-annotated with three different semantic dependency formalisms.
-Here we briefly describe the three formalisms, and refer the reader to \sam{the
-shared task paper, cite} for a more complete summary.
+The organizers of Shared Task 8 have provided a corpus of English language
+newswire annotated with three different semantic dependency formalisms.
+\sam{should mention/cite that it's PTB}
+%Here we briefly describe the three formalisms, and refer the reader to \sam{the
+%shared task paper, cite} for a more complete summary.
 \emph{DM} is automatically derived from LinGO English Resource Grammar (ERG)
 annotations in DeepBank \cite{flickinger_deepbank_2012}.
 \emph{PAS} is automatically derived from the Enju HPSG treebank using the
 conversion rules of \newcite{miyao_corpus_oriented_2004}.
-\emph{PCEDT} is automatically derived from the tectogrammatic layer of the
+And \emph{PCEDT} is automatically derived from the tectogrammatic layer of the
 Prague Czech--English Dependency Treebank \cite{hajic_building_1998}.
 See Figure~\ref{fig:formalisms} for an example sentence.
 \begin{figure*}
@@ -169,8 +170,10 @@ See Figure~\ref{fig:formalisms} for an example sentence.
 
 All three formalisms come from very different linguistic theories, but all
 three are represented as labeled directed graphs, with words as vertices, and
-all three have ``top'' annotations.
-\sam{what does ``top'' mean?}
+all three have ``top'' annotations\footnote{
+``Top'' annotations roughly correspond to the semantic focus of a
+sentence, but there is no constraint that the ``top'' must be a root of the
+semantic dependency graph.}.
 This allows us to use the same machinery (\S\ref{s:models}) to simultaneously
 train and test statistical models for the three formalisms.
 \sam{Stats about \% multiple roots, \% multiple tops, \% tree, \% acyclic}
@@ -188,9 +191,6 @@ The second stage jointly predicts whether an edge is
 present, and if so, what its label is (\S\ref{s:edge_model}).
 The third stage predicts whether a word is a \emph{top} or not
 (\S\ref{s:top_model}).
-``Top'' annotations roughly correspond to the semantic focus of a
-sentence, but there is no constraint that the ``top'' must be a root of the
-semantic dependency graph.
 Formalisms sometimes annotate more than one ``top'' per sentence, but we
 found that we achieve the best performance on all formalisms by predicting only
 the one best-scoring ``top'' under the model.
@@ -234,9 +234,18 @@ For the PAS formalism, we use a structured SVM
 \emph{determinism}\jmf{I'll find a citation} constraint -- a word can
 have at most one outgoing edge with the
 same label (\S\ref{s:graphparser}).
-\sam{explain why we use different models for different formalisms}
-\bocomment{shouldn't we just say, we tried both for all and are reporting the configurations that performed best on devset?}
-\sam{yes, that sounds good. waiting on graph vs. non-graph results from jflan}
+\sam{For each formalism, we trained both models with varying features enabled
+and hyperparameter settings and chose the configuration that performed best on
+development set.
+Due to time constraints, full feature and hyperparameter sweeps were not
+possible.
+Jeff, please make it clear here about what happened in the 11th
+hour.}
+We report only the best performing configuration.
+%\sam{explain why we use different models for different formalisms}
+%\bocomment{shouldn't we just say, we tried both for all and are reporting the
+% configurations that performed best on devset?}
+%\sam{yes, that sounds good. waiting on graph vs. non-graph results from jflan}
 
 Both models consider only token index pairs $(i, j)$ where %that are within 10
 % tokens of each other (i.e.~
@@ -272,7 +281,6 @@ $\bm{f}^{(\text{edge})}(i, j)$.
 These features are described in \S\ref{s:features}.
 The final binary feature vector is made by conjoining the output label with
 each:
-\bocomment{we dont always use binary features...}
 \begin{align*} 
 \bm{f}(i, j, \ell) =
 \{ \ell \} \otimes (& 
@@ -307,7 +315,7 @@ distribution over $y_{i,j} \in L$, parametrized by the weight vector $\bm\phi$,
 $\bm\phi$ is learned by minimizing total negative log-likelihood of the above
 (with weighting; see below), plus $\ell_2$ regularization.
 Adagrad \cite{duchi_adaptive_2011} is used for optimization.
-This seemed to optimize faster than L-BFGS\sam{cite}, at least for earlier
+This seemed to optimize faster than L-BFGS \cite{byrd_limited_1995}, at least for earlier
 iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
 
 In the FFF\jmf{what's FFF and NNN?} formalism, the training set (\S\ref{s:evaluation})
@@ -331,17 +339,12 @@ PAS used a weight of $0.4$ while the others were $0.3$, though the differences a
 To predict a graph structure at test-time for a new sentence,
 the most likely edge label is predicted for every candidate $(i, j)$ pair of
 tokens that has not been pruned by an earlier stage.
-%There were several post-processing steps.
 We enforce only one graph constraint, which is that there cannot be
 an edge in both directions between any pair of words.
 If an edge is predicted for both directions for a single $(i, j)$
 pair, only the edge with the higher score is chosen.
-% If the gold standard has an edge in the direction $i \rightarrow j$, the
-% direction $j \rightarrow i$ is considered a \noedge.
 There are no such bidirectional edges in the training data, and enforcing this
-restriction improved accuracy on the development set.
-The graph-based parser has more sophisticated decoding constraints.
-
+restriction slightly improved accuracy on the development set ($~0.2\%$ absolute F on PAS; other formalisms unchanged).\codenote{\url{https://github.com/Noahs-ARK/semeval-2014/pull/21}}
 
 
 \subsubsection{Graph-based Structured SVM Parser} \label{s:graphparser}
@@ -391,46 +394,57 @@ development set.  Tops are predicted using the top prediction model
 \label{s:edgefeatures}
 
 \label{s:features}
-These features were computed over an edge $E$ with parent token $S$ and child
-token $T$.  For each of those listed here, we have an indicator feature for each value it takes on.
+These features were computed over an edge $e$ with parent token $s$ at index
+$i$ and child token $t$ at index $j$. 
+For each feature listed, we have an indicator feature for each value it takes
+on.
 
 \begin{itemize}
-\item Basic
-\begin{itemize}
-\item Lemmas of $S$ and $T$.
-\item Part of speech tags of $S$ and $T$.
-\item Token strings of $S$ and $T$.
-\item 1 if Index($S$) $\le$ Index($T$), 0 otherwise.
-\end{itemize}
-\item LinearOrder
-\begin{itemize}
-\item Index($S$) - Index($T$).
-\end{itemize}
-\item CoarseDependency
-\begin{itemize}
-\item 1 if $S$ is the parent of $T$ in syntactic dependency parse, 0 otherwise.
-\item Distance between $S$ and $T$ in syntactic dependency parse.
-\end{itemize}
-\item LinearContext
-\begin{itemize}
-\item Concatenated PoS tags of tokens at Index($S$)-1, Index($S$), Index($S$)+1, Index($T$)-1, Index($T$), Index($T$)+1.
-\item Concatenated PoS tags of tokens at Index($S$)-1, Index($S$), Index($T$)-1, Index($T$).
-\item Concatenated PoS tags of tokens at Index($S$), Index($S$)+1, Index($T$), Index($T$)+1.
-\end{itemize}
-\item DependencyPath
-\begin{itemize}
-\item The token string concatenated to the labeled path through the syntactic dependency tree from $S$ to $T$.
-\end{itemize}
-\item SubcatSequence
-\begin{itemize}
-\item For each child $c$ of $S$ in the syntactic dependency tree, concatenate the PoS tag of $S$ with the label of the ark to the child. If $c$ is $T$, append a ``+''.
-\item For each child $c$ of $S$ in the syntactic dependency tree, concatenate the PoS tag of $S$ with the PoS tag of $c$ and the label of the ark to the child. If $c$ is $T$, append a ``+''.
-\end{itemize}
-\item UnlabeledDep
-\begin{itemize}
-\item The unlabeled path through the syntactic dependency tree from $S$ to $S$. 
-\item The unlabeled path through the syntactic dependency tree from $S$ to $T$, annotated with whether the each step through the tree was to the right or left in the sentence.
-\end{itemize}
+	\item Basic
+	\begin{itemize}
+		\item The tokens $s$ and $t$ themselves.
+		\item Lemmas of $s$ and $t$.
+		\item Part of speech tags of $s$ and $t$.
+		\item 1 if $i \le j$, 0 otherwise.
+	\end{itemize}
+	\item LinearOrder
+		\begin{itemize}
+		\item $i - j$.
+	\end{itemize}
+	\item CoarseDependency
+		\begin{itemize}
+		\item 1 if $s$ is the parent of $t$ in the syntactic dependency parse, 0
+		otherwise.
+		\item Distance between $s$ and $t$ in syntactic dependency parse.
+	\end{itemize}
+	\item LinearContext
+		\begin{itemize}
+		\item Concatenated POS tags of tokens at $i-1$, $i$, $i+1$, $j-1$, $j$,
+		and $j+1$.
+		\item Concatenated POS tags of tokens at $i-1, i, j-1$, and $j$.
+		\item Concatenated POS tags of tokens at $i, i+1, j$, and $j+1$.
+	\end{itemize}
+	\item DependencyPath
+		\begin{itemize}
+		\item The concatenation of all tokens and arc labels on the labeled path in
+		the syntactic dependency tree from $s$ to $t$.
+	\end{itemize}
+	\item UnlabeledDep
+		\begin{itemize}
+		\item The unlabeled path through the syntactic dependency tree from $s$ to $t$. 
+		\item The unlabeled path through the syntactic dependency tree from $s$ to $t$,
+		annotated with whether the each step through the tree was to the right or left in the sentence.
+	\end{itemize}
+	\item SubcatSequence
+		\begin{itemize}
+		\item For each direct child $c$ of $s$ in the syntactic dependency tree, the
+		concatenation of the POS tag of $c$ with the label of the arc to the child.
+		If $c$ is $t$, append a ``+''.
+		\item For each child $c$ of $s$ in the syntactic dependency tree, the
+		concatenation of the POS tag of $s$ with the POS tag of $c$ and the label of the
+		arc from $s$ to $c$.
+		If $c$ is $t$, append a ``+''.
+	\end{itemize}
 \end{itemize}
 
 \subsubsection{Feature Hashing}
@@ -485,7 +499,7 @@ array lookups and gradient steps are simply implemented with $h$ instead of $g$,
 dot products are approximately preserved with high probability;
 and indeed, we observed no drop in accuracy compared to using an explicit feature map.
 We used a value of $B$ as large as was convenient for memory usage (due only to $h(\phi)$), $B=10^{8}$.
-This was actually higher than $|F|\approx 10^7$, though there were still plenty of collisions: about 9.5\% of features are hashed to a value shared by at least one other feature.
+This is actually higher than $|F|\approx 10^7$, though plenty of collisions still happen: about 9.5\% of features are hashed to a value shared by at least one other feature.
 
 %% simulation:
 % num buckets count 0: 90484843
@@ -505,23 +519,20 @@ chosen to be ``top''.
 This is suboptimal, since some graphs have multiple tops (and in PCEDT this is
 more common);
 but selection rules based on probability thresholds gave worse $F_1$
-performance on the development set. \bocomment{I wonder if I documented this on
-an issue/PR}
+performance on the development set. \codenote{\url{https://github.com/Noahs-ARK/semeval-2014/issues/37}}
 
-
-\subsubsection{Top Features}
-For a given token $T$, the topness classifier used the following features:
+For a given token $t$ at index $i$, the topness classifier used the following
+features:
 \begin{itemize}
-\item The PoS tag of $T$.
-\item Index($T$).
-\item Conjoined PoS tag of $T$ and Index($T$).
-\item The depth of $T$ in the syntactic dependency parse. 
+\item The POS tag of $t$.
+\item $i$.
+\item $i$ conjoined with the POS tag of $t$.
+\item The depth of $t$ in the syntactic dependency tree. 
 \end{itemize}
 
+\section{Experiment Setup}
 
-
-
-
+We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (section 20), training on sections 00 through 19.
 
 \section{Negative Results}
 \label{s:badfeatures}
@@ -533,11 +544,11 @@ If the new feature did not improve performance, we did not add it.
 We list below some of the features which we tested, but did not find to improve
 performance.
 
-Note that in order to save time, we ran these feature selection experiments
+In order to save time, we ran these feature selection experiments
 on a subsample of the training data, for a reduced number of iterations.
-So please regard the following with the strong caveat that our experiments were
-not exhaustive, and we do not claim that these features could not be found to
-help.
+The following results thus have a 
+the strong caveat that the experiments were
+not exhaustive.  It could be these that any of the following features would help under more careful testing.
 
 \subsection{Word vectors}
 Word vectors have been shown to benefit a number of semantic tasks. We
@@ -580,10 +591,19 @@ A verb tends to realize its semantic arguments differently when the verb is in
 active voice vs. passive voice.
 We attempted to capture this by conjoining a ACTIVE/PASSIVE feature with both
 the LinearDistance features and the SubcatSequence features.
-We surprisingly did not see any improvement when including these features.
+\bocomment{From reading this i don't understand how this was computed. word patterns for "has been" etc? PTB POSes? left-vs-right directionality?}
+
+There was no improvement from including these features.
+Since we were already using dependency features from the 
+organizers' supplied Stanford Dependencies-style parses,
+which include passivization information in arc labels (\emph{nsubjpass},\emph{auxpass}),
+we hypothesize this information may have already been incorporated into the syntactic analysis preprocessing.
 
 \subsection{Alternative Distance Measures}
-Multiple kinds of distance features, including log distance, binned distance (i.e. less than five tokens apart, between five and ten tokens apart, more than ten tokens apart), and thresholded distance (i.e. zero to three tokens apart, zero to five tokens apart, etc.).
+We tried multiple kinds of distance features, including log distance, binned
+distance (i.e. less than five tokens apart, between five and ten tokens apart, more than
+ten tokens apart), and thresholded distance (i.e. zero to three tokens apart,
+zero to five tokens apart, etc.).
 
 \subsection{Brown Clusters}
 We experimented with Brown cluster features \cite{Brown:1992:CNG:176313.176316}
@@ -596,7 +616,7 @@ size.
 We added the Brown cluster for the parent token, the child token, and both
 conjoined.
 No combination of the above settings helped performance.
-Neither did conjoining the above features with the PoS tags of the parent and
+Neither did conjoining the above features with the POS tags of the parent and
 child tokens.
 
 
@@ -659,27 +679,25 @@ Table~\ref{table:perf}).
 \hline
 \multirow{2}{*}{\textbf{DM}}
 & CMU & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
-& Prib & 0.9023 & 0.8811 & 0.8916 & 0.2685 \\
+& PRIB-IT & 0.9023 & 0.8811 & 0.8916 & 0.2685 \\
 \hline
 \multirow{2}{*}{\textbf{PAS}}
 & CMU & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
-& Prib & 0.9256 & 0.9097 & 0.9176 & 0.3783 \\
+& PRIB-IT & 0.9256 & 0.9097 & 0.9176 & 0.3783 \\
 \hline
 \multirow{2}{*}{\textbf{PCEDT}}
 & CMU & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
-& Prib & 0.8014 & 0.7580 & 0.7790 & 0.1068 \\
+& PRIB-IT & 0.8014 & 0.7580 & 0.7790 & 0.1068 \\
 \hline
 \hline
 \multirow{2}{*}{\textbf{Average}}
 & CMU & 0.8402 & 0.8090 & 0.8241 & 0.1397 \\
-& Prib & 0.8764 & 0.8496 & 0.8627 & 0.2512 \\
+& PRIB-IT & 0.8764 & 0.8496 & 0.8627 & 0.2512 \\
 \end{tabular*}
 \caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
 whole-sentence match (LM) on the held out test data.
-We show results for our system (CMU) and the winning system (Prib) \sam{how to
-cite?}
-\bocomment{why don't we show results for both logreg and the graph-based parser? did we not run all of them? i thought we did and that's why/how we picked the ones we did. maybe that was just hte devset?}
-}
+We show results for our system (CMU) and the winning system (PRIB-IT)
+\cite{martins_prib_2014}.}
 \label{table:perf}
 \end{center}
 \end{table*}
@@ -687,9 +705,39 @@ cite?}
 
 
 \section{Future work}
-There are a number of clear extensions to this work that could improve performance. While using an edge factored model allows for efficient inference, there is much to be gained from using higher-order features. Extending the model in this way would require using some kind of approximate inference, but others have shown large gains without a significant decrease in speed. 
 
-While each of the three formalisms is different, there is much information shared between them. For example, the head of a sentence is often the same in all three formalisms. Taking advantage of this information in a multi-task learning framework could lead to significant gains. 
+There are a number of clear extensions to this work that could improve
+performance.
+While using an edge factored model allows for efficient inference, there is
+much to be gained from using higher-order features.
+Extending the model in this way often requires resorting to approximate
+inference, but others have shown gains without a significant decrease in
+speed \cite{mcdonald_online_2006,martins_turning_2013}.
+
+While each of the three formalisms is different, there is much information
+shared between them.
+For example, the head of a sentence is often the same in all three formalisms.
+Taking advantage of this shared structure in a multi-task learning framework
+could lead to gains.
+
+There is additional structure in the formalisms which were unable to take
+advantage of due to time constraints.
+PCEDT annotations were originally a tree, but underwent a preprocessing step by
+the task organizers in order to better capture bilexical dependency
+relationships.
+Wherever there is a coordination arc\footnote{A coordination arc
+is one of ``CONJ.member'', ``APPS.member'', ``GRAD.member'', ``CONTRA.member'',
+or ``REAS.member''.} present from $i \rightarrow j$, edges incoming to $i$ were
+copied to instead point to $j$.
+The ``LOC'' arcs incoming to ``paralysis'' and ``politics'' in
+Figure~\ref{fig:pcedt}) are a result of this step, for example.
+There was originally just one arc pointing to ``and''.
+PCEDT trees were also mostly deterministic with respect to non-coordination arcs
+before this step.
+We conjecture that this copying is one reason that determinism constraints were
+not helpful for PCEDT.
+Formulating more subtle graph constraints that are able to capture this a priori
+knowledge of the graph structure could lead to improved performance.
 
 
 \section{Conclusion}
@@ -697,7 +745,7 @@ We found that feature-rich discriminative models performed well on the task of
 mapping from sentences to semantic dependency parses.
 Our work has shown the best results when using one model for predicting whether
 a given token was to be included in the final graph, then using either our
-\logitedge parser or a graph-based structured SVM parser to predict a graph
+\logitedge\ parser or a graph-based structured SVM parser to predict a graph
 from the remaining tokens.
 Each of the three formalisms has different constraints;
 we found enforcing determinism in the PAS formalisms gave improvements, while
@@ -709,7 +757,10 @@ those negative results.
 
 
 \section*{Acknowledgements}
-The research reported in this article was supported by US NSF grants IIS-1251131 and ***
+The research reported in this article was sponsored by the U.~S.~Army Research
+Laboratory and the U.~S.~Army Research Office under contract/grant number
+W911NF-10-1-0533, DARPA grant FA8750-12-2-0342 funded under the DEFT program, US
+NSF grants IIS-1251131\sam{, and \ldots}
 
 
 \bibliographystyle{acl}
