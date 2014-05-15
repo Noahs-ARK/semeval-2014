@@ -102,7 +102,8 @@ As distinct from deeper semantic analysis (e.g., parsing to a full
 lambda-calculus logical form), shallow semantic parsing captures relationships
 between pairs of words or concepts in a sentence, and has wide application for
 information extraction, knowledge base population, and question answering (among others).
-SemEval 2014 Shared Task 8 \sam{cite}, includes three different semantic
+SemEval 2014 Shared Task 8: Broad-Coverage Semantic Dependency
+Parsing \cite{oepens_broad_2014} includes three different semantic
 formalisms (\S\ref{s:formalisms}), which encourages finding features and methods
 that are broadly applicable to semantic parsing, and discourages optimization
 toward a single semantic representation.
@@ -131,16 +132,15 @@ We present our results, and compare to the first place system, PRIB-IT
 
 \section{Formalisms} \label{s:formalisms}
 
-The organizers of SemEval 2014 Shared Task 8: Broad-Coverage Semantic Dependency
-Parsing \sam{cite} have provided a corpus of English language newswire
-annotated with three different semantic dependency formalisms.
-Here we briefly describe the three formalisms, and refer the reader to \sam{the
-shared task paper, cite} for a more complete summary.
+The organizers of Shared Task 8 have provided a corpus of English language
+newswire annotated with three different semantic dependency formalisms.
+%Here we briefly describe the three formalisms, and refer the reader to \sam{the
+%shared task paper, cite} for a more complete summary.
 \emph{DM} is automatically derived from LinGO English Resource Grammar (ERG)
 annotations in DeepBank \cite{flickinger_deepbank_2012}.
 \emph{PAS} is automatically derived from the Enju HPSG treebank using the
 conversion rules of \newcite{miyao_corpus_oriented_2004}.
-\emph{PCEDT} is automatically derived from the tectogrammatic layer of the
+And \emph{PCEDT} is automatically derived from the tectogrammatic layer of the
 Prague Czech--English Dependency Treebank \cite{hajic_building_1998}.
 See Figure~\ref{fig:formalisms} for an example sentence.
 \begin{figure*}
@@ -166,8 +166,10 @@ See Figure~\ref{fig:formalisms} for an example sentence.
 
 All three formalisms come from very different linguistic theories, but all
 three are represented as labeled directed graphs, with words as vertices, and
-all three have ``top'' annotations.
-\sam{what does ``top'' mean?}
+all three have ``top'' annotations\footnote{
+``Top'' annotations roughly correspond to the semantic focus of a
+sentence, but there is no constraint that the ``top'' must be a root of the
+semantic dependency graph.}.
 This allows us to use the same machinery (\S\ref{s:models}) to simultaneously
 train and test statistical models for the three formalisms.
 \sam{Stats about \% multiple roots, \% multiple tops, \% tree, \% acyclic}
@@ -185,9 +187,6 @@ The second stage jointly predicts whether an edge is
 present, and if so, what its label is (\S\ref{s:edge_model}).
 The third stage predicts whether a word is a \emph{top} or not
 (\S\ref{s:top_model}).
-``Top'' annotations roughly correspond to the semantic focus of a
-sentence, but there is no constraint that the ``top'' must be a root of the
-semantic dependency graph.
 Formalisms sometimes annotate more than one ``top'' per sentence, but we
 found that we achieve the best performance on all formalisms by predicting only
 the one best-scoring ``top'' under the model.
@@ -303,7 +302,7 @@ distribution over $y_{i,j} \in L$, parametrized by the weight vector $\bm\phi$,
 $\bm\phi$ is learned by minimizing total negative log-likelihood of the above
 (with weighting; see below), plus $\ell_2$ regularization.
 Adagrad \cite{duchi_adaptive_2011} is used for optimization.
-It seemed to optimize faster than L-BFGS\sam{cite}, at least for earlier
+It seemed to optimize faster than L-BFGS \cite{byrd_limited_1995}, at least for earlier
 iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
 
 In the FFF formalism, the training set (\S\ref{s:evaluation})
