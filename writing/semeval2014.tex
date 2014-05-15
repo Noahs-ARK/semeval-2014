@@ -327,7 +327,6 @@ downweighting $\noedge$ examples through a weighted log-likelihood objective,
 $\sum_{i,j} \sum_\ell w_\ell \log P(y_{i,j}=\ell; \bm\phi)$, with $w_{\noedge}=0.3$
 and $w_{\ell} = 1, \forall \ell \in L$.
 (The weight was chosen by gridsearch on a development set.)
-\bocomment{ok, i removed the point on PAS.  this paper is very awkward because of how formalisms and systems are split. it makes it harder to make useful points.}
 
 % 0.4
 
@@ -349,8 +348,10 @@ We enforce only one graph constraint, which is that there cannot be
 an edge in both directions between any pair of words.
 If an edge is predicted for both directions for a single $(i, j)$
 pair, only the edge with the higher score is chosen.
-There are no such bidirectional edges in the training data, and enforcing this
-restriction slightly improved accuracy on the development set ($\sim 0.2\%$ absolute $F_1$-score on PAS; other formalisms unchanged).\codenote{\url{https://github.com/Noahs-ARK/semeval-2014/pull/21}}
+There are no such bidirectional edges in the training data.
+This enforcement actually did not improve accuracy on \emph{DM} or \emph{PCEDT};
+it did improve \emph{PAS} by $\sim 0.2\%$ absolute $F_1$-score, but we did not submit \logitedge\ for \emph{PAS}.
+\codenote{\url{https://github.com/Noahs-ARK/semeval-2014/pull/21}}
 
 
 \subsubsection{Structured SVM Parser with Determinism Constraints} \label{s:graphparser}
