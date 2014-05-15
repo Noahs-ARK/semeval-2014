@@ -623,13 +623,13 @@ concatenation, difference, inner product, and element-wise multiplication of the
 trained on a large corpus of web data. Parent, child and conjoined parent-child edge features from cluster prefixes of length 2, 4, 6, 8, 10 and 12. Conjunctions of those features with the POS tags of the parent and
 child tokens.
 
-
 \textbf{Active/passive:} Active/passive voice feature
 (as in \newcite{johansson_dependency-based_2008}) conjoined with both the Linear
-Distance features and the Subcategorization Sequence features (we hypothesize
+Distance features and the Subcategorization Sequence features. (We hypothesize
 voice information may already have been incorporated into our featureset by the
 use of the supplied Stanford dependency-style parses, which include
-passivization information in arc labels such as \emph{nsubjpass} and \emph{auxpass}).
+passivization information in arc labels such as \emph{nsubjpass} and \emph{auxpass}\cite{Marneffe2008DepColing}).
+
 
 \textbf{Connectivity constraint:} Enforcing that the graph is connected (ignoring singletons), similar
 to \newcite{flanigan-etal:ACL2014}. Almost all semantic dependency graphs are connected (ignoring singletons) in the
@@ -640,7 +640,7 @@ performance.
 
 \end{small}
 \end{framed}
-\caption{Negative features and graph constraints.}
+\caption{Features and constraints giving negative results.}
 \label{table:negedgefeatures}
 \end{table}
 
