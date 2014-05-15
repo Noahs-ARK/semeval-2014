@@ -52,9 +52,11 @@
 \definecolor{mygreen}{rgb}{0,0.3,0.1}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=mygreen,urlcolor=myblue]{hyperref}
 \newcommand{\transpose}{^\mathsf{T}}
+\DeclareMathOperator*{\argmax}{arg\,max}
 
 \newcommand{\bocomment}[1]{\textcolor{Bittersweet}{[#1 -BTO]}}
 \newcommand{\sam}[1]{\textcolor{blue}{[#1 -SMT]}}
+\newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
 % turn off for submission, but on for a more tech report-y version.
@@ -64,6 +66,7 @@
 
 % saves only a little bit of space. might need tweaking to save more.
 \newenvironment{itemizesquish}{\begin{list}{\labelitemi}{\setlength{\itemsep}{-0.1em}\setlength{\labelwidth}{1em}\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}}}{\end{list}}
+
 
 
 \title{CMU-Ark: Broad-Coverage Semantic Dependency Parsing with Rich
@@ -113,8 +116,8 @@ We present here two systems that produce semantic dependency parses by extractin
 features for each potential dependency arc and learning a statistical model to
 discriminate between good arcs and bad;
 the first treats each labeled edge decision as an independent multiclass
-logistic regression (\S\ref{s:logitedge}), while the second predicts all edges
-as part of a graph-based structured SVM (\S~\ref{s:graphparser}). 
+logistic regression (\S\ref{s:logitedge}), while the second predicts edges
+as part of a graph-based structured SVM (\S~\ref{s:graphparser}).\jmf{I removed ``all'' edges since it's a little abiguous.  We actually do them one at a time.} 
 Common to both models are a rich set of edge features, described in
 \S\ref{s:edgefeatures}.
 While the features included in the final prediction were all found to have a
@@ -228,7 +231,8 @@ For the DM and PCEDT formalisms, we use an edge-independent multiclass logistic
 regression model (\logitedge, \S\ref{s:logitedge}).
 For the PAS formalism, we use a structured SVM 
 \cite{taskar_max_2003,tsochantaridis_support_2004} that enforces a
-\emph{determinism} constraint -- a word may not have two outgoing edges with the
+\emph{determinism}\jmf{I'll find a citation} constraint -- a word can
+have at most one outgoing edge with the
 same label (\S\ref{s:graphparser}).
 \sam{explain why we use different models for different formalisms}
 \bocomment{shouldn't we just say, we tried both for all and are reporting the configurations that performed best on devset?}
@@ -237,7 +241,7 @@ same label (\S\ref{s:graphparser}).
 Both models consider only token index pairs $(i, j)$ where %that are within 10
 % tokens of each other (i.e.~
 $|i-j| \leq 10$, $i \ne j$, and both $i$ and
-$j$ have been predicted to be non-singletons by the first stage.
+$j$ have been predicted to be non-singletons by the first stage.\jmf{actually, the graph parser doesn't have the distance constraint}
 In other words, edges with more than 9 tokens between its two endpoints are not
 considered.
 Although this prunes some gold edges, among the formalisms,
@@ -248,7 +252,7 @@ Both directions $i \rightarrow j$ and $j \rightarrow
 i$ are considered between every pair.
 
 
-\subsubsection{\logitedge\ parser} 
+\subsubsection{\logitedge\ parser\jmf{I think we should call this \sc{LogisticEdge}}}
 \label{s:logitedge}
 
 
@@ -303,10 +307,10 @@ distribution over $y_{i,j} \in L$, parametrized by the weight vector $\bm\phi$,
 $\bm\phi$ is learned by minimizing total negative log-likelihood of the above
 (with weighting; see below), plus $\ell_2$ regularization.
 Adagrad \cite{duchi_adaptive_2011} is used for optimization.
-It seemed to optimize faster than L-BFGS\sam{cite}, at least for earlier
+This seemed to optimize faster than L-BFGS\sam{cite}, at least for earlier
 iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
 
-In the FFF formalism, the training set (\S\ref{s:evaluation})
+In the FFF\jmf{what's FFF and NNN?} formalism, the training set (\S\ref{s:evaluation})
 contains NNN candidate edges (pairs of tokens with length between 1 and 10 inclusive),
 and NNN actual (non-null) edges.  $F_1$ performance was improved by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
@@ -342,20 +346,44 @@ The graph-based parser has more sophisticated decoding constraints.
 
 \subsubsection{Graph-based Structured SVM Parser} \label{s:graphparser}
 
-To predict edges for the PAS formalism, we use a structured SVM model
-\sam{cite}.
-The model uses the same set of features as \logitedge, but optimizes a
-max-margin objective during training, and enforces an additional constraint: no
-node may have more than one outgoing edge with the same label.
+To predict edges for the PAS formalism, we use a model with determinism
+constraints.  This ensures that at each word, there is at most one
+outgoing edge for each label type.
 
-\sam{TK from jflan}
+Consider the fully dense graph of all edges between all words predicted
+as not singletons by the singleton classifier \S\ref{s:singleton_model} (in all
+directions with all possible labels).  If $\bm\psi$ denotes the model
+weights, and $\bm{f}$ denotes the same features as the
+\logitedge~model, then an edge from $i$ to $j$ with label $\ell$ in the
+dense graph has a weight $c(i,j,\ell)$ assigned to it using the linear
+scoring function:
+\[
+c(i,j,\ell) = \bm\psi^\top \bm{f}(i,j,\ell)
+\]
 
-\sam{
-explain how this differs from 
-\cite{flanigan-etal:ACL2014}
-}
+The decoder finds the highest scoring subgraph of the dense graph
+subject to the determinism constraints.  Let $edge(i,j,\ell)$ be a
+binary function where $edge(i,j,\ell) = 1 $ denotes inclusion of an edge
+from $i$ to $j$ with a label $\ell$.  Then $edge(i,j,\ell)$ is computed
+as follows:
+\[
+edge(i,j,\ell) =
+\begin{cases}
+1 & \text{if } j = \argmax_{k} c(i,k,\ell) \\
+& \text{and } c(i,j,\ell) > 0 \\
+0 & \text{otherwise}
+\end{cases}
+\]
+In other words, for each node and each label, the decoder searches for
+the highest scoring outgoing edge and adds it if its weight is
+positive.
 
-\bocomment{Does this use the topness prediction system?}
+The model weights are trained using the structured SVM loss optimized
+with AdaGrad \cite{duchi_adaptive_2011} using early-stopping on a
+development set.  Tops are predicted using the top prediction model
+\S\ref{s:top_model}.
+
+\bocomment{Does this use the topness prediction system?}\jmf{yup}
 
 
 
