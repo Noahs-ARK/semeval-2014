@@ -60,11 +60,11 @@
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
-% \renewcommand{\bocomment}[1]{}
-% \renewcommand{\sam}[1]{}
-% \renewcommand{\nas}[1]{}
-% \renewcommand{\jmf}[1]{}
-% \renewcommand{\jdcomment}[1]{}
+ \renewcommand{\bocomment}[1]{}
+ \renewcommand{\sam}[1]{}
+ \renewcommand{\nas}[1]{}
+ \renewcommand{\jmf}[1]{}
+ \renewcommand{\jdcomment}[1]{}
 
 
 % turn off for submission, but on for a more tech report-y version.
@@ -181,8 +181,8 @@ train and test statistical models for the three formalisms.
 \section{Models} \label{s:models}
 
 We treat the problem as a three-stage pipeline.
-The first stage prunes words by predicting whether has any incoming or
-outgoing edges at all (\S\ref{s:singleton_model}); if not, then it need not be 
+The first stage prunes words by predicting whether they have any incoming or
+outgoing edges at all (\S\ref{s:singleton_model}); if a word does not, then it need not be 
 considered in later stages.
 The second stage jointly predicts whether an edge is
 present, and if so, its label (\S\ref{s:edge_model}).
@@ -582,7 +582,7 @@ For each $x \in \{1, 2, 3, 5, 7, 10, 13, 19\}$, fires if $|i-j| \le x$.
 
 We trained a separate token-level binary logistic regression to classify
 whether a token's node had the ``top'' attribute or not.
-At decoding time, all predicated predicates (i.e., nodes where there is at least one outbound edge)
+At decoding time, all predicted predicates (i.e., nodes where there is at least one outbound edge)
 are possible candidates to be ``top'';
 the classifier probabilities are evaluated, and the highest-scoring node is
 chosen to be ``top.''
