@@ -765,7 +765,9 @@ training data, but we found that enforcing this constraint significantly hurt
 performance.
 Enforcing this constraint causes more edges to be predicted, and we conjecture
 that because the evaluation metric penalizes wrongly labeled edges more than
-false negatives, this hurts overall.
+false negatives, 
+\bocomment{huh? don't they count equally?}
+this hurts overall.
 
 We also tried enforcing a tree constraint, although most gold graphs are not
 trees.
