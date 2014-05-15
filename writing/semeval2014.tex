@@ -60,11 +60,11 @@
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
 
-% \renewcommand{\bocomment}[1]{}
-% \renewcommand{\sam}[1]{}
-% \renewcommand{\nas}[1]{}
-% \renewcommand{\jmf}[1]{}
-% \renewcommand{\jdcomment}[1]{}
+ \renewcommand{\bocomment}[1]{}
+ \renewcommand{\sam}[1]{}
+ \renewcommand{\nas}[1]{}
+ \renewcommand{\jmf}[1]{}
+ \renewcommand{\jdcomment}[1]{}
 
 
 % turn off for submission, but on for a more tech report-y version.
@@ -191,26 +191,27 @@ The third stage predicts whether a word is a \emph{top} or not
 Formalisms sometimes annotate more than one ``top'' per sentence, but we
 found that we achieve the best performance on all formalisms by predicting only
 the one best-scoring ``top'' under the model.
-\bocomment{I thought that only LogitEdge has the separate third stage of ``top'' prediction. Maybe I'm wrong? delete this comment if so}
-\bocomment{Also, singleton pruning does not matter for LogitEdge.  It doesn't affect accuracy, I'm pretty sure.  But it is essential for the graph model.}
+\bocomment{Singleton pruning does not matter for LogitEdge.  It doesn't affect accuracy, I'm pretty sure.  But it is essential for the graph model.}
+
 
 
 \subsection{Singleton Classification} \label{s:singleton_model}
 
 We call a node in a graph without any parents or children a \emph{singleton}.
-For singleton prediction, we train a simple token-level logistic regression
+For singleton prediction, we train a token-level logistic regression
 classifier.
-We train a model for each of the three formalisms, as each of the three
-formalisms follow different conventions determining whether a token is
-included in the final graph for a sentence.
-\emph{PAS}, for example, includes almost all tokens that are not
-punctuation or a determiner, and our singleton model achieves over 99\%
-accuracy.
-\jdcomment{I need to find the accuracy for the other two formalisms. Will
-include this in our Results section.}
+For each token $t$, the features include the token $t$, its lemma, and its
+part-of-speech tag.
+If the classifier predicts a probability of 99\% or higher (a
+threshold chosen by grid search on the development set), then we prune the
+token.
+% Our singleton model achieves over 99\% accuracy for the \emph{PAS} formalism,
+% for example.
+We found that pruning words predicted to be singletons improved accuracy in later stages, and made the system
+faster overall.
+% \jdcomment{I need to find the accuracy for the other two formalisms. Will
+% include this in our Results section.}
 
-For each token $t$, the features include
-the token $t$, its lemma, and its part-of-speech tag.
 
 
 
@@ -251,9 +252,6 @@ The \logitedge\ model considers only token index pairs $(i, j)$ where %that are
 % within 10 tokens of each other (i.e.~
 $|i-j| \leq 10$, $i \ne j$, and both $t_i$ and
 $t_j$ have been predicted to be non-singletons by the first stage.
-\jmf{actually, the graph parser doesn't have the distance constraint}
-\sam{this could account for the discrepency in performance btwn logit/svm. we
-found that this pruning helped.}
 % In other words, edges with more than 9 tokens between its two endpoints are not
 % considered.
 Although this prunes some gold edges, among the formalisms,
@@ -496,7 +494,8 @@ Conjoined with head lemma, with dependent lemma, and without either.
 
 
 \textbf{Distance Thresholds (\svmedge~only):}
-For each $x \in \{1, 2, 3, 5, 7, 10, 13, 19\}$, fires if $|i-j| \le x$.
+For each $x \in \{1, 2, 3, 5, 7, 10, 13, 19\}$, a feature fires if
+$|i-j| \le x$.
 
 
 \end{small}
@@ -504,6 +503,9 @@ For each $x \in \{1, 2, 3, 5, 7, 10, 13, 19\}$, fires if $|i-j| \le x$.
 \caption{Features used in edge prediction}
 \label{table:edgefeatures}
 \end{table}
+
+
+
 
 
 \subsubsection{Feature Hashing}
@@ -598,32 +600,57 @@ of $t$ in the syntactic dependency tree.
 
 
 \section{Negative Results}
-
-\subsection{Features}
 \label{s:badfeatures}
 
 We followed a forward-selection process during feature engineering.
 For each potential feature, we tested the current feature set versus the current
 feature set plus the new potential feature.
 If the new feature did not improve performance, we did not add it.
-We list below some of the features which we tested, but did not find to improve
+We list in table \ref{table:negedgefeatures} some of the features which we tested, but did not find to improve
 performance.
 
 In order to save time, we ran these feature selection experiments
 on a subsample of the training data, for a reduced number of iterations.
-The following results thus have a 
+These results thus have a 
  strong caveat that the experiments were
-not exhaustive.  It could be these that any of the following features would help under more careful testing.
+not exhaustive.  It could be the case that that any of these features would help under more careful testing.
 
 
-We experimented with features derived from distributional word embeddings using 64-dimensional vectors from  \cite{wordVectors}.  
- Features
-derived from these vectors for a potential edge---including their
-concatenation, difference, inner product, and element-wise multiplication---offered no benefit.
-We also trained a
-random forest\footnote{Using \cite{RandomForest2002}'s \emph{randomForest} R implementation.}
+\begin{table}
+\begin{framed}
+\begin{small}
+%\textbf{Bias:} Always fires.
+
+\textbf{Word vectors:} Features derived from 64-dimensional vectors from  \cite{wordVectors}, including their
+concatenation, difference, inner product, and element-wise multiplication. Random forest\footnote{Using \cite{RandomForest2002}'s \emph{randomForest} R implementation.}
 from the word vectors, using its predicted hard labels as features;
-no improvement was visible.
+
+\textbf{Brown clusters} Features derived from Brown clusters \cite{Brown:1992:CNG:176313.176316}
+trained on a large corpus of web data. Parent, child and conjoined parent-child edge features from cluster prefixes of length 2, 4, 6, 8, 10 and 12. Conjunctions of those features with the POS tags of the parent and
+child tokens.
+
+
+\textbf{Active/passive:} Active/passive voice feature\newcite{johansson_dependency-based_2008} conjoined with both the Linear Distance features and the Subcategorization Sequence features (we hypothesize voice information may already have been incorporated into our featureset by the use of the supplied Stanford dependency-style parses, which include passivization information in arc labels such as \emph{nsubjpass},\emph{auxpass}).
+features.
+
+\textbf{Complex distance features:} Log distance, binned
+distance (i.e., less than five tokens apart, between five and ten tokens apart, more than
+ten tokens apart), and thresholded distance (i.e., zero to three tokens apart,
+zero to five tokens apart, etc.).
+
+\textbf{Connectivity constraint:} Enforcing that the graph was connected (ignoring singletons), similarly
+to \newcite{flanigan-etal:ACL2014}. Almost all semantic dependency graphs are connected (ignoring singletons) in the
+training data, but we found that enforcing this constraint causes more edges to be predicted, significantly hurting
+performance.
+
+\textbf{Tree constraint:} Enforces that the graph is a tree. Unsurprisingly, we found that enforcing a tree constraint hurt performance.
+
+\end{small}
+\end{framed}
+\caption{Negative features and graph constraints.}
+\label{table:negedgefeatures}
+\end{table}
+
 
 % For each method outlined below, each dimension of the output vector was used as
 % a feature, whose value was the value of the vector along that dimension.
@@ -639,51 +666,6 @@ no improvement was visible.
 % \item Element-wise multiplication: $\bm{v_1} \bigodot \bm{v_2}$
 % \end{itemize}
 % Unfortunately we saw no improvement from these features.
-
-
-A verb tends to realize its semantic arguments differently when the verb is in
-active voice vs.~passive voice.
-We attempted to capture this by conjoining an ACTIVE/PASSIVE voice feature
-with both the Linear Distance features and the Subcategorization Sequence
-features.
-The voice feature was calculated with code from the system described in
-\newcite{johansson_dependency-based_2008}.
-There was no improvement from including these features.
-Since we were already using dependency features from the 
-organizers' supplied Stanford Dependencies-style parses,
-which include passivization information in arc labels (\emph{nsubjpass},\emph{auxpass}),
-we hypothesize this information may have already been incorporated into the syntactic analysis preprocessing.
-
-
-We tried multiple kinds of distance features, including log distance, binned
-distance (i.e., less than five tokens apart, between five and ten tokens apart, more than
-ten tokens apart), and thresholded distance (i.e., zero to three tokens apart,
-zero to five tokens apart, etc.).
-
-
-We experimented with Brown cluster features \cite{Brown:1992:CNG:176313.176316}
-trained on a large corpus of web data, creating parent, child and conjoined parent-child edge features from cluster prefixes of length 2, 4, 6, 8, 10 and 12. No combination of the above settings helped performance, nor did conjoining the above features with the POS tags of the parent and
-child tokens.
-
-\subsection{Graph Constraints}
-\label{s:badconstraints}
-
-We experimented with enforcing other graph constraints in the structured SVM
-decoder (\S\ref{s:graphparser}).
-We tried enforcing that the graph was connected (ignoring singletons), similarly
-to \newcite{flanigan-etal:ACL2014}.
-Almost all semantic dependency graphs are connected (ignoring singletons) in the
-training data, but we found that enforcing this constraint significantly hurt
-performance.
-Enforcing this constraint causes more edges to be predicted, and we conjecture
-that because the evaluation metric penalizes wrongly labeled edges more than
-false negatives, 
-\bocomment{huh? don't they count equally?}
-this hurts overall. \nas{tweak alpha and beta?  that might fix this problem}
-
-We also tried enforcing a tree constraint, although most gold graphs are not
-trees.
-Unsurprisingly, we found that enforcing a tree constraint hurt performance.
 
 
 
