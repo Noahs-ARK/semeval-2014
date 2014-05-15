@@ -360,7 +360,8 @@ type.  We found these contraints to improve the $F_1$-score for this formalism o
 
 Consider the fully dense graph of all edges between all words predicted
 as not singletons by the singleton classifier \S\ref{s:singleton_model} (in all
-directions with all possible labels).
+directions with all possible labels). Unlike \logitedge, the labelset $L$ does not 
+include an explicit \textsc{NoEdge} label.
 If $\Psi = \{\bm\psi_\ell\}_{\ell \in L}$ denotes the model
 weights, and $\bm{f}$ denotes the same features as the
 \logitedge~model, then an edge from $i$ to $j$ with label $\ell$ in the
