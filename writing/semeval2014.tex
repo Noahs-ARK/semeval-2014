@@ -59,22 +59,18 @@
 \newcommand{\nas}[1]{\textcolor{red}{[#1 -NAS]}}
 \newcommand{\jmf}[1]{\textcolor{orange}{[#1 -JMF]}}
 \newcommand{\jdcomment}[1]{\textcolor{NavyBlue}{[#1 -JDD]}}
-% \newcommand{\bocomment}[1]{}
-% \newcommand{\sam}[1]{}
-% \newcommand{\nas}[1]{}
-% \newcommand{\jmf}[1]{}
-% \newcommand{\jdcomment}[1]{}
 
 % \newcommand{\bocomment}[1]{}
 % \newcommand{\sam}[1]{}
 % \newcommand{\nas}[1]{}
 % \newcommand{\jmf}[1]{}
 % \newcommand{\jdcomment}[1]{}
+
 
 % turn off for submission, but on for a more tech report-y version.
 % \newcommand{\codenote}[1]{\textcolor{PineGreen}{[#1]}}
 \newcommand{\codenote}[1]{}
-\newcommand{\logitedge}{\textsc{LogitEdge}}
+\newcommand{\logitedge}{\textsc{LogisticEdge}}
 \newcommand{\noedge}{\textsc{NoEdge}}
 
 % saves only a little bit of space. might need tweaking to save more.
@@ -159,22 +155,20 @@ conversion rules of \newcite{miyao_corpus_oriented_2004}.
 \emph{PCEDT} is automatically derived from the tectogrammatic layer of the
 Prague Czech-English Dependency Treebank \cite{hajic_building_1998}.
 See Figure~\ref{fig:formalisms} for an example sentence.
-\begin{figure*}
+\begin{figure}
 	\centering
-		\includegraphics[width=\textwidth]{fig/example_dm} \\
-		\includegraphics[width=\textwidth]{fig/example_pas} \\
-		\includegraphics[width=\textwidth]{fig/example_pcedt}
+		\includegraphics[width=.5\textwidth]{fig/example_dm} \\
+		\includegraphics[width=.5\textwidth]{fig/example_pas} \\
+		\includegraphics[width=.5\textwidth]{fig/example_pcedt}
 	\caption{Example annotations for \emph{DM} (top), \emph{PAS}
-          (middle), and \emph{PCEDT} (bottom). \jmf{are the
-    three LOC's in PCEDT correct? is the capitalization of 'BAKER
-    FALTERS' meaningful?}}
+          (middle), and \emph{PCEDT} (bottom).}
 	\label{fig:formalisms}
-\end{figure*}
+\end{figure}
 
 The three formalisms come from very different linguistic theories, but all
 three are represented as labeled directed graphs, with words as vertices, and
 all three have ``top'' annotations, corresponding roughly to the
-semantic focus of the sentence.  The ``top'' need not be a root of the
+semantic focus of the sentence.  A ``top'' need not be a root of the
 graph.
 This allows us to use the same machinery (\S\ref{s:models}) to simultaneously
 train and test statistical models for the three formalisms.
@@ -245,8 +239,7 @@ hour.}
 %\sam{yes, that sounds good. waiting on graph vs. non-graph results from jflan}
 
 
-\subsubsection{\logitedge\ Parser\jmf{I think we should call this
-\sc{LogisticEdge}}}
+\subsubsection{\logitedge\ Parser}
 \label{s:logitedge}
 
 
@@ -610,66 +603,57 @@ The following results thus have a
 the strong caveat that the experiments were
 not exhaustive.  It could be these that any of the following features would help under more careful testing.
 
-\nas{NOAH LEFT OFF HERE}
-
-\subsubsection{Word vectors}
 
 We experimented with features derived from distributional word embeddings.
 The vectors we used \cite{wordVectors} were trained trained on the WMT-2011
 dataset, using a variation on latent semantic analysis which incorporated
 information from multiple languages.
 The vectors contained 64 dimensions.
-
-%For our edge factored model \logitedge, w
 When considering a potential edge, we
 had a parent token $s$ with associated word vector $\bm{v_1}$ and a child token
-$t$ with associated word vector $\bm{v_2}$.
-For each method outlined below, each dimension of the output vector was used as
-a feature, whose value was the value of the vector along that dimension.
-%As an example, if we concatenated the two vectors into a third vector $V_3$ (as
-%we show in $f_1$), each element of $V_3$ was used as a feature in our model.
+$t$ with associated word vector $\bm{v_2}$.  Features
+derived as the
+concatenation, difference, inner product, and element-wise
+multiplication of these vectors offered no benefit.  We also trained a
+random forest\footnote{We trained using:  \url{http://cran.r-project.org/web/packages/randomForest/randomForest.pdf}}  from the word vectors and used hard labels it predicted
+as features in the \logitedge\ parser; no improvement was visible.
 
-\begin{itemize}
-\item Concatenation:
-$ \left( \begin{smallmatrix} \bm{v_1}\\ \bm{v_2}
-\end{smallmatrix} \right)$
-\item Difference: $\bm{v_1} - \bm{v_2}$.
-\item Dot product: $\bm{v_1} \cdot \bm{v_2}$
-\item Element-wise multiplication: $\bm{v_1} \bigodot \bm{v_2}$
-\end{itemize}
-Unfortunately we saw no improvement from these features.
+% For each method outlined below, each dimension of the output vector was used as
+% a feature, whose value was the value of the vector along that dimension.
+% %As an example, if we concatenated the two vectors into a third vector $V_3$ (as
+% %we show in $f_1$), each element of $V_3$ was used as a feature in our model.
 
-\subsubsection{Random Forests Over Word Vectors}
-The word vectors added as features didn't reliably improve accuracy on any of
-the formalisms.
-One hypothesis as to why was that the vectors had a non-linear relationship
-with the labels.
-To address this, we trained a random forest in
-R\footnote{\url{http://cran.r-project.org/web/packages/randomForest/randomForest.pdf}}
-with the word vector features as described above, and used the hard labels
-predicted by the random forests as features in the \logitedge\ parser.
-Again, we saw no improvement.
+% \begin{itemize}
+% \item Concatenation:
+% $ \left( \begin{smallmatrix} \bm{v_1}\\ \bm{v_2}
+% \end{smallmatrix} \right)$
+% \item Difference: $\bm{v_1} - \bm{v_2}$.
+% \item Dot product: $\bm{v_1} \cdot \bm{v_2}$
+% \item Element-wise multiplication: $\bm{v_1} \bigodot \bm{v_2}$
+% \end{itemize}
+% Unfortunately we saw no improvement from these features.
 
-\subsubsection{Active vs. Passive Voice}
+
 A verb tends to realize its semantic arguments differently when the verb is in
-active voice vs. passive voice.
+active voice vs.~passive voice.
 We attempted to capture this by conjoining a ACTIVE/PASSIVE feature with both
 the LinearDistance features and the SubcatSequence features.
-\bocomment{From reading this i don't understand how this was computed. word patterns for "has been" etc? PTB POSes? left-vs-right directionality?}
-
+\bocomment{From reading this i don't understand how this was
+  computed. word patterns for "has been" etc? PTB POSes? left-vs-right
+  directionality?} \nas{agreed, this is confusing}
 There was no improvement from including these features.
 Since we were already using dependency features from the 
 organizers' supplied Stanford Dependencies-style parses,
 which include passivization information in arc labels (\emph{nsubjpass},\emph{auxpass}),
 we hypothesize this information may have already been incorporated into the syntactic analysis preprocessing.
 
-\subsubsection{Alternative Distance Measures}
+
 We tried multiple kinds of distance features, including log distance, binned
-distance (i.e. less than five tokens apart, between five and ten tokens apart, more than
-ten tokens apart), and thresholded distance (i.e. zero to three tokens apart,
+distance (i.e., less than five tokens apart, between five and ten tokens apart, more than
+ten tokens apart), and thresholded distance (i.e., zero to three tokens apart,
 zero to five tokens apart, etc.).
 
-\subsubsection{Brown Clusters}
+
 We experimented with Brown cluster features \cite{Brown:1992:CNG:176313.176316}
 for tokens in the sentence.
 These clusters were obtained by training on a large corpus of data crawled from
@@ -679,8 +663,7 @@ We added a padding when the length of cluster was less than the required prefix
 size.
 We added the Brown cluster for the parent token, the child token, and both
 conjoined.
-No combination of the above settings helped performance.
-Neither did conjoining the above features with the POS tags of the parent and
+No combination of the above settings helped performance, nor did conjoining the above features with the POS tags of the parent and
 child tokens.
 
 \subsection{Graph Constraints}
@@ -697,7 +680,7 @@ Enforcing this constraint causes more edges to be predicted, and we conjecture
 that because the evaluation metric penalizes wrongly labeled edges more than
 false negatives, 
 \bocomment{huh? don't they count equally?}
-this hurts overall.
+this hurts overall. \nas{tweak alpha and beta?  that might fix this problem}
 
 We also tried enforcing a tree constraint, although most gold graphs are not
 trees.
@@ -709,13 +692,11 @@ Unsurprisingly, we found that enforcing a tree constraint hurt performance.
 \label{s:evaluation}
 
 We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (\S 20), training on \S 00--19.
-
-%\section{Evaluation}
-
 We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
 labeled whole-sentence match (LM) on the held out test data using the
-evaluation script provided by the organizers (see Table~\ref{table:perf}).
+evaluation script provided by the organizers. 
 LF was averaged over the formalisms to determine the winning system.
+Table~\ref{table:perf} shows our scores.
 
 % CMU:
 % DM:
@@ -804,22 +785,24 @@ For example, the head of a sentence is often the same in all three formalisms.
 Taking advantage of this shared structure in a multi-task learning framework
 could lead to gains.
 
-There is additional structure in the formalisms which were unable to take
-advantage of due to time constraints.
-PCEDT annotations were originally a tree, but underwent a preprocessing step by
+There is additional structure in the formalisms which could be
+exploited.
+\emph{PCEDT} annotations were originally a tree, but underwent a preprocessing step by
 the task organizers in order to better capture bilexical dependency
 relationships.
 Wherever there is a coordination arc\footnote{A coordination arc
-is one of ``CONJ.member'', ``APPS.member'', ``GRAD.member'', ``CONTRA.member'',
-or ``REAS.member''.} present from $i \rightarrow j$, edges incoming to $i$ were
+is one of ``CONJ.member,'' ``APPS.member,'' ``GRAD.member,'' ``CONTRA.member,''
+or ``REAS.member.''} present from $i \rightarrow j$, edges incoming to $i$ were
 copied to instead point to $j$.
-The ``LOC'' arcs incoming to ``paralysis'' and ``politics'' in
-Figure~\ref{fig:formalisms}) are a result of this step, for example.
-There was originally just one arc pointing to ``and''.
-PCEDT trees were also mostly deterministic with respect to non-coordination arcs
+For example, in 
+Figure~\ref{fig:formalisms}
+the ``CPR'' arcs incoming to ``flashlights'' and ``alarms'' 
+ are a result of this step.
+There was originally just one arc pointing to ``and.''
+\emph{PCEDT} trees were also mostly deterministic with respect to non-coordination arcs
 before this step.
 We conjecture that this copying is one reason that determinism constraints were
-not helpful for PCEDT.
+not helpful for \emph{PCEDT}.
 Formulating more subtle graph constraints that are able to capture this a priori
 knowledge of the graph structure could lead to improved performance.
 
@@ -827,25 +810,27 @@ knowledge of the graph structure could lead to improved performance.
 \section{Conclusion}
 We found that feature-rich discriminative models performed well on the task of
 mapping from sentences to semantic dependency parses.
-Our work has shown the best results when using one model for predicting whether
+Our work has shown the best \nas{what?  best comparing what to what?
+  this was not in the paper} results when using one model for predicting whether
 a given token was to be included in the final graph, then using either our
 \logitedge\ parser or a graph-based structured SVM parser to predict a graph
 from the remaining tokens.
 Each of the three formalisms has different constraints;
-we found enforcing determinism in the PAS formalisms gave improvements, while
+we found enforcing determinism in the \emph{PAS} formalism gave improvements, while
 enforcing other constraints did not.
-While our final approach was fairly standard for work in parsing, we tried a
-number of additional features and constraints which did not help, and include
-those negative results.
+While our final approach was fairly standard for work in parsing, we
+have noted some additional features and constraints which did not
+appear to help.
 
 
 
 \section*{Acknowledgements}
 We are grateful to Manaal Faruqui for his help in the word vector experiments.
 The research reported in this article was sponsored by the U.S.~Army Research
-Laboratory and the U.S.~Army Research Office under contract/grant number
-W911NF-10-1-0533, DARPA grant FA8750-12-2-0342 funded under the DEFT program, US
-NSF grants IIS-1251131\sam{, and \ldots}
+Laboratory and the U.~S.~Army Research Office under contract/grant number
+W911NF-10-1-0533, DARPA grant FA8750-12-2-0342 funded under the DEFT
+program, U.S.~NSF grants IIS-1251131 and IIS-1054319, and Google's
+support of the Reading is Believing project at CMU.
 
 
 \bibliographystyle{acl}
