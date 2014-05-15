@@ -625,13 +625,12 @@ trained on a large corpus of web data. Parent, child and conjoined parent-child 
 child tokens.
 
 
-\textbf{Active/passive:} Active/passive voice feature\newcite{johansson_dependency-based_2008} conjoined with both the Linear Distance features and the Subcategorization Sequence features (we hypothesize voice information may already have been incorporated into our featureset by the use of the supplied Stanford dependency-style parses, which include passivization information in arc labels such as \emph{nsubjpass},\emph{auxpass}).
-features.
-
-\textbf{Complex distance features:} Log distance, binned
-distance (i.e., less than five tokens apart, between five and ten tokens apart, more than
-ten tokens apart), and thresholded distance (i.e., zero to three tokens apart,
-zero to five tokens apart, etc.).
+\textbf{Active/passive:} Active/passive voice feature
+(as in \newcite{johansson_dependency-based_2008}) conjoined with both the Linear
+Distance features and the Subcategorization Sequence features (we hypothesize
+voice information may already have been incorporated into our featureset by the
+use of the supplied Stanford dependency-style parses, which include
+passivization information in arc labels such as \emph{nsubjpass},\emph{auxpass}).
 
 \textbf{Connectivity constraint:} Enforcing that the graph was connected (ignoring singletons), similarly
 to \newcite{flanigan-etal:ACL2014}. Almost all semantic dependency graphs are connected (ignoring singletons) in the
