@@ -139,12 +139,12 @@ discriminate between good arcs and bad;
 the first treats each labeled edge decision as an independent multiclass
 logistic regression (\S\ref{s:logitedge}), while the second predicts arcs
 as part of a graph-based structured support vector machine (\S\ref{s:graphparser}).
-Common to both models are a rich set of features on arcs, described in
+Common to both models is a rich set of features on arcs, described in
 \S\ref{s:edgefeatures}.  We include a discussion of features found to
 have no discernable effect, or negative effect, during development (\S\ref{s:badfeatures}).
 
 Our system placed second in the open track of the broad-coverage semantic
-parsing task (in which output from syntax parsers and other outside resources \emph{can} be used).
+parsing task (in which output from syntactic parsers and other outside resources \emph{can} be used).
 We present our results in \S\ref{s:evaluation}.
 
 
@@ -157,7 +157,7 @@ The dataset on which Shared Task 8 focuses is comprised of annotations of the Pe
 annotations in DeepBank \cite{flickinger_deepbank_2012}.
 \emph{PAS} is derived from the Enju HPSG treebank using the
 conversion rules of \newcite{miyao_corpus_oriented_2004}.
-\emph{PCEDT} is derived from the tectogrammatic layer of the
+\emph{PCEDT} is derived from the tectogrammatical layer of the
 Prague Czech-English Dependency Treebank \cite{hajic_building_1998}.
 See Figure~\ref{fig:formalisms} for an example sentence.
 \begin{figure}
@@ -173,8 +173,9 @@ See Figure~\ref{fig:formalisms} for an example sentence.
 The three formalisms come from very different linguistic theories, but all
 three are represented as labeled directed graphs, with words as vertices, and
 all three have ``top'' annotations, corresponding roughly to the
-semantic focus of the sentence.  A ``top'' need not be a root of the
-graph.
+semantic focus of the sentence.  
+(A ``top'' need not be a root of the
+graph.)
 This allows us to use the same machinery (\S\ref{s:models}) to simultaneously
 train and test statistical models for the three formalisms.
 \sam{Stats about \% multiple roots, \% multiple tops, \% tree, \% acyclic}
@@ -185,11 +186,12 @@ train and test statistical models for the three formalisms.
 
 We treat the problem as a three-stage pipeline.
 The first stage prunes words by predicting whether they have any incoming or
-outgoing edges at all (\S\ref{s:singleton_model}); if a word does not, then it need not be 
-considered in later stages.
-The second stage jointly predicts whether an edge is
-present, and if so, its label (\S\ref{s:edge_model}).
-The third stage predicts whether a word is a \emph{top} or not
+outgoing edges at all (\S\ref{s:singleton_model}); 
+if a word does not, then it is not 
+considered for any attachments in later stages.
+The second stage predicts where edges are
+present, and their labels (\S\ref{s:edge_model}).
+The third stage predicts whether a predicate word is a \emph{top} or not
 (\S\ref{s:top_model}).
 Formalisms sometimes annotate more than one ``top'' per sentence, but we
 found that we achieve the best performance on all formalisms by predicting only
@@ -226,7 +228,7 @@ We use the same set of edge-factored features (\S\ref{s:features}) in two
 alternative models: an edge-independent multiclass logistic
 regression model (\logitedge, \S\ref{s:logitedge}); and a structured SVM 
 \cite{taskar_max_2003,tsochantaridis_support_2004} that enforces 
-\emph{determinism} constraints that allow a word to
+\emph{determinism} constraints which allow a word to
 have at most one outgoing edge with the
 same label (\svmedge, \S\ref{s:graphparser}).
 For each formalism, we trained both models with varying features enabled and
@@ -252,14 +254,15 @@ $t_j$ have been predicted to be non-singletons by the first stage.
 % In other words, edges with more than 9 tokens between its two endpoints are not
 % considered.
 Although this prunes some gold edges, among the formalisms,
-95\%-97\% of all gold edges are between tokens of distance 10 or less.
+95\%--97\% of all gold edges are between tokens of distance 10 or less.
 We found that pruning long edges increased accuracy overall, in addition to
 speeding up training and prediction.
 Both directions $i \rightarrow j$ and $j \rightarrow
 i$ are considered between every pair.
 
 %\noindent
-The model treats every ordered pair of token indices $(i, j)$ as a
+The model treats every ordered pair of token indices $(i, j)$ as an
+independent
 multiclass logistic regression with $K+1$ possible outputs:
 the formalism's original $K$ edge labels plus the additional label \noedge,
 which indicates that no edge exists from $i$ to $j$.
@@ -298,7 +301,7 @@ $\bm{f}(i, j)$, as described in \S\ref{s:features}.
 The multiclass logistic regression model defines a distribution over $L$,
 parametrized by the weight vectors $\Phi = \{\bm\phi_\ell\}_{\ell \in L}$:
 \[
-  P_\Phi(\ell)  = \frac{
+  P(\ell\mid\Phi,i,j)  = \frac{
   	\exp\{\bm\phi_\ell \cdot \bm{f}(i, j)\}
   } {
   	\sum_{\ell^\prime \in L} {
@@ -338,14 +341,12 @@ and $w_{\ell} = 1$ otherwise.
 \textbf{Decoding:} \codenote{MyGraph::decodeEdgeProbsToGraph()}
 To predict a graph structure at test-time for a new sentence,
 the most likely edge label is predicted for every candidate $(i, j)$ pair of
-tokens that has not been pruned by an earlier stage.
-We enforce only one graph constraint, which is that there cannot be
-an edge in both directions between any pair of words.
-If an edge is predicted for both directions for a single $(i, j)$
+unpruned tokens.
+If an edge is predicted for both directions for a single $(i,j)$
 pair, only the edge with the higher score is chosen.
-There are no such bidirectional edges in the training data.
-This enforcement actually did not improve accuracy on \emph{DM} or \emph{PCEDT};
-it did improve \emph{PAS} by $\sim 0.2\%$ absolute $F_1$-score, but we did not submit \logitedge\ for \emph{PAS}.
+(There are no such bidirectional edges in the training data.)
+This post-processing actually did not improve accuracy on \emph{DM} or \emph{PCEDT};
+it did improve \emph{PAS} by $\approx0.2\%$ absolute $F_1$, but we did not submit \logitedge\ for \emph{PAS}.
 \codenote{\url{https://github.com/Noahs-ARK/semeval-2014/pull/21}}
 
 
