@@ -280,45 +280,52 @@ the formalism's original $K$ edge labels plus the additional label \noedge,
 which indicates that no edge exists from $i$ to $j$.
 Let $L$ be the set of possible edge labels.
 
-In our implementation, we separate features into two classes:
-those which can be extracted for any one word, $\bm{f}^{(\text{node})}(i)$;
-and those which look at both the parent and the child,
-$\bm{f}^{(\text{edge})}(i, j)$.
-These features are described in \S\ref{s:features}.
-The final binary feature vector is made by conjoining the output label with
-each:
-\begin{align*} 
-\bm{f}(i, j, \ell) =
-\{ \ell \} \otimes (& 
-	\{ \text{``bias''} \} \\
-	& \cup \bm{f}^{(\text{edge})}(i, j) \\
-	& \cup \{ \text{``parent''} \} \otimes \bm{f}^{(\text{node})}(i) \\
-	& \cup \{ \text{``child''} \} \otimes \bm{f}^{(\text{node})}(j)
-)\\
-\end{align*}
-\noindent
-where  $\otimes$ represents the Cartesian product.
+% In our implementation, we separate features into two classes:
+% those which can be extracted for any one token, $\bm{f}^{(\text{node})}(i)$;
+% and those which look at both the parent and the child,
+% $\bm{f}^{(\text{edge})}(i, j)$.
+% These features are described in \S\ref{s:features}.
+% Then the final feature vector $\bm{f}(i, j)$ is $\bm{f}^{(\text{edge})}(i,
+% j)$, along with the $\bm{f}^{(\text{node})}$ features for both the parent and
+% child token.
+% The final feature vector is made by conjoining the output label with
+% each:
+% \[
+% 	\bm{f}(i, j, \ell) := \text{conjoin}(\ell, \bm{f}^{\text{percept}}(i, j))
+% \]
+% where
+% 
+% \begin{aligned}
+% \bm{f}^{\text{percept}}(i, j) := & \bm{f}^{(\text{edge})}(i, j) \\
+% 	& \cup \text{ conjoin}(\text{``par''}, \bm{f}^{(\text{node})}(i)) \\
+% 	& \cup \text{ conjoin}(\text{``child''}, \bm{f}^{(\text{node})}(j))
+% \end{aligned}
+% \[
+% \text{conjoin}(\alpha, M) := \{ ((\alpha, k), v) \mid (k, v) \in M \}
+% \]
 %Feature extractors are defined to extract
 %features both for individual tokens ($f^{(\text{node})}(i)$), and also for
 % pairs of tokens ($f^{(\text{edge})}(i,j)$), which are conjoined against all possible output
 %labels.
-For candidate parent index $i$ and child index $j$, the model defines a
-distribution over $y_{i,j} \in L$, parametrized by the weight vector $\bm\phi$,
-
-\begin{equation}
-  Pr(y_{i,j}=\ell; \bm\phi)  = \frac{
-  	e^{\bm\phi^\top \bm{f}(i, j, \ell)}
+% \noindent
+For candidate parent index $i$ and child index $j$, we extract a feature vector
+$\bm{f}(i, j)$, as described in \S\ref{s:features}.
+The multiclass logistic regression model defines a distribution over $L$,
+parametrized by the weight vectors $\Phi = \{\bm\phi_\ell\}_{\ell \in L}$:
+\[
+  Pr_\Phi(\ell)  = \frac{
+  	\exp\{\bm\phi_\ell \cdot \bm{f}(i, j)\}
   } {
   	\sum_{\ell^\prime \in L} {
-  		e^{\bm\phi^\top \bm{f}(i, j, \ell^\prime)}
+  		\exp\{\bm\phi_{\ell^\prime} \cdot \bm{f}(i, j)\}
   	}
   }
-\end{equation}
+\]
 
 \noindent
 %In this notation, an $f$ function outputs a real-valued vector, defined as the
 % concatenation of features from all the feature classes (\S\ref{s:features}).
-$\bm\phi$ is learned by minimizing total negative log-likelihood of the above
+$\Phi$ is learned by minimizing total negative log-likelihood of the above
 (with weighting; see below), plus $\ell_2$ regularization.
 Adagrad \cite{duchi_adaptive_2011} is used for optimization.
 This seemed to optimize faster than L-BFGS \cite{byrd_limited_1995}, at least for earlier
@@ -356,7 +363,7 @@ There are no such bidirectional edges in the training data, and enforcing this
 restriction slightly improved accuracy on the development set ($~0.2\%$ absolute F on PAS; other formalisms unchanged).\codenote{\url{https://github.com/Noahs-ARK/semeval-2014/pull/21}}
 
 
-\subsubsection{Graph-based Structured SVM Parser} \label{s:graphparser}
+\subsubsection{Deterministic Structured SVM Parser} \label{s:graphparser}
 
 To predict edges for the PAS formalism, we use a model with determinism
 constraints.  This ensures that at each word, there is at most one
@@ -364,15 +371,15 @@ outgoing edge for each label type.
 
 Consider the fully dense graph of all edges between all words predicted
 as not singletons by the singleton classifier \S\ref{s:singleton_model} (in all
-directions with all possible labels).  If $\bm\psi$ denotes the model
+directions with all possible labels).
+If $\Psi = \{\bm\psi_\ell\}_{\ell \in L}$ denotes the model
 weights, and $\bm{f}$ denotes the same features as the
 \logitedge~model, then an edge from $i$ to $j$ with label $\ell$ in the
 dense graph has a weight $c(i,j,\ell)$ assigned to it using the linear
 scoring function:
 \[
-c(i,j,\ell) = \bm\psi^\top \bm{f}(i,j,\ell)
+c(i,j,\ell) = \bm\psi_\ell \cdot \bm{f}(i,j)
 \]
-
 The decoder finds the highest scoring subgraph of the dense graph
 subject to the determinism constraints.  Let $edge(i,j,\ell)$ be a
 binary function where $edge(i,j,\ell) = 1 $ denotes inclusion of an edge
@@ -411,6 +418,10 @@ For each feature listed, we have an indicator feature for each value it takes
 on.
 
 \begin{itemize}
+	\item Bias:
+	\begin{itemize}
+	  \item ``BIAS''
+	\end{itemize}
 	\item Basic
 	\begin{itemize}
 		\item The tokens $s$ and $t$ themselves.
