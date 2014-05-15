@@ -358,7 +358,8 @@ it did improve \emph{PAS} by $\sim 0.2\%$ absolute $F_1$-score, but we did not s
 
 To predict edges for the \emph{PAS} formalism, we use a model with determinism
 constraints.  This ensures that each word token has at most one
-outgoing edge for each label type.
+outgoing edge for each label type.  We found these contraints to improve the $F_1$-score
+for this formalism only.
 \bocomment{need to answer here: why only PAS?}
 
 Consider the fully dense graph of all edges between all words predicted
@@ -426,7 +427,12 @@ edges.
 These features were computed over an edge $e$ with parent token $s$ at
 index $i$ and child token $t$ at index $j$. 
 Unless otherwise stated, each feature template listed has an indicator
-feature that fires for each value it can take on.
+feature that fires for each value it can take on.  For the submitted results,
+\logitedge~uses all features except Dependency Path v2, POS Path, and Distance
+Thresholds, and the structured SVM parser uses all features except Dependency
+Path v1.  This was due to the fact that the structured SVM parser was faster to
+train, and due to time constraints for the submission we were unable to retrain
+\logitedge~with these features.\jmf{added this, I hope it's clear}
 
 \renewcommand{\floatpagefraction}{0.8}
 \begin{table}
