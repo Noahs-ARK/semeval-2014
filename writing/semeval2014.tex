@@ -70,6 +70,7 @@
 % turn off for submission, but on for a more tech report-y version.
 % \newcommand{\codenote}[1]{\textcolor{PineGreen}{[#1]}}
 \newcommand{\codenote}[1]{}
+% \newcommand{\logitedge}{\textsc{IndepEdge}}
 \newcommand{\logitedge}{\textsc{LogisticEdge}}
 \newcommand{\svmedge}{\textsc{SvmEdge}}
 \newcommand{\noedge}{\textsc{NoEdge}}
@@ -137,7 +138,7 @@ features for each potential dependency arc and learning a statistical model to
 discriminate between good arcs and bad;
 the first treats each labeled edge decision as an independent multiclass
 logistic regression (\S\ref{s:logitedge}), while the second predicts arcs
-as part of a graph-based structured support vector machine (\S~\ref{s:graphparser}).
+as part of a graph-based structured support vector machine (\S\ref{s:graphparser}).
 Common to both models are a rich set of features on arcs, described in
 \S\ref{s:edgefeatures}.  We include a discussion of features found to
 have no discernable effect, or negative effect, during development (\S\ref{s:badfeatures}).
@@ -312,7 +313,7 @@ parametrized by the weight vectors $\Phi = \{\bm\phi_\ell\}_{\ell \in L}$:
 $\Phi$ is learned by minimizing total negative log-likelihood of the above
 (with weighting; see below), plus $\ell_2$ regularization.
 Adagrad \cite{duchi_adaptive_2011} is used for optimization.
-This seemed to optimize faster than L-BFGS \cite{byrd_limited_1995}, at least for earlier
+This seemed to optimize faster than L-BFGS \cite{Liu1989LBFGS}, at least for earlier
 iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
 
 There is a class imbalance in the output labels; in all three formalisms, there
