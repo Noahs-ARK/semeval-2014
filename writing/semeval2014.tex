@@ -79,6 +79,10 @@
 
 % \renewcommand{\baselinestretch}{0.95}
 
+\hyphenation{SemEval}
+\hyphenation{ana-ly-sis}
+\hyphenation{Logistic-Edge}
+\hyphenation{Svm-Edge}
 
 
 \title{CMU-ARK: Arc-Factored, Discriminative Semantic Dependency Parsing}
@@ -201,20 +205,20 @@ the one best-scoring ``top'' under the model.
 
 \subsection{Singleton Classification} \label{s:singleton_model}
 
-We call a node in a graph without any parents or children a \emph{singleton}.
-For singleton prediction, we train a token-level logistic regression
-classifier.
-For each token $t$, the features include the token $t$, its lemma, and its
+For each formalism, we train a classifier to recognize \emph{singletons},
+nodes that have no parents or children.
+(For example, punctuation tokens are often singletons.)
+This makes the system faster without affecting accuracy.
+For singleton prediction, we use a token-level logistic regression
+classifier, with features including
+the word, its lemma, and its
 part-of-speech tag.
-If the classifier predicts a probability of 99\% or higher (a
-threshold chosen by grid search on the development set), then we prune the
-token.
-% Our singleton model achieves over 99\% accuracy for the \emph{PAS} formalism,
-% for example.
-We found that pruning words predicted to be singletons improved accuracy in later stages, and made the system
-faster overall.
-% \jdcomment{I need to find the accuracy for the other two formalisms. Will
-% include this in our Results section.}
+If the classifier predicts a probability of 99\% or higher 
+the token is pruned; this removes around 10\% of tokens.
+(The classifier performs differently on different formalisms;
+on \emph{PAS} it has perfect accuracy, 
+while on
+\emph{DM} and \emph{PCEDT} accuracy is in the mid-90's.)
 
 
 
