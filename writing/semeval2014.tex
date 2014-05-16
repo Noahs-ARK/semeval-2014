@@ -342,16 +342,17 @@ label ``ARG1.''
 deterministic in the training data.\footnote{
 By this we mean that of the nodes that have at least one
 outgoing $\ell$ edge, $99.9\%$ of them have only one outgoing $\ell$ edge.
-For \emph{DM}, $L_d=L \setminus$\{``\_and\_c,'' ``\_or\_c,'' ``\_then\_c,'' ``loc,'' ``mwe,'' ``subord''\},
-for \emph{PAS}, $L_d = L$, and for \emph{PCEDT},
-$L_d=$\{``DPHR,'' ``INTF,''  ``VOCAT''\}.}
+For \emph{DM}, $L_d=L \setminus$\{``\_and\_c,'' ``\_or\_c,'' ``\_then\_c,''
+``loc,'' ``mwe,'' ``subord''\};
+for \emph{PAS}, $L_d = L$;
+and for \emph{PCEDT}, $L_d=$\{``DPHR,'' ``INTF,''  ``VOCAT''\}.}
 %We found this contraint improved the $F_1$-score for the
 %\emph{PAS} formalism only.
 
 Consider the fully dense graph of all edges between all words predicted
 as not singletons by the singleton classifier \S\ref{s:singleton_model} (in all
-directions with all possible labels). Unlike \logitedge, the labelset $L$ does not 
-include an explicit \textsc{NoEdge} label.
+directions with all possible labels). Unlike \logitedge, the label set $L$ does
+not include an explicit \textsc{NoEdge} label.
 If $\bm\psi$ denotes the model
 weights, and $\bm{f}$ denotes the features, then an edge from $i$ to $j$ with
 label $\ell$ in the dense graph has a weight $c(i,j,\ell)$ assigned to it using the linear
@@ -482,11 +483,11 @@ e.g.~$\{1,2,3,5,7,10,\ldots\}$.
 
 %\bocomment{ALTERNATE VERSION TO SAVE SPACE:
   The biggest memory usage was in the hash table implementing the map
-  of feature names to integer indexes, used during feature extraction.
+  of feature names to integer indices, used during feature extraction.
   In order to facilitate more convenient experimentation, we
   implemented multitask feature hashing
   \cite{weinberger_feature_2009}, which randomly assigns features'
-  numeric indexes with a hash function, under the theory that errors
+  numeric indices with a hash function, under the theory that errors
   due to collisions tend to cancel each other out.  We found no
   drop in accuracy when using the technique.
 
@@ -509,18 +510,18 @@ e.g.~$\{1,2,3,5,7,10,\ldots\}$.
 % \noindent
 % For \logitedge, the biggest memory usage was from
 % the hash table that implemented
-% a map of feature names to integer indexes, used during feature extraction.
+% a map of feature names to integer indices, used during feature extraction.
 % Tens of millions of features (before conjunction) resulted in several gigabytes of memory use.  To facilitate more convenient experimentation,
 % we eliminated this by using
 % multitask feature hashing
 % \cite{weinberger_feature_2009},
-% which randomly assigns features' numeric indexes with a hash function.\footnote{We also tried replacing the hash table with a Patricia Tree, trying several open-source implementations; but they had worse memory usage than a GNU Trove hash table. 
+% which randomly assigns features' numeric indices with a hash function.\footnote{We also tried replacing the hash table with a Patricia Tree, trying several open-source implementations; but they had worse memory usage than a GNU Trove hash table. 
 %   \codenote{\url{https://github.com/brendano/myutil/blob/0a5697a7f066c265a75ce1b7bd527feafa683c8a/src/vocabalts/vocabalts_results.txt}}}
 % Let $F$ be the space of all feature names (before conjunction with the output label).
 % In the usual approach, a hash table is maintained containing a
-% one-one onto map from features to integer indexes $g: F \rightarrow \{1,\ldots,|F|\}$,
+% one-one onto map from features to integer indices $g: F \rightarrow \{1,\ldots,|F|\}$,
 % and each output label has an array of model parameters $\bm\phi^\ell \in \mathbb{R}^{|F|}$,
-% which $g(f)$ indexes into.
+% which $g(f)$ indices into.
 % In the hashing approach, a hash function $h_{\ell}$
 % maps feature name to one of $B$ bucket values,
 % $h_{\ell} : F \rightarrow \{1, \ldots, B\}$.
@@ -594,22 +595,23 @@ not exhaustive.  It may be that some of these features could help under more car
 concatenation, difference, inner product, and element-wise multiplication of the two vectors associated with a parent-child edge. We also trained a random forest\footnote{Using \cite{RandomForest2002}'s \emph{randomForest} R implementation.} on the word vectors (using the vector elements as features to predict the observed semantic label); at test time, the predicted hard labels were incorporated as features.
 
 \textbf{Brown clusters} Features derived from Brown clusters \cite{Brown:1992:CNG:176313.176316}
-trained on a large corpus of web data. Parent, child and conjoined parent-child edge features from cluster prefixes of length 2, 4, 6, 8, 10 and 12. Conjunctions of those features with the POS tags of the parent and
-child tokens.
+trained on a large corpus of web data. Parent, child, and conjoined parent-child
+edge features from cluster prefixes of length 2, 4, 6, 8, 10, and 12.
+Conjunctions of those features with the POS tags of the parent and child tokens.
 
 \textbf{Active/passive:} Active/passive voice feature
 (as in \newcite{johansson_dependency-based_2008}) conjoined with both the Linear
 Distance features and the Subcategorization Sequence features. (We hypothesize
-voice information may already have been incorporated into our featureset by the
-use of the supplied Stanford dependency-style parses, which include
+voice information may already have been incorporated into our feature set by the
+use of the supplied Stanford dependency--style parses, which include
 passivization information in arc labels such as \emph{nsubjpass} and
 \emph{auxpass} \cite{Marneffe2008DepColing}).
 
 
 \textbf{Connectivity constraint:} Enforcing that the graph is connected (ignoring singletons), similar
 to \newcite{flanigan-etal:ACL2014}. Almost all semantic dependency graphs are connected (ignoring singletons) in the
-training data, but we found that enforcing this constraint causes more edges to be predicted, significantly hurting
-performance.
+training data, but we found that enforcing this constraint caused more edges to
+be predicted, significantly hurting performance.
 
 \textbf{Tree constraint:} Enforces that the graph is a tree. Unsurprisingly, we found that enforcing a tree constraint hurt performance.
 
@@ -642,7 +644,7 @@ performance.
 
 We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (\S 20), training on \S 00--19.
 We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
-labeled whole-sentence match (LM) on the held out test data using the
+labeled whole-sentence match (LM) on the held-out test data using the
 evaluation script provided by the organizers. 
 LF was averaged over the formalisms to determine the winning system.
 Table~\ref{table:perf} shows our scores.
@@ -710,7 +712,7 @@ Table~\ref{table:perf} shows our scores.
 & 0.8402 & 0.8090 & 0.8241 & 0.1397 \\
 \end{tabular}
 \caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
-whole-sentence match (LM) on the held out test data.
+whole-sentence match (LM) on the held-out test data.
 }
 \label{table:perf}
 \end{center}
@@ -725,8 +727,9 @@ note here additional features and constraints which did not
 appear to help (contrary to expectation).
 There are a number of clear extensions to this work that could improve
 performance.
-While using an edge factored model allows for efficient inference, there is
-much to be gained from using \textbf{higher-order features} \cite{mcdonald_online_2006,martins_turning_2013}
+While an edge-factored model allows for efficient inference, there is
+much to be gained from \textbf{higher-order features}
+\cite{mcdonald_online_2006,martins_turning_2013}.
 The amount of information
 shared between the three formalisms suggests that a \textbf{multi-task learning} framework
 could lead to gains.
