@@ -30,7 +30,6 @@
 \usepackage{multirow}
 \usepackage{tabularx}
 \usepackage{framed}
-%\usepackage{subcaption}
 
 \setitemize{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
 \setenumerate{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
@@ -365,7 +364,7 @@ By this we mean that of the nodes that have at least one
 outgoing $\ell$ edge, $99.9\%$ of them have only one outgoing $\ell$ edge.
 For \emph{DM}, $L_d=L \setminus$\{``\_and\_c,'' ``\_or\_c,'' ``\_then\_c,'' ``loc,'' ``mwe,'' ``subord''\},
 for \emph{PAS}, $L_d = L$, and for \emph{PCEDT},
-$L_d=\emptyset$.}
+$L_d=$\{``DPHR,'' ``INTF,''  ``VOCAT''\}.}
 %We found this contraint improved the $F_1$-score for the
 %\emph{PAS} formalism only.
 
@@ -392,7 +391,7 @@ scoring function $c(i,j,\ell) = \bm\psi_\ell \cdot \bm{f}(i,j)$.
 % In other words, f
 
 \textbf{Decoding:} For each node and each label $\ell$, if $\ell \in L_d$, the
-decoder adds for the highest scoring outgoing edge, if its weight is positive.
+decoder adds the highest scoring outgoing edge, if its weight is positive.
 For $\ell \not\in L_d$, every outgoing edge with positive weight is added.
 This procedure is guaranteed to find the highest scoring subgraph (largest sum
 of edge weights) of the dense graph subject to the determinism constraints.
