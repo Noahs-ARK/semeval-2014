@@ -271,18 +271,18 @@ exists from $i$ to $j$.
 The model treats every pair of token indices $(i, j)$ as an
 independent multiclass logistic regression over output space $L$:
 
-
+Let $x$ be an input sentence.
 For candidate parent index $i$, child index $j$, and edge label $\ell$, we
-extract a feature vector $\bm{f}(i, j, \ell)$, where $\ell$ is conjoined with every
-feature described in \S\ref{s:features}.
+extract a feature vector $\bm{f}(x, i, j, \ell)$, where $\ell$ is conjoined with
+every feature described in \S\ref{s:features}.
 The multiclass logistic regression model defines a distribution over $L$,
 parametrized by a weight vector $\bm\phi$:
 \[
-  P(\ell\mid\bm\phi,i,j)  = \frac{
-  	\exp\{\bm\phi \cdot \bm{f}(i, j, \ell)\}
+  P(\ell\mid\bm\phi,x, i,j)  = \frac{
+  	\exp\{\bm\phi \cdot \bm{f}(x, i, j, \ell)\}
   } {
   	\sum_{\ell^\prime \in L} {
-  		\exp\{\bm\phi \cdot \bm{f}(i, j, \ell^\prime)\}
+  		\exp\{\bm\phi \cdot \bm{f}(x, i, j, \ell^\prime)\}
   	}
   }
 \]
@@ -303,7 +303,7 @@ like ``In the FFF formalism, the training set (\S\ref{s:evaluation}) contains NN
 candidate edges (pairs of tokens with length between 1 and 10 inclusive), and NNN actual (non-null) edges.''}
 We improved $F_1$ performance by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
-$\sum_{i,j} \sum_\ell w_\ell \log P(\ell \mid \bm\phi, i, j)$, 
+$\sum_{i,j} \sum_\ell w_\ell \log P(\ell \mid \bm\phi, x, i, j)$, 
 with $w_{\noedge}=0.3$ (selected on development set)
 and $w_{\ell} = 1$ otherwise.
 
@@ -352,23 +352,10 @@ Consider the fully dense graph of all edges between all words predicted
 as not singletons by the singleton classifier \S\ref{s:singleton_model} (in all
 directions with all possible labels). Unlike \logitedge, the labelset $L$ does not 
 include an explicit \textsc{NoEdge} label.
-If $\Psi = \{\bm\psi_\ell\}_{\ell \in L}$ denotes the model
+If $\bm\psi$ denotes the model
 weights, and $\bm{f}$ denotes the features, then an edge from $i$ to $j$ with
 label $\ell$ in the dense graph has a weight $c(i,j,\ell)$ assigned to it using the linear
-scoring function $c(i,j,\ell) = \bm\psi_\ell \cdot \bm{f}(i,j)$.
-%  Let $edge(i,j,\ell)$ be a
-% binary function where $edge(i,j,\ell) = 1 $ denotes inclusion of an edge
-% from $i$ to $j$ with a label $\ell$.  Then $edge(i,j,\ell)$ is computed
-% as follows:
-% \[
-% edge(i,j,\ell) =
-% \begin{cases}
-% 1 & \text{if } j = \argmax_{k} c(i,k,\ell) \\
-% & \text{and } c(i,j,\ell) > 0 \\
-% 0 & \text{otherwise}
-% \end{cases}
-% \]
-% In other words, f
+scoring function $c(i,j,\ell) = \bm\psi \cdot \bm{f}(x,i,j,\ell)$.
 
 \textbf{Decoding:} For each node and each label $\ell$, if $\ell \in L_d$, the
 decoder adds the highest scoring outgoing edge, if its weight is positive.
@@ -382,7 +369,7 @@ Its runtime is $O(n^2)$.
 The model weights are trained using the structured SVM loss.  If $x$
 is a sentence and $y$ is a graph over that sentence, let the features 
 be denoted $\bm{f}(x,y) = \sum_{(i,j,\ell) \in edges(y)}
-\bm{f}(i,j,\ell)$.  The SVM loss for each training example $(x_i, y_i)$ is:
+\bm{f}(x, i,j,\ell)$.  The SVM loss for each training example $(x_i, y_i)$ is:
 \begin{multline*}
 -\bm\psi^\top \bm{f}(x_i,y_i) + \max_{y} \bm\psi^\top \bm{f}(x_i,y) +
 \mathit{cost}(y,y_i)
@@ -615,7 +602,8 @@ child tokens.
 Distance features and the Subcategorization Sequence features. (We hypothesize
 voice information may already have been incorporated into our featureset by the
 use of the supplied Stanford dependency-style parses, which include
-passivization information in arc labels such as \emph{nsubjpass} and \emph{auxpass}\cite{Marneffe2008DepColing}).
+passivization information in arc labels such as \emph{nsubjpass} and
+\emph{auxpass} \cite{Marneffe2008DepColing}).
 
 
 \textbf{Connectivity constraint:} Enforcing that the graph is connected (ignoring singletons), similar
