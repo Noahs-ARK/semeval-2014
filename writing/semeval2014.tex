@@ -31,6 +31,8 @@
 \usepackage{framed}
 \usepackage{url}
 \usepackage{footnote}
+\usepackage{microtype}
+\usepackage[small,bf,skip=5pt]{caption}
 
 \setitemize{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
 \setenumerate{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
@@ -46,6 +48,11 @@
 \newcommand{\submissionpage}{\url{http://alt.qcri.org/semeval2014/index.php?id=cfp}}
 \newcommand{\filename}{semeval2014}
 \newcommand{\contact}{pnakov qf.org.qa}
+
+\renewcommand\floatpagefraction{.9}
+\renewcommand\topfraction{.9}
+\renewcommand\bottomfraction{.9}
+\renewcommand\textfraction{.1}   
 
 
 \definecolor{myblue}{rgb}{0,0.1,0.6}
@@ -78,6 +85,13 @@
 % saves only a little bit of space. might need tweaking to save more.
 \newenvironment{itemizesquish}{\begin{list}{\labelitemi}{\setlength{\itemsep}{-0.1em}\setlength{\labelwidth}{1em}\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}}}{\end{list}}
 
+\expandafter\def\expandafter\normalsize\expandafter{%
+    \normalsize
+    \setlength\abovedisplayskip{9pt}
+    \setlength\belowdisplayskip{9pt}
+    \setlength\abovedisplayshortskip{9pt}
+    \setlength\belowdisplayshortskip{9pt}
+}
 % \renewcommand{\baselinestretch}{0.95}
 
 \hyphenation{SemEval}
@@ -147,14 +161,15 @@ Common to both models is a rich set of features on arcs, described in
 \S\ref{s:edgefeatures}.  We include a discussion of features found to
 have no discernable effect, or negative effect, during development (\S\ref{s:badfeatures}).
 
-Our system placed second in the open track of the broad-coverage semantic
-parsing task (in which output from syntactic parsers and other outside resources \emph{can} be used).
+Our system placed second in the open track of the Broad-Coverage Semantic
+Dependency Parsing task (in which output from syntactic parsers and other outside resources \emph{can} be used).
 We present our results in \S\ref{s:evaluation}.
 
 
 
 \section{Formalisms} \label{s:formalisms}
-The dataset on which Shared Task 8 focuses is comprised of annotations of the Penn Treebank in three different semantic dependency formalisms.
+The Shared Task 8 dataset consists of annotations of the Penn Treebank in
+three different semantic dependency formalisms.
 %The organizers of Shared Task 8 provided a corpus of English news text
 %drawn from the Penn Treebank, annotated according to three different semantic dependency formalisms.
 \emph{DM} is derived from LinGO English Resource Grammar (ERG)
@@ -163,7 +178,7 @@ annotations in DeepBank \cite{flickinger_deepbank_2012}.
 conversion rules of \newcite{miyao_corpus_oriented_2004}.
 \emph{PCEDT} is derived from the tectogrammatical layer of the
 Prague Czech-English Dependency Treebank \cite{hajic_building_1998}.
-See Figure~\ref{fig:formalisms} for an example sentence.
+See Figure~\ref{fig:formalisms} for an example.
 \begin{figure}
 	\centering
 		\includegraphics[width=.5\textwidth]{fig/example_dm} \\
@@ -175,13 +190,13 @@ See Figure~\ref{fig:formalisms} for an example sentence.
 \end{figure}
 
 The three formalisms come from very different linguistic theories, but all
-three are represented as labeled directed graphs, with words as vertices, and
-all three have ``top'' annotations, corresponding roughly to the
+are represented as labeled directed graphs, with words as vertices, and
+all have ``top'' annotations, corresponding roughly to the
 semantic focus of the sentence.  
 (A ``top'' need not be a root of the
 graph.)
-This allows us to use the same machinery (\S\ref{s:models}) to simultaneously
-train and test statistical models for the three formalisms.
+This allows us to use the same machinery (\S\ref{s:models}) for
+training and testing statistical models for the three formalisms.
 \sam{Stats about \% multiple roots, \% multiple tops, \% tree, \% acyclic}
 
 
@@ -276,7 +291,7 @@ For candidate parent index $i$, child index $j$, and edge label $\ell$, we
 extract a feature vector $\bm{f}(x, i, j, \ell)$, where $\ell$ is conjoined with
 every feature described in \S\ref{s:features}.
 The multiclass logistic regression model defines a distribution over $L$,
-parametrized by a weight vector $\bm\phi$:
+parametrized by weights $\bm\phi$:
 \[
   P(\ell\mid\bm\phi,x, i,j)  = \frac{
   	\exp\{\bm\phi \cdot \bm{f}(x, i, j, \ell)\}
@@ -315,6 +330,7 @@ and $w_{\ell} = 1$ otherwise.
 % \bocomment{TODO need to check how much preproc was used for this.  Was singleton pruning turned on?  It looks like we commented out the prune features in LRParser.java.  But singleton pruning might have been turned on.}
 
 % \textbf{Decoding and postprocessing:}
+\noindent
 \textbf{Decoding:} \codenote{MyGraph::decodeEdgeProbsToGraph()}
 To predict a graph structure at test-time for a new sentence,
 the most likely edge label is predicted for every candidate $(i, j)$ pair of
@@ -358,6 +374,7 @@ weights, and $\bm{f}$ denotes the features, then an edge from $i$ to $j$ with
 label $\ell$ in the dense graph has a weight $c(i,j,\ell)$ assigned to it using the linear
 scoring function $c(i,j,\ell) = \bm\psi \cdot \bm{f}(x,i,j,\ell)$.
 
+\noindent
 \textbf{Decoding:} For each node and each label $\ell$, if $\ell \in L_d$, the
 decoder adds the highest scoring outgoing edge, if its weight is positive.
 For $\ell \not\in L_d$, every outgoing edge with positive weight is added.
@@ -369,18 +386,14 @@ Its runtime is $O(n^2)$.
 
 The model weights are trained using the structured SVM loss.  If $x$
 is a sentence and $y$ is a graph over that sentence, let the features 
-be denoted $\bm{f}(x,y) = \sum_{(i,j,\ell) \in edges(y)}
+be denoted $\bm{f}(x,y) = \sum_{(i,j,\ell) \in y}
 \bm{f}(x, i,j,\ell)$.  The SVM loss for each training example $(x_i, y_i)$ is:
 \begin{multline*}
 -\bm\psi^\top \bm{f}(x_i,y_i) + \max_{y} \bm\psi^\top \bm{f}(x_i,y) +
 \mathit{cost}(y,y_i)
 \end{multline*}
-where $\mathit{cost}(y,y_i)$
-is the cost function
-\begin{multline*}
-\mathit{cost}(y,y_i) = \alpha |edges(y)\setminus edges(y_i)| + \\
-\beta |edges(y_i)\setminus edges(y)|.
-\end{multline*}
+where $\mathit{cost}(y,y_i) = \alpha |y\setminus y_i| +
+\beta |y_i\setminus y|$.
 $\alpha$ and $\beta$ trade off between precision and recall for the
 edges \cite{gimpel_softmax-margin_2010}.
 The loss is minimized with AdaGrad
@@ -482,14 +495,13 @@ e.g.~$\{1,2,3,5,7,10,\ldots\}$.
 \subsubsection{Feature Hashing}
 
 %\bocomment{ALTERNATE VERSION TO SAVE SPACE:
-  The biggest memory usage was in the hash table implementing the map
-  of feature names to integer indices, used during feature extraction.
-  In order to facilitate more convenient experimentation, we
+  The biggest memory usage was in the map from
+  feature names to integer indices during feature extraction.
+  For experimental expedience, we
   implemented multitask feature hashing
-  \cite{weinberger_feature_2009}, which randomly assigns features'
-  numeric indices with a hash function, under the theory that errors
-  due to collisions tend to cancel each other out.  We found no
-  drop in accuracy when using the technique.
+  \cite{weinberger_feature_2009}, which hashes feature names to indices, under
+  the theory that errors due to collisions tend to cancel.  No
+  drop in accuracy was observed.
 
 % }
 % \sam{I think we can get away with this short version}
@@ -587,8 +599,8 @@ not exhaustive.  It may be that some of these features could help under more car
 
 \begin{savenotes}
 \begin{table}
+\small
 \begin{framed}
-\begin{small}
 %\textbf{Bias:} Always fires.
 
 \textbf{Word vectors:} Features derived from 64-dimensional vectors from  \cite{wordVectors}, including the
@@ -601,11 +613,10 @@ Conjunctions of those features with the POS tags of the parent and child tokens.
 
 \textbf{Active/passive:} Active/passive voice feature
 (as in \newcite{johansson_dependency-based_2008}) conjoined with both the Linear
-Distance features and the Subcategorization Sequence features. (We hypothesize
-voice information may already have been incorporated into our feature set by the
-use of the supplied Stanford dependency--style parses, which include
-passivization information in arc labels such as \emph{nsubjpass} and
-\emph{auxpass} \cite{Marneffe2008DepColing}).
+Distance features and the Subcategorization Sequence features.
+Voice information may already be captured by features from the Stanford
+dependency--style parses, which include passivization information in arc labels such as \emph{nsubjpass} and
+\emph{auxpass} \cite{Marneffe2008DepColing}.
 
 
 \textbf{Connectivity constraint:} Enforcing that the graph is connected (ignoring singletons), similar
@@ -615,8 +626,8 @@ be predicted, significantly hurting performance.
 
 \textbf{Tree constraint:} Enforces that the graph is a tree. Unsurprisingly, we found that enforcing a tree constraint hurt performance.
 
-\end{small}
 \end{framed}
+\small
 \caption{Features and constraints giving negative results.}
 \label{table:negedgefeatures}
 \end{table}
@@ -689,24 +700,20 @@ Table~\ref{table:perf} shows our scores.
 % LF: 0.779042
 % LM: 0.106825
 
-
 \begin{table}
-\begin{center}
+\small
+\centering
 \begin{tabular}%{\textwidth}%{.6\textwidth}
 {@{\extracolsep{\fill}}c|cccc}%|c|c|c|c|c|c|}
 % \hline
 & \textbf{LP} & \textbf{LR} & \textbf{LF} & \textbf{LM} \\
 \hline
-\hline
 \textbf{DM}
 & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
-\hline
 \textbf{PAS}
 & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
-\hline
 \textbf{PCEDT}
 & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
-\hline
 \hline
 \textbf{Average}
 & 0.8402 & 0.8090 & 0.8241 & 0.1397 \\
@@ -715,7 +722,6 @@ Table~\ref{table:perf} shows our scores.
 whole-sentence match (LM) on the held-out test data.
 }
 \label{table:perf}
-\end{center}
 \end{table}
 
 
