@@ -18,7 +18,6 @@
 \documentclass[11pt]{article}
 \usepackage{semeval2014}
 \usepackage{times}
-\usepackage{url}
 \usepackage{latexsym}
 \usepackage{color}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
@@ -30,6 +29,8 @@
 \usepackage{multirow}
 \usepackage{tabularx}
 \usepackage{framed}
+\usepackage{url}
+\usepackage{footnote}
 
 \setitemize{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
 \setenumerate{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
@@ -264,72 +265,45 @@ Both directions $i \rightarrow j$ and $j \rightarrow
 i$ are considered between every pair.
 
 %\noindent
-The model treats every ordered pair of token indices $(i, j)$ as an
-independent
-multiclass logistic regression with $K+1$ possible outputs:
-the formalism's original $K$ edge labels plus the additional label \noedge,
-which indicates that no edge exists from $i$ to $j$.
-Let $L$ be the set of possible edge labels.
+Let $L$ be the set of $K+1$ possible output labels: the formalism's original $K$
+edge labels, plus the additional label \noedge, which indicates that no edge
+exists from $i$ to $j$.
+The model treats every pair of token indices $(i, j)$ as an
+independent multiclass logistic regression over output space $L$:
 
-% In our implementation, we separate features into two classes:
-% those which can be extracted for any one token, $\bm{f}^{(\text{node})}(i)$;
-% and those which look at both the parent and the child,
-% $\bm{f}^{(\text{edge})}(i, j)$.
-% These features are described in \S\ref{s:features}.
-% Then the final feature vector $\bm{f}(i, j)$ is $\bm{f}^{(\text{edge})}(i,
-% j)$, along with the $\bm{f}^{(\text{node})}$ features for both the parent and
-% child token.
-% The final feature vector is made by conjoining the output label with
-% each:
-% \[
-% 	\bm{f}(i, j, \ell) := \text{conjoin}(\ell, \bm{f}^{\text{percept}}(i, j))
-% \]
-% where
-% 
-% \begin{aligned}
-% \bm{f}^{\text{percept}}(i, j) := & \bm{f}^{(\text{edge})}(i, j) \\
-% 	& \cup \text{ conjoin}(\text{``par''}, \bm{f}^{(\text{node})}(i)) \\
-% 	& \cup \text{ conjoin}(\text{``child''}, \bm{f}^{(\text{node})}(j))
-% \end{aligned}
-% \[
-% \text{conjoin}(\alpha, M) := \{ ((\alpha, k), v) \mid (k, v) \in M \}
-% \]
-%Feature extractors are defined to extract
-%features both for individual tokens ($f^{(\text{node})}(i)$), and also for
-% pairs of tokens ($f^{(\text{edge})}(i,j)$), which are conjoined against all possible output
-%labels.
-% \noindent
-For candidate parent index $i$ and child index $j$, we extract a feature vector
-$\bm{f}(i, j)$, as described in \S\ref{s:features}.
+
+For candidate parent index $i$, child index $j$, and edge label $\ell$, we
+extract a feature vector $\bm{f}(i, j, \ell)$, where $\ell$ is conjoined with every
+feature described in \S\ref{s:features}.
 The multiclass logistic regression model defines a distribution over $L$,
-parametrized by the weight vectors $\Phi = \{\bm\phi_\ell\}_{\ell \in L}$:
+parametrized by a weight vector $\bm\phi$:
 \[
-  P(\ell\mid\Phi,i,j)  = \frac{
-  	\exp\{\bm\phi_\ell \cdot \bm{f}(i, j)\}
+  P(\ell\mid\bm\phi,i,j)  = \frac{
+  	\exp\{\bm\phi \cdot \bm{f}(i, j, \ell)\}
   } {
   	\sum_{\ell^\prime \in L} {
-  		\exp\{\bm\phi_{\ell^\prime} \cdot \bm{f}(i, j)\}
+  		\exp\{\bm\phi \cdot \bm{f}(i, j, \ell^\prime)\}
   	}
   }
 \]
 
 \noindent
-%In this notation, an $f$ function outputs a real-valued vector, defined as the
-% concatenation of features from all the feature classes (\S\ref{s:features}).
-$\Phi$ is learned by minimizing total negative log-likelihood of the above
+$\bm\phi$ is learned by minimizing total negative log-likelihood of the above
 (with weighting; see below), plus $\ell_2$ regularization.
-Adagrad \cite{duchi_adaptive_2011} is used for optimization.
+AdaGrad \cite{duchi_adaptive_2011} is used for optimization.
 This seemed to optimize faster than L-BFGS \cite{Liu1989LBFGS}, at least for earlier
-iterations, though we did no systematic comparison. Stochastic gradient steps are applied one at a time from individual examples, and a gradient step for the regularizer is applied once per epoch.
+iterations, though we did no systematic comparison. Stochastic gradient steps
+are applied one at a time from individual examples, and a gradient step for the
+regularizer is applied once per epoch.
 
-There is a class imbalance in the output labels; in all three formalisms, there
+The output labels have a class imbalance; in all three formalisms, there
 are many more $\noedge$ examples than true edge examples.
 \sam{If we get these numbers, it would be nicer to quantify, and say something
 like ``In the FFF formalism, the training set (\S\ref{s:evaluation}) contains NNN
 candidate edges (pairs of tokens with length between 1 and 10 inclusive), and NNN actual (non-null) edges.''}
 We improved $F_1$ performance by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
-$\sum_{i,j} \sum_\ell w_\ell \log P(y_{i,j}=\ell; \bm\phi)$, 
+$\sum_{i,j} \sum_\ell w_\ell \log P(\ell \mid \bm\phi, i, j)$, 
 with $w_{\noedge}=0.3$ (selected on development set)
 and $w_{\ell} = 1$ otherwise.
 
@@ -362,8 +336,10 @@ In the \svmedge~model, we use a structured SVM
 with a determinism constraint.
 This constraint ensures that each word token has at most one outgoing edge for
 each label in a set of deterministic labels $L_d$.
-$L_d$ was chosen to be the set of edges that were $> 99.9\%$ deterministic in
-the training data.\footnote{
+For example, in \emph{DM} a predicate never has more than one child with edge
+label ``ARG1.''
+ $L_d$ was chosen to be the set of edges that were $> 99.9\%$
+deterministic in the training data.\footnote{
 By this we mean that of the nodes that have at least one
 outgoing $\ell$ edge, $99.9\%$ of them have only one outgoing $\ell$ edge.
 For \emph{DM}, $L_d=L \setminus$\{``\_and\_c,'' ``\_or\_c,'' ``\_then\_c,'' ``loc,'' ``mwe,'' ``subord''\},
@@ -418,7 +394,8 @@ is the cost function
 \beta |edges(y_i)\setminus edges(y)|.
 \end{multline*}
 $\alpha$ and $\beta$ trade off between precision and recall for the
-edges.  The loss is minimized with AdaGrad
+edges \cite{gimpel_softmax-margin_2010}.
+The loss is minimized with AdaGrad
 using early-stopping on a development set. % Tops are predicted using the
 %top prediction model \S\ref{s:top_model}.
 
@@ -620,7 +597,7 @@ These results thus have a
  strong caveat that the experiments were
 not exhaustive.  It may be that some of these features could help under more careful study.
 
-
+\begin{savenotes}
 \begin{table}
 \begin{framed}
 \begin{small}
@@ -653,7 +630,7 @@ performance.
 \caption{Features and constraints giving negative results.}
 \label{table:negedgefeatures}
 \end{table}
-
+\end{savenotes}
 
 % For each method outlined below, each dimension of the output vector was used as
 % a feature, whose value was the value of the vector along that dimension.
@@ -672,7 +649,7 @@ performance.
 
 
 
-\section{Experiment Setup}
+\section{Experimental Setup}
 \label{s:evaluation}
 
 We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (\S 20), training on \S 00--19.
@@ -774,7 +751,7 @@ knowledge of the graph structure could lead to improved performance.  We leave s
 \small
 \section*{Acknowledgements}
 We are grateful to Manaal Faruqui for his help in the word vector experiments.
-The research reported in this article was sponsored by the U.S.~Army Research
+The research reported in this paper was sponsored by the U.S.~Army Research
 Laboratory and the U.~S.~Army Research Office under contract/grant number
 W911NF-10-1-0533, DARPA grant FA8750-12-2-0342 funded under the DEFT
 program, U.S.~NSF grants IIS-1251131 and IIS-1054319, and Google's
