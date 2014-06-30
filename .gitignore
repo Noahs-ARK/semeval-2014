@@ -16,3 +16,4 @@ experiments
 
 # Python cruft
 *.pyc
+/writing/
