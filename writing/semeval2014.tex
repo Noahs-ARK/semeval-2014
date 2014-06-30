@@ -285,8 +285,7 @@ Let $L$ be the set of $K+1$ possible output labels: the formalism's original $K$
 edge labels, plus the additional label \noedge, which indicates that no edge
 exists from $i$ to $j$.
 The model treats every pair of token indices $(i, j)$ as an
-independent multiclass logistic regression over output space $L$:
-
+independent multiclass logistic regression over output space $L$.
 Let $x$ be an input sentence.
 For candidate parent index $i$, child index $j$, and edge label $\ell$, we
 extract a feature vector $\bm{f}(x, i, j, \ell)$, where $\ell$ is conjoined with
@@ -300,7 +299,7 @@ parametrized by weights $\bm\phi$:
   	\sum_{\ell^\prime \in L} {
   		\exp\{\bm\phi \cdot \bm{f}(x, i, j, \ell^\prime)\}
   	}
-  }
+  }.
 \]
 
 \noindent
@@ -437,8 +436,8 @@ train than \logitedge~when including POS Path features, and due to time constrai
 \textbf{Linear Distance:} $i - j$.
 
 \textbf{Dependency Path v1 (\logitedge~only):} The concatenation of all POS
-tags and arc labels on the labeled path in the syntactic dependency tree from $s$ to
-$t$.  Conjoined with $s$, with $t$, and without either.
+tags, arc labels and up/down directions on the path in the syntactic dependency
+tree from $s$ to $t$.  Conjoined with $s$, with $t$, and without either.
 
 \textbf{Dependency Path v2 (\svmedge~only):}
 Same as Dependency Path v1, but with the lemma of $s$ or $t$ instead of the
@@ -499,7 +498,7 @@ Fires for every integer between $1$ and $\lfloor \log(|i-j|+1)/\log(1.39)
   The biggest memory usage was in the map from
   feature names to integer indices during feature extraction.
   For experimental expedience, we
-  implemented multitask feature hashing
+  implemented multi-task feature hashing
   \citep{weinberger_feature_2009}, which hashes feature names to indices, under
   the theory that errors due to collisions tend to cancel.  No
   drop in accuracy was observed.
@@ -566,7 +565,7 @@ Fires for every integer between $1$ and $\lfloor \log(|i-j|+1)/\log(1.39)
 
 \bocomment{may15 afternoon: The below describes how top pred works in LogitEdge.  Jeff, please confirm this is how you use the topness classifier, or modify appropriately.}\jmf{yes, this is correct for the graph parser}
 
-We trained a separate token-level binary logistic regression to classify
+We trained a separate token-level binary logistic regression model to classify
 whether a token's node had the ``top'' attribute or not.
 At decoding time, all predicted predicates (i.e., nodes where there is at least one outbound edge)
 are possible candidates to be ``top'';
@@ -738,8 +737,8 @@ While an edge-factored model allows for efficient inference, there is
 much to be gained from \textbf{higher-order features}
 \citep{mcdonald_online_2006,martins_turning_2013}.
 The amount of information
-shared between the three formalisms suggests that a \textbf{multi-task learning} framework
-could lead to gains.
+shared between the three formalisms suggests that a \textbf{multi-task learning}
+\cite{evgeniou_regularized_2004} framework could lead to gains.
 And finally, there is additional structure in the formalisms which could be
 exploited (such as the deterministic processes by which an original PCEDT tree annotation was converted into a graph); formulating more subtle \textbf{graph constraints} that are able to capture this a priori
 knowledge of the graph structure could lead to improved performance.  We leave such explorations to future work.
