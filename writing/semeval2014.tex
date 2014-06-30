@@ -17,6 +17,9 @@
 
 \documentclass[11pt]{article}
 \usepackage{semeval2014}
+\usepackage{natbib}
+\newcommand{\citeposs}[1]{\citeauthor{#1}'s (\citeyear{#1})}
+\newcommand{\Citeposs}[1]{\Citeauthor{#1}'s (\citeyear{#1})}
 \usepackage{times}
 \usepackage{latexsym}
 \usepackage{color}
@@ -29,7 +32,7 @@
 \usepackage{multirow}
 \usepackage{tabularx}
 \usepackage{framed}
-\usepackage{url}
+%\usepackage{url}
 \usepackage{footnote}
 \usepackage{microtype}
 \usepackage[small,bf,skip=5pt]{caption}
@@ -57,7 +60,7 @@
 
 \definecolor{myblue}{rgb}{0,0.1,0.6}
 \definecolor{mygreen}{rgb}{0,0.3,0.1}
-\usepackage[colorlinks=true,linkcolor=black,citecolor=mygreen,urlcolor=myblue]{hyperref}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=myblue]{hyperref}
 \newcommand{\transpose}{^\mathsf{T}}
 \DeclareMathOperator*{\argmax}{arg\,max}
 
@@ -143,7 +146,7 @@ lambda-calculus logical form), shallow semantic parsing captures relationships
 between pairs of words or concepts in a sentence, and has wide application for
 information extraction, knowledge base population, and question answering (among others).
 %The SemEval 2014 Shared Task 8 on Broad-Coverage Semantic Dependency
-%Parsing \cite{oepens_broad_2014} includes three different semantic
+%Parsing \citep{oepens_broad_2014} includes three different semantic
 %formalisms (\S\ref{s:formalisms}), which encourages finding features and methods
 %that are broadly applicable to semantic parsing, and discourages optimization
 %toward a single semantic representation.
@@ -151,7 +154,7 @@ information extraction, knowledge base population, and question answering (among
 %semantic analysis itself.
 
 We present here two systems that produce semantic dependency parses in the three formalisms of the SemEval 2014 Shared Task 8 on Broad-Coverage Semantic Dependency
-Parsing \cite{oepens_broad_2014}.  These systems generate parses by extracting
+Parsing \citep{oepens_broad_2014}.  These systems generate parses by extracting
 features for each potential dependency arc and learning a statistical model to
 discriminate between good arcs and bad;
 the first treats each labeled edge decision as an independent multiclass
@@ -173,11 +176,11 @@ three different semantic dependency formalisms.
 %The organizers of Shared Task 8 provided a corpus of English news text
 %drawn from the Penn Treebank, annotated according to three different semantic dependency formalisms.
 \emph{DM} is derived from LinGO English Resource Grammar (ERG)
-annotations in DeepBank \cite{flickinger_deepbank_2012}.
+annotations in DeepBank \citep{flickinger_deepbank_2012}.
 \emph{PAS} is derived from the Enju HPSG treebank using the
-conversion rules of \newcite{miyao_corpus_oriented_2004}.
+conversion rules of \citet{miyao_corpus_oriented_2004}.
 \emph{PCEDT} is derived from the tectogrammatical layer of the
-Prague Czech-English Dependency Treebank \cite{hajic_building_1998}.
+Prague Czech-English Dependency Treebank \citep{hajic_building_1998}.
 See Figure~\ref{fig:formalisms} for an example.
 \begin{figure}
 	\centering
@@ -246,7 +249,7 @@ edges in the graph.
 We use the same set of edge-factored features (\S\ref{s:features}) in two
 alternative models: an edge-independent multiclass logistic
 regression model (\logitedge, \S\ref{s:logitedge}); and a structured SVM 
-\cite{taskar_max_2003,tsochantaridis_support_2004} that enforces 
+\citep{taskar_max_2003,tsochantaridis_support_2004} that enforces 
 \emph{determinism} constraints which allow a word to
 have at most one outgoing edge with the
 same label (\svmedge, \S\ref{s:graphparser}).
@@ -303,8 +306,8 @@ parametrized by weights $\bm\phi$:
 \noindent
 $\bm\phi$ is learned by minimizing total negative log-likelihood of the above
 (with weighting; see below), plus $\ell_2$ regularization.
-AdaGrad \cite{duchi_adaptive_2011} is used for optimization.
-This seemed to optimize faster than L-BFGS \cite{Liu1989LBFGS}, at least for earlier
+AdaGrad \citep{duchi_adaptive_2011} is used for optimization.
+This seemed to optimize faster than L-BFGS \citep{Liu1989LBFGS}, at least for earlier
 iterations, though we did no systematic comparison. Stochastic gradient steps
 are applied one at a time from individual examples, and a gradient step for the
 regularizer is applied once per epoch.
@@ -393,7 +396,7 @@ be denoted $\bm{f}(x,y) = \sum_{(i,j,\ell) \in y}
 where $\mathit{cost}(y,y_i) = \alpha |y\setminus y_i| +
 \beta |y_i\setminus y|$.
 $\alpha$ and $\beta$ trade off between precision and recall for the
-edges \cite{gimpel_softmax-margin_2010}.
+edges \citep{gimpel_softmax-margin_2010}.
 The loss is minimized with AdaGrad
 using early-stopping on a development set. % Tops are predicted using the
 %top prediction model \S\ref{s:top_model}.
@@ -497,7 +500,7 @@ Fires for every integer between $1$ and $\lfloor \log(|i-j|+1)/\log(1.39)
   feature names to integer indices during feature extraction.
   For experimental expedience, we
   implemented multitask feature hashing
-  \cite{weinberger_feature_2009}, which hashes feature names to indices, under
+  \citep{weinberger_feature_2009}, which hashes feature names to indices, under
   the theory that errors due to collisions tend to cancel.  No
   drop in accuracy was observed.
 
@@ -524,7 +527,7 @@ Fires for every integer between $1$ and $\lfloor \log(|i-j|+1)/\log(1.39)
 % Tens of millions of features (before conjunction) resulted in several gigabytes of memory use.  To facilitate more convenient experimentation,
 % we eliminated this by using
 % multitask feature hashing
-% \cite{weinberger_feature_2009},
+% \citep{weinberger_feature_2009},
 % which randomly assigns features' numeric indices with a hash function.\footnote{We also tried replacing the hash table with a Patricia Tree, trying several open-source implementations; but they had worse memory usage than a GNU Trove hash table. 
 %   \codenote{\url{https://github.com/brendano/myutil/blob/0a5697a7f066c265a75ce1b7bd527feafa683c8a/src/vocabalts/vocabalts_results.txt}}}
 % Let $F$ be the space of all feature names (before conjunction with the output label).
@@ -546,7 +549,7 @@ Fires for every integer between $1$ and $\lfloor \log(|i-j|+1)/\log(1.39)
 % \]
 % This is easy to implement:
 % array lookups and gradient steps are simply implemented with $h$ instead of $g$, and feature vectors are also stored in a hashed space.
-% \cite{weinberger_feature_2009} show that, even with some collisions,
+% \citep{weinberger_feature_2009} show that, even with some collisions,
 % dot products are approximately preserved with high probability;
 % and indeed, we observed no drop in accuracy compared to using an explicit feature map.
 % We used a value of $B$ as large as was convenient for memory usage (due only to $h(\phi)$), $B=10^{8}$.
@@ -601,24 +604,24 @@ not exhaustive.  It may be that some of these features could help under more car
 \begin{framed}
 %\textbf{Bias:} Always fires.
 
-\textbf{Word vectors:} Features derived from 64-dimensional vectors from  \cite{wordVectors}, including the
-concatenation, difference, inner product, and element-wise multiplication of the two vectors associated with a parent-child edge. We also trained a random forest\footnote{Using \cite{RandomForest2002}'s \emph{randomForest} R implementation.} on the word vectors (using the vector elements as features to predict the observed semantic label); at test time, the predicted hard labels were incorporated as features.
+\textbf{Word vectors:} Features derived from 64-dimensional vectors from  \citep{wordVectors}, including the
+concatenation, difference, inner product, and element-wise multiplication of the two vectors associated with a parent-child edge. We also trained a random forest\footnote{Using \citeposs{RandomForest2002} \emph{randomForest} R implementation.} on the word vectors (using the vector elements as features to predict the observed semantic label); at test time, the predicted hard labels were incorporated as features.
 
-\textbf{Brown clusters} Features derived from Brown clusters \cite{Brown:1992:CNG:176313.176316}
+\textbf{Brown clusters} Features derived from Brown clusters \citep{Brown:1992:CNG:176313.176316}
 trained on a large corpus of web data. Parent, child, and conjoined parent-child
 edge features from cluster prefixes of length 2, 4, 6, 8, 10, and 12.
 Conjunctions of those features with the POS tags of the parent and child tokens.
 
 \textbf{Active/passive:} Active/passive voice feature
-(as in \newcite{johansson_dependency-based_2008}) conjoined with both the Linear
+(as in \citet{johansson_dependency-based_2008}) conjoined with both the Linear
 Distance features and the Subcategorization Sequence features.
 Voice information may already be captured by features from the Stanford
 dependency--style parses, which include passivization information in arc labels such as \emph{nsubjpass} and
-\emph{auxpass} \cite{Marneffe2008DepColing}.
+\emph{auxpass} \citep{Marneffe2008DepColing}.
 
 
 \textbf{Connectivity constraint:} Enforcing that the graph is connected (ignoring singletons), similar
-to \newcite{flanigan-etal:ACL2014}. Almost all semantic dependency graphs are connected (ignoring singletons) in the
+to \citet{flanigan-etal:ACL2014}. Almost all semantic dependency graphs are connected (ignoring singletons) in the
 training data, but we found that enforcing this constraint caused more edges to
 be predicted, significantly hurting performance.
 
@@ -733,7 +736,7 @@ There are a number of clear extensions to this work that could improve
 performance.
 While an edge-factored model allows for efficient inference, there is
 much to be gained from \textbf{higher-order features}
-\cite{mcdonald_online_2006,martins_turning_2013}.
+\citep{mcdonald_online_2006,martins_turning_2013}.
 The amount of information
 shared between the three formalisms suggests that a \textbf{multi-task learning} framework
 could lead to gains.
@@ -753,7 +756,7 @@ program, U.S.~NSF grants IIS-1251131 and IIS-1054319, and Google's
 support of the Reading is Believing project at CMU.
 
 
-\bibliographystyle{acl}
+\bibliographystyle{aclnat}
 \bibliography{semeval8,morebib}
 
 
