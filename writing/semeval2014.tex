@@ -320,7 +320,7 @@ like ``In the FFF formalism, the training set (\S\ref{s:evaluation}) contains NN
 candidate edges (pairs of tokens with length between 1 and 10 inclusive), and NNN actual (non-null) edges.''}
 We improved $F_1$ performance by
 downweighting $\noedge$ examples through a weighted log-likelihood objective,
-$\sum_{i,j} \sum_\ell w_\ell \log P(\ell \mid \bm\phi, x, i, j)$, 
+$\sum_{i,j} \sum_\ell w_\ell \log P(\ell\,|\,\bm\phi, x, i, j)$, 
 with $w_{\noedge}=0.3$ (selected on development set)
 and $w_{\ell} = 1$ otherwise.
 
@@ -341,7 +341,7 @@ If an edge is predicted for both directions for a single $(i,j)$
 pair, only the edge with the higher score is chosen.
 (There are no such bidirectional edges in the training data.)
 This post-processing actually did not improve accuracy on \DM\ or \PCEDT;
-it did improve \PAS\ by $\approx0.2\%$ absolute $F_1$, but we did not submit \logitedge\ for \PAS.
+it did improve \PAS\ by $\approx$0.2\% absolute $F_1$, but we did not submit \logitedge\ for \PAS.
 \codenote{\url{https://github.com/Noahs-ARK/semeval-2014/pull/21}}
 
 
