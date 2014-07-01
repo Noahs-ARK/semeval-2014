@@ -16,6 +16,7 @@
 %% and that of ACL 08 by Joakim Nivre and Noah Smith
 
 \documentclass[11pt]{article}
+\include{macros}
 \usepackage{semeval2014}
 \usepackage{natbib}
 \newcommand{\citeposs}[1]{\citeauthor{#1}'s (\citeyear{#1})}
@@ -36,6 +37,7 @@
 \usepackage{footnote}
 \usepackage{microtype}
 \usepackage[small,bf,skip=5pt]{caption}
+\usepackage[scaled=0.92]{helvet}
 
 \setitemize{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
 \setenumerate{noitemsep,topsep=10pt,parsep=0pt,partopsep=0pt}
@@ -175,11 +177,11 @@ The Shared Task 8 dataset consists of annotations of the Penn Treebank in
 three different semantic dependency formalisms.
 %The organizers of Shared Task 8 provided a corpus of English news text
 %drawn from the Penn Treebank, annotated according to three different semantic dependency formalisms.
-\emph{DM} is derived from LinGO English Resource Grammar (ERG)
+\DM\ is derived from LinGO English Resource Grammar (ERG)
 annotations in DeepBank \citep{flickinger_deepbank_2012}.
-\emph{PAS} is derived from the Enju HPSG treebank using the
+\PAS\ is derived from the Enju HPSG treebank using the
 conversion rules of \citet{miyao_corpus_oriented_2004}.
-\emph{PCEDT} is derived from the tectogrammatical layer of the
+\PCEDT\ is derived from the tectogrammatical layer of the
 Prague Czech-English Dependency Treebank \citep{hajic_building_1998}.
 See Figure~\ref{fig:formalisms} for an example.
 \begin{figure}
@@ -187,8 +189,8 @@ See Figure~\ref{fig:formalisms} for an example.
 		\includegraphics[width=.5\textwidth]{fig/example_dm} \\
 		\includegraphics[width=.5\textwidth]{fig/example_pas} \\
 		\includegraphics[width=.5\textwidth]{fig/example_pcedt}
-	\caption{Example annotations for \emph{DM} (top), \emph{PAS}
-          (middle), and \emph{PCEDT} (bottom).}
+	\caption{Example annotations for \DM\ (top), \PAS\ 
+          (middle), and \PCEDT\ (bottom).}
 	\label{fig:formalisms}
 \end{figure}
 
@@ -235,9 +237,9 @@ part-of-speech tag.
 If the classifier predicts a probability of 99\% or higher 
 the token is pruned; this removes around 10\% of tokens.
 (The classifier performs differently on different formalisms;
-on \emph{PAS} it has perfect accuracy, 
+on \PAS\ it has perfect accuracy, 
 while on
-\emph{DM} and \emph{PCEDT} accuracy is in the mid-90's.)
+\DM\ and \PCEDT\ accuracy is in the mid-90's.)
 
 
 
@@ -256,8 +258,8 @@ same label (\svmedge, \S\ref{s:graphparser}).
 For each formalism, we trained both models with varying features enabled and
 hyperparameter settings and submitted the configuration that produced the best
 labeled $F_1$ on the development set.
-For \emph{DM} and \emph{PCEDT}, this was \logitedge;
-for \emph{PAS}, this was \svmedge.
+For \DM\ and \PCEDT, this was \logitedge;
+for \PAS, this was \svmedge.
 We report results only for the submitted configurations, with different features
 enabled.
 Due to time constraints, full hyperparameter sweeps and comparable feature sweeps were not possible.
@@ -338,8 +340,8 @@ unpruned tokens.
 If an edge is predicted for both directions for a single $(i,j)$
 pair, only the edge with the higher score is chosen.
 (There are no such bidirectional edges in the training data.)
-This post-processing actually did not improve accuracy on \emph{DM} or \emph{PCEDT};
-it did improve \emph{PAS} by $\approx0.2\%$ absolute $F_1$, but we did not submit \logitedge\ for \emph{PAS}.
+This post-processing actually did not improve accuracy on \DM\ or \PCEDT;
+it did improve \PAS\ by $\approx0.2\%$ absolute $F_1$, but we did not submit \logitedge\ for \PAS.
 \codenote{\url{https://github.com/Noahs-ARK/semeval-2014/pull/21}}
 
 
@@ -352,18 +354,18 @@ In the \svmedge~model, we use a structured SVM
 with a determinism constraint.
 This constraint ensures that each word token has at most one outgoing edge for
 each label in a set of deterministic labels $L_d$.
-For example, in \emph{DM} a predicate never has more than one child with edge
+For example, in \DM\ a predicate never has more than one child with edge
 label ``ARG1.''
  $L_d$ was chosen to be the set of edges that were $> 99.9\%$
 deterministic in the training data.\footnote{
 By this we mean that of the nodes that have at least one
 outgoing $\ell$ edge, $99.9\%$ of them have only one outgoing $\ell$ edge.
-For \emph{DM}, $L_d=L \setminus$\{``\_and\_c,'' ``\_or\_c,'' ``\_then\_c,''
+For \DM, $L_d=L \setminus$\{``\_and\_c,'' ``\_or\_c,'' ``\_then\_c,''
 ``loc,'' ``mwe,'' ``subord''\};
-for \emph{PAS}, $L_d = L$;
-and for \emph{PCEDT}, $L_d=$\{``DPHR,'' ``INTF,''  ``VOCAT''\}.}
+for \PAS, $L_d = L$;
+and for \PCEDT, $L_d=$\{``DPHR,'' ``INTF,''  ``VOCAT''\}.}
 %We found this contraint improved the $F_1$-score for the
-%\emph{PAS} formalism only.
+%\PAS\ formalism only.
 
 Consider the fully dense graph of all edges between all words predicted
 as not singletons by the singleton classifier \S\ref{s:singleton_model} (in all
@@ -572,7 +574,7 @@ are possible candidates to be ``top'';
 the classifier probabilities are evaluated, and the highest-scoring node is
 chosen to be ``top.''
 \codenote{LogitEdge: MyGraph::decideTops()}
-This is suboptimal, since some graphs have multiple tops (in \emph{PCEDT} this is
+This is suboptimal, since some graphs have multiple tops (in \PCEDT\ this is
 more common);
 but selection rules based on probability thresholds gave worse $F_1$
 performance on the dev set. \codenote{\url{https://github.com/Noahs-ARK/semeval-2014/issues/37}}
@@ -654,10 +656,10 @@ be predicted, significantly hurting performance.
 \label{s:evaluation}
 
 We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (\S 20), training on \S 00--19.
-We evaluate labeled precision (LP), labeled recall (LR), labeled $F_1$ (LF), and
-labeled whole-sentence match (LM) on the held-out test data using the
+We evaluate labeled precision (\LP), labeled recall (\LR), labeled $F_1$ (\LF),
+and labeled whole-sentence match (\LM) on the held-out test data using the
 evaluation script provided by the organizers. 
-LF was averaged over the formalisms to determine the winning system.
+\LF\ was averaged over the formalisms to determine the winning system.
 Table~\ref{table:perf} shows our scores.
 
 % CMU:
@@ -706,20 +708,20 @@ Table~\ref{table:perf} shows our scores.
 \begin{tabular}%{\textwidth}%{.6\textwidth}
 {@{\extracolsep{\fill}}c|cccc}%|c|c|c|c|c|c|}
 % \hline
-& \textbf{LP} & \textbf{LR} & \textbf{LF} & \textbf{LM} \\
+& \textbf{\LP} & \textbf{\LR} & \textbf{\LF} & \textbf{\LM} \\
 \hline
-\textbf{DM}
+\textbf{\DM}
 & 0.8446 & 0.8348 & 0.8397 & 0.0875 \\
-\textbf{PAS}
+\textbf{\PAS}
 & 0.9078 & 0.8851 & 0.8963 & 0.2604 \\
-\textbf{PCEDT}
+\textbf{\PCEDT}
 & 0.7681 & 0.7072 & 0.7364 & 0.0712 \\
 \hline
 \textbf{Average}
 & 0.8402 & 0.8090 & 0.8241 & 0.1397 \\
 \end{tabular}
-\caption{Labeled precision (LP), recall (LR), $F_1$ (LF), and
-whole-sentence match (LM) on the held-out test data.
+\caption{Labeled precision (\LP), recall (\LR), $F_1$ (\LF), and
+whole-sentence match (\LM) on the held-out test data.
 }
 \label{table:perf}
 \end{table}
