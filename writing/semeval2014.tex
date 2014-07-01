@@ -606,7 +606,11 @@ not exhaustive.  It may be that some of these features could help under more car
 %\textbf{Bias:} Always fires.
 
 \textbf{Word vectors:} Features derived from 64-dimensional vectors from  \citep{wordVectors}, including the
-concatenation, difference, inner product, and element-wise multiplication of the two vectors associated with a parent-child edge. We also trained a random forest\footnote{Using \citeposs{RandomForest2002} \emph{randomForest} R implementation.} on the word vectors (using the vector elements as features to predict the observed semantic label); at test time, the predicted hard labels were incorporated as features.
+concatenation, difference, inner product, and element-wise multiplication of
+the two vectors associated with a parent-child edge. We also trained a Random
+Forest on the word vectors using \citeposs{RandomForest2002} \emph{R}
+implementation.
+The predicted labels were then used as features in \logitedge.
 
 \textbf{Brown clusters} Features derived from Brown clusters \citep{Brown:1992:CNG:176313.176316}
 trained on a large corpus of web data. Parent, child, and conjoined parent-child
@@ -622,9 +626,9 @@ dependency--style parses, which include passivization information in arc labels 
 
 
 \textbf{Connectivity constraint:} Enforcing that the graph is connected (ignoring singletons), similar
-to \citet{flanigan-etal:ACL2014}. Almost all semantic dependency graphs are connected (ignoring singletons) in the
-training data, but we found that enforcing this constraint caused more edges to
-be predicted, significantly hurting performance.
+to \citet{flanigan-etal:ACL2014}. Almost all semantic dependency graphs in the
+training data are connected (ignoring singletons), but we found that enforcing
+this constraint significantly hurt precision.
 
 \textbf{Tree constraint:} Enforces that the graph is a tree. Unsurprisingly, we found that enforcing a tree constraint hurt performance.
 
