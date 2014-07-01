@@ -659,7 +659,7 @@ this constraint significantly hurt precision.
 \section{Experimental Setup}
 \label{s:evaluation}
 
-We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (\S 20), training on \S 00--19.
+We participated in the Open Track, and used the syntactic dependency parses supplied by the organizers.  Feature engineering was performed on a development set (\S 20), training on \S\S 00--19.
 We evaluate labeled precision (\LP), labeled recall (\LR), labeled $F_1$ (\LF),
 and labeled whole-sentence match (\LM) on the held-out test data using the
 evaluation script provided by the organizers. 
@@ -744,7 +744,7 @@ much to be gained from \textbf{higher-order features}
 \citep{mcdonald_online_2006,martins_turning_2013}.
 The amount of information
 shared between the three formalisms suggests that a \textbf{multi-task learning}
-\cite{evgeniou_regularized_2004} framework could lead to gains.
+\citep{evgeniou_regularized_2004} framework could lead to gains.
 And finally, there is additional structure in the formalisms which could be
 exploited (such as the deterministic processes by which an original PCEDT tree annotation was converted into a graph); formulating more subtle \textbf{graph constraints} that are able to capture this a priori
 knowledge of the graph structure could lead to improved performance.  We leave such explorations to future work.
