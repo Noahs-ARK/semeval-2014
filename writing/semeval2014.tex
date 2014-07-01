@@ -251,10 +251,10 @@ edges in the graph.
 We use the same set of edge-factored features (\S\ref{s:features}) in two
 alternative models: an edge-independent multiclass logistic
 regression model (\logitedge, \S\ref{s:logitedge}); and a structured SVM 
-\citep{taskar_max_2003,tsochantaridis_support_2004} that enforces 
-\emph{determinism} constraints which allow a word to
-have at most one outgoing edge with the
-same label (\svmedge, \S\ref{s:graphparser}).
+\citep{taskar_max_2003,tsochantaridis_support_2004} that enforces a
+\emph{determinism} constraint for certain labels, which allows each word to
+have at most one outgoing edge with that label (\svmedge,
+\S\ref{s:graphparser}).
 For each formalism, we trained both models with varying features enabled and
 hyperparameter settings and submitted the configuration that produced the best
 labeled $F_1$ on the development set.
