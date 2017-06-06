@@ -1,4 +1,4 @@
-Copyright (c) 2014, Jeffrey Flanigan
+Copyright (c) 2014, Jeff Flanigan, Sam Thomson, Brendan O'Connor, David Bamman, Jesse Dodge, Swabha Swayamdipta, Nathan Schneider
 All rights reserved.
 
 Individual files within this source code may contain additional copyright notices.
