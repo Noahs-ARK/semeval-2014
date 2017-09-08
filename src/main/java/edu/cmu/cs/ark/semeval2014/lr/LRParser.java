@@ -6,15 +6,14 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import edu.cmu.cs.ark.semeval2014.ParallelParser;
+import edu.cmu.cs.ark.semeval2014.common.ConstitLoader;
+import edu.cmu.cs.ark.semeval2014.common.ConstitTree;
 import edu.cmu.cs.ark.semeval2014.common.InputAnnotatedSentence;
 import edu.cmu.cs.ark.semeval2014.lr.fe.*;
 import edu.cmu.cs.ark.semeval2014.prune.Prune;
 import edu.cmu.cs.ark.semeval2014.topness.TopClassifier;
 import edu.cmu.cs.ark.semeval2014.util.GenerateGraphsAndVocab;
 import edu.cmu.cs.ark.semeval2014.utils.Corpus;
-import sdp.graph.Edge;
-import sdp.graph.Graph;
-import sdp.io.GraphReader;
 import util.U;
 import util.Vocabulary;
 import util.misc.Pair;
@@ -23,9 +22,9 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static edu.cmu.cs.ark.semeval2014.lr.fe.BasicLabelFeatures.*;
 
@@ -114,6 +113,8 @@ public class LRParser {
     static String sdpFile;
     @Parameter(names="-depInput", required=true)
 	static String depFile;
+    @Parameter(names="-sexprInput", required=false)
+    static String sexprFile;
     
     static long numPairs = 0, numTokens = 0, numTokenPrunes = 0, numCorrectTokenPrunes = 0; // purely for diagnosis
 
@@ -133,6 +134,10 @@ public class LRParser {
 		inputSentences = Corpus.getInputAnnotatedSentences(depFile);
 		U.pf("%d input sentences\n", inputSentences.length);
 		setSentenceIndexOrder();
+		
+		if (sexprFile != null) {
+			loadConstitTreesAndIntoInputSentences();
+		}
 
 		preprocessor = new Prune(inputSentences, modelFile);
 		
@@ -160,6 +165,18 @@ public class LRParser {
 		preprocessor.loadModels();
 		preprocessor.predictIntoInputs();
 		diagnosePruning();
+	}
+	
+	private static void loadConstitTreesAndIntoInputSentences() {
+		Map<String,ConstitTree> sentid2tree = ConstitLoader.loadSexprFile(sexprFile);
+		for (InputAnnotatedSentence sent : inputSentences) {
+			if ( ! sentid2tree.containsKey(sent.sentenceId)) {
+				U.pf("Warning: sentence %s does not have a sexpr\n", sent.sentenceId);
+			}
+			else {
+				sent.constitTree = sentid2tree.get(sent.sentenceId);
+			}
+		}
 	}
 	
 	static void setDefaultNoedgeWeights() {
@@ -615,7 +632,7 @@ public class LRParser {
 		allFE.add(new DependencyPathv1());
 		allFE.add(new SubcatSequenceFE());
 		allFE.add(new UnlabeledDepFE());
-		
+		allFE.add(new ConstitFE());
 //		allFE.add(new PruneFeatsForSemparser());
 		return allFE;
 	}

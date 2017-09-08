@@ -41,7 +41,7 @@ case class DependencyParse(deps: Array[SyntacticDependency]) {
   }
 }
 object DependencyParse {
-  private def longestCommonPrefixLength[T](s1: Seq[T], s2: Seq[T]) : Int = {
+  def longestCommonPrefixLength[T](s1: Seq[T], s2: Seq[T]) : Int = {
     // from http://stackoverflow.com/questions/8104479/how-to-find-the-longest-common-prefix-of-two-strings-in-scala
     val maxSize = min(s1.size, s2.size)
     var i = 0
